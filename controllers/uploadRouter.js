@@ -16,6 +16,7 @@ function fileRef(fname) {
 function debugLog(text) {
     if (debug) console.log(text);
 }
+//console.log("uploadRouter loaded");
 module.exports = function (dir, app) {
 
     app.use(express.static(path.join(dir, '/public')));
@@ -23,19 +24,19 @@ module.exports = function (dir, app) {
     app.use(bodyParser.urlencoded({ extended: true }));
     //debugLog("using dir " + dir);
     // main page 
+	/*
     app.get('/', (req, res) => {
         //debugLog("controllers/uploadRouter.js");
         res.sendFile(dir + '/fileinput3.html');
     });
-    
-    app.put('/move1/', (req, res) => {
+    */
+    app.put('/movefiles/', (req, res) => {
         
         var fname = req.body.fname;
        
-        
         var from = path.join(dir, uploadDir, fname).replace(/\//, "\\");
         var to   = path.join(dir, targetDir, fname).replace(/\//, "\\");
-        debugLog("move1 from " + from);
+        debugLog("movefiles from " + from);
         
         fs.move(from, to).then(
             () => res.json({"moved 1 file": fname}),
@@ -44,7 +45,7 @@ module.exports = function (dir, app) {
                 debugLog("move error "+error.message);
                 return res.json({error:error.message});
             }).catch(function () {
-                   console.log("Move1 Promise Rejected");
+                   console.log("movefiles Promise Rejected");
               });
     });
 

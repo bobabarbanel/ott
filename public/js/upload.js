@@ -30,6 +30,8 @@ $(function () {
             console.log("getScript " + "Triggered ajaxError handler.");
         });
 
+        
+
 });
 
 
@@ -197,9 +199,15 @@ function doRows(specs, turret, spindle, table, haves) {
 
         // Files Uploading Actuator
         td = $('<td/>');
-        var u_input = $('<input type="file" name="files[]" multiple/>');
+        var u_input = $('<input class=".fileupload" type="file" name="files[]" multiple/>');
 
         u_input.attr("id", inputStr(t, s, "upload"));
+        u_input.on("change", function() {
+            var idFields = $(this).attr("id").split("_");
+            var func   = $("#"+inputStr(idFields[1], idFields[2], "function")).val();
+            var type   = $("#"+inputStr(idFields[1], idFields[2], "type")).val();
+            console.log("fileupload change " + $(this).attr("id") + " " + func + " " + type);
+        });
 
         // inputs[inputStr(t, s, "upload")] = u_input;
         u_input.parent().addClass("disabled");

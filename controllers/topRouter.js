@@ -4,21 +4,12 @@ const path         = require('path');
 const express      = require('express');
 const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
-const upload       = require('jquery-file-upload-middleware');
 
-// configure upload middleware
-    upload.configure({
-        uploadDir: __dirname + '/public/uploads',
-        uploadUrl: '/uploads',
-        imageVersions: {
-            thumbnail: {
-                width: 80,
-                height: 80
-            }
-        }
-    });
+
+
 const COOKIE      = 'chosenCookie';
 module.exports = function(dir, app, db) {
+	const upload = require('./uploadRouter')(dir,app);
 	var data;
 	
 
@@ -27,7 +18,6 @@ module.exports = function(dir, app, db) {
 	app.use(bodyParser.urlencoded({extended: true}));
 	app.use(cookieParser());
 
-	app.get('/upload', upload.fileHandler()); //RMA
 	
 	// main page 
 	app.get('/', (req, res) => {
@@ -69,13 +59,13 @@ module.exports = function(dir, app, db) {
 	});
 
 	app.get('/machine/:mnum', (req, res) => {
-		console.log(req.params.mnum);
+		//console.log(req.params.mnum);
 		var query = {"machines": req.params.mnum};
-		console.log('/machine/:mnum ' + req.params.mnum);
+		//console.log('/machine/:mnum ' + req.params.mnum);
 		db.collection('machineSpecs').findOne( query, {"_id":0, "machines":0} ).then(
 								doc => 
 									{
-										console.log(doc);
+										//console.log(doc);
 										res.json(doc);
 									},
 								err => {
@@ -105,6 +95,7 @@ module.exports = function(dir, app, db) {
 		);
 		return;
 	});
+	/*
 	app.post('/imageComment', (req, res) => {	
 		//console.log("/imageComment " + req.body.dir);
 		//console.log("/imageComment " + req.body.filename);
@@ -114,7 +105,8 @@ module.exports = function(dir, app, db) {
 			//console.log("/imageComment " + result.comment);
 			res.send(result.comment);
 		});
-    });
+	});
+	*/
 	app.post('/addkey', (req, res) => {	
 		
 		db.collection('main').insertOne(req.body).then(
@@ -128,9 +120,9 @@ module.exports = function(dir, app, db) {
 		
     });
 	app.post('/sheetTags', (req, res) => {	
-		console.log("/sheetTags post " + JSON.stringify(req.body));
+		//console.log("/sheetTags post " + JSON.stringify(req.body));
 
-		console.log("/sheetTags parameters " + req.body.key + " : : " + req.body.tab + " : : " + req.body.files);
+		//console.log("/sheetTags parameters " + req.body.key + " : : " + req.body.tab + " : : " + req.body.files);
 		
 		var key4 = [req.body.key.dept,req.body.key.partId,req.body.key.op,req.body.key.machine].join("|");
 		var includeFiles = req.body.files;
@@ -164,7 +156,7 @@ module.exports = function(dir, app, db) {
 
 	// do Mongo query
 	app.get('/parts', (req, res) => {
-		console.log("/parts");
+		//console.log("/parts");
 
 		data = [];
 		// project out the ids
