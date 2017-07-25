@@ -1,0 +1,16 @@
+
+
+#tabs [aria-controls="tabs-1"] {
+		background: green !important;
+}
+
+
+#tabs {
+    
+}
+#tabs ul li {
+    display: inline-block;
+    margin: 0 0 0 60px;
+    font-size: .70em;
+}
+

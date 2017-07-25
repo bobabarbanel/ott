@@ -1,0 +1,32 @@
+{ 
+    "machines": ["LC40-2A","SL40B", "NL3000"],
+    "Turret1" : { "range": [1,12] ,
+		  "Spindle1": [1,12] } 
+
+}
+
+{ 
+    "machines" : ["ZL253-1",  "ZL253-2"],
+    "Turret1" : {"range": [1,10] ,
+		  "Spindle1": [1,10]},
+    "Turret2" : {"range": [1,8] ,
+		  "Spindle1": [1,8]}  
+
+}
+{ 
+    "machines" : [ "LU35-4A", "LC40-4A"],
+    "Turret1" :  { "range": [1,12] ,
+		  "Spindle1": [1,12] },
+    "Turret2" : { "range": [1,8] ,
+		  "Spindle1": [1,8] }  
+
+}
+
+
+{ 
+    "machines" : ["NLX2500", "NLX1500",  "NL2500", "NL1500"],
+    "Turret1" : { "range": [1,12] ,
+		  "Spindle1": [1,12],
+		  "Spindle2": [17,28]
+		}
+}

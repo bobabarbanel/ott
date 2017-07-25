@@ -1,0 +1,15 @@
+Notes 5/19
+Turrets and Spindles by numbers
+Setup clicks to tool images
+Get dates from images
+
+
+function urlDate(U) {
+    var X = !window.XMLHttpRequest ? new ActiveXObject('Microsoft.XMLHTTP') : new XMLHttpRequest;
+    X.open('GET', U, false);
+   try{ X.send();}catch(y){}
+  var dt=X.getResponseHeader("Last-Modified");
+  return dt ? new Date(dt).toString() : new Date(1970,0,0);
+}
+
+urlDate("http://www.webdeveloper.com/forum/images/statusicon/user_offline.gif")

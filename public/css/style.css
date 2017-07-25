@@ -1,0 +1,105 @@
+body {
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center; 
+}
+.chosen-container {
+	font-size: 16px;
+}
+#error {
+	font-size: 32px;
+	color: red;
+}
+
+div a.chosen-single:not(.chosen-default) {
+	background: pink;
+}
+div a.chosen-single:not(.chosen-default) span{
+	color: black;
+}
+a.chosen-single:not(.chosen-default) span{
+	color: white;
+	font-weight: bold;
+	background-color: inherit;
+}
+
+.chosen-container .chosen-drop {
+	background-color: #eef;
+}
+.chosen-container-single .chosen-single {
+	border: 2px solid blue;
+	height: 32px;
+}	
+.chosen-disabled .chosen-single {
+  opacity: 0.8 !important;
+  cursor: default;
+}
+
+#container div{
+	display: inline-block;
+	margin-left: 5px;
+}
+#container .horiz {
+	display: inline-block;
+}
+#container label {
+	margin-left: 10px;
+}
+#buttons {
+	display: inline-block;
+}
+.action {
+	margin-left: 40px;
+}
+#run {
+	background: blue;
+	color: white;
+}
+#dataTable {
+	width: 900px;
+	margin: 70px auto;
+	font-size: 16px;
+}
+
+
+.counter {
+	float: left;
+	font-weight: bold;
+}
+.tabulator-col-content {
+	background: lightgreen;
+	color: black;
+	text-align: center;
+	font-weight: bold;
+}
+.tabulator .tabulator-tableHolder .tabulator-table .tabulator-row .tabulator-cell.partIdCol,
+.tabulator .tabulator-tableHolder .tabulator-table .tabulator-row .tabulator-cell.machineCol {
+	padding-left:20px
+} 
+
+#new_key_input {
+	width: 60%;
+
+}
+#new_key_input tr th {
+	text-align: right;
+	width: 180px;
+}
+
+
+#insertNotice {
+	margin-left:100px;
+	color: white;
+	width: 400px;
+	display: none;
+	font-size: 2em;
+	text-align: center;
+}
+
+#machine_warning {
+	width: 260px;
+	color: red;
+}
+
+
+	

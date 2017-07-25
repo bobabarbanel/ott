@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>General</title>
+
+    <script src="./public/js/jquery-2.2.4.min.js"></script>
+<style>
+#file-input {
+  cursor: pointer;
+  outline: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  filter: alpha(opacity=0); /* IE < 9 */
+  opacity: 0;
+}
+.input-label {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+    </style
+
+</head>
+
+<body>
+<label for="file-input" class="input-label">
+  Click Me <!-- Replace with whatever text or icon you wish to use -->
+  <input type="file" id="file-input">
+</label>
+<!--a href="#">New File</a -->
+<script>
+$("#file-input").on('change', function() {
+        alert($(this).val());
+    });
+/*$(function () {
+    $("a").click(function() {
+        var input = $(document.createElement('input')); 
+        $(this).attr('id', 'fileid');
+        input.attr("type", "file");
+        input.trigger('click');
+        return false;
+    });
+    $("#fileid").on('change', function() {
+        alert('change');
+    });
+});*/
+</script>
+</body>
+
+</html>
+

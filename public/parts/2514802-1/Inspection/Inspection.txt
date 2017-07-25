@@ -1,0 +1,19 @@
+1. Chamfer 45' x 3.855 Dia
+2. Turn 3.955/3.957 Dia.
+3. Drill and Bore 2.200 Dia. +/- .0015 (Hold For Tooling)
+4. Bore 2.560 Dia
+	4a. X 360 Deep
+5. Chamfer I.D. 2.760 Dia
+6. Part-Off .510 Long
+
+Inspection Tools (we need to talk about how we go about this set up) [also need to talk about the pictures, we shouldn't need to take a pic of calipers or micrometers every time or even the chamfer gage {or maybe we do?} that could be standard, but we need a pic of the Hone Gage at it's setting...Or Do we ? maybe not]
+	 -All these pics could probably be standard since we will have unique pics at the top section.
+1. Calipers (any...0-6 would be standard I suppose, but min 0-4 [if they make that?])
+2. 0-1 Micrometers
+3. 3-4 Micrometers
+4. 2-3 0-90 Degree Chamfer Gage
+5. Hone Gage set to 2.201 (+.0005 -.0025)
+6. Depth Micrometers (any min 0-1, probably standard 0-6 I think)
+
+All pics (Do we need this?)
+1. All inspection items.

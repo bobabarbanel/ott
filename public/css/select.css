@@ -1,0 +1,19 @@
+select {
+  font: 400 12px/1.3 "Helvetica Neue", sans-serif;
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid hotpink;
+  line-height: 1;
+  outline: 0;
+  color: hotpink;
+  border-color: hotpink;
+  padding: 0.65em 2.5em 0.55em 0.75em;
+  border-radius: 3px;
+  background: linear-gradient(hotpink, hotpink) no-repeat,
+              linear-gradient(-135deg, rgba(255,255,255,0) 50%, white 50%) no-repeat,
+              linear-gradient(-225deg, rgba(255,255,255,0) 50%, white 50%) no-repeat,
+              linear-gradient(hotpink, hotpink) no-repeat;
+  background-color: white;
+  background-size: 1px 100%, 20px 20px, 20px 20px, 20px 60%;
+  background-position: right 20px center, right bottom, right bottom, right bottom;   
+}

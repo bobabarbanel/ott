@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>General</title>
+
+    <script src="./public/js/jquery-2.2.4.min.js"></script>
+<style>
+#fileInput{opacity:0}  
+body{
+    background:cadetblue;
+}
+    </style
+
+</head>
+
+<body>
+   <input id="fileupload" type="file" name="files[]" data-url="/upload" multiple>
+   <script>$('#fileupload').fileupload({ dataType: 'json' })</script>
+
+<script>
+$("#fileInput").on('change', function() {
+        alert(document.getElementById("fileInput").files);
+    });
+
+</script>
+</body>
+
+</html>
+

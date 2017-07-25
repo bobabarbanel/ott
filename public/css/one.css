@@ -1,0 +1,48 @@
+body{
+    background:cadetblue;
+}
+
+
+content {
+	position: absolute;
+	left: 20px;
+	top: 150px;
+    width: 80%;
+}
+#setup { /* a table */
+    width: 50%;
+    border-collapse: collapse;
+}
+table, th, td {
+   border: 1px solid black;
+   text-align: center;
+}
+.left {
+    text-align: center;
+    width: 20px;
+}
+.digit {
+    text-align: center;
+    width: 70px;
+}
+tr.colnames {
+    background-color: lightgreen;
+}
+tr.greyrow {
+    background-color: grey;
+}
+tr.greyrow th {
+    color: white;
+    width: 100px;
+}
+
+tr.slightgrey {
+    background-color: #EEEEEE;
+}
+
+tr.nogrey {
+    background-color: white;
+}
+td.left a:link {
+    text-decoration: none;
+}

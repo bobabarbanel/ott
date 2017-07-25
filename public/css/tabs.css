@@ -1,0 +1,65 @@
+tabs-nohdr { 
+    padding: 0px; 
+    background: none; 
+    border-width: 0px; 
+} 
+tabs-nohdr .ui-tabs-nav { 
+    padding-left: 0px; 
+    background: transparent; 
+    border-width: 0px 0px 1px 0px; 
+    -moz-border-radius: 0px; 
+    -webkit-border-radius: 0px; 
+    border-radius: 0px; 
+} 
+tabs-nohdr .ui-tabs-panel { 
+    background: #f5f3e5 url(http://code.jquery.com/ui/1.8.23/themes/south-street/images/ui-bg_highlight-hard_100_f5f3e5_1x100.png) repeat-x scroll 50% top;
+    border-width: 0px 1px 1px 1px; 
+}
+
+#tabs [aria-controls="tabs-1"] {
+		background: green !important;
+}
+
+#mainmenu {
+	background: white;
+}
+
+nav {
+	position: fixed;
+	left: 20px;
+	top: 10%;
+	background: lightblue;
+}
+#tabs-2 {
+	margin-left: 120px;
+}
+content {
+	
+}
+pictures {
+	float: left;
+	width: 40%;
+}
+single {
+	/*float: right;*/
+	margin-left: 30px;
+	/*margin-right: 80px;*/
+	/*position: fixed;
+	right: 80px;
+	top: 10%;
+	width: 60%;*/
+}
+
+.sheet {
+	width: 80%;
+	margin: 0 auto;
+}
+.pic {
+	maximum-width: 15%;
+	margin-right: 300px;
+	background-color: white;
+	color: #222;
+}
+#large {
+	width: 60%;
+}

@@ -1,0 +1,65 @@
+body{
+    background:cadetblue;
+}
+
+content {
+	position: absolute;
+	left: 20px;
+	top: 20px;
+    width: 80%;
+}
+#setup { /* a table */
+    width: 60%;
+    border-collapse: collapse;
+}
+table, th, td {
+   border: 1px solid black;
+   text-align: center;
+}
+
+.digit {
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+tr.sep {
+    height: 0.5em;
+    background-color: palevioletred;
+}
+tr.colnames {
+    background-color: lightgreen;
+}
+tr.greyrow {
+    background-color: grey;
+}
+tr.greyrow th {
+    color: white;
+    width: 200px;
+    /*border: solid blue 5px; */
+}
+
+tr.spaced {
+    background-color: white;
+}
+input.noval {
+    background-color: lightyellow;
+}
+input {
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+.ibutton {
+    margin: .5em;
+}
+td.enabled { /* will be flashed to show change */
+    background-color: yellow;
+}
+td.disabled { /* will be flashed to show change */
+    background-color: pink;
+}
+.colT, .colS {
+    width: 200px;
+}
+
+
+

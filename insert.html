@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+      <script src="/js/jquery-2.2.4.min.js"></script>
+      <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+      <link rel="stylesheet" type="text/css" href="/css/style.css">
+      <script src="/js/chosen.jquery.js"></script>
+      <link rel="stylesheet" type="text/css" href="/css/chosen.css">
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.2.3/jquery-confirm.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.2.3/jquery-confirm.min.js"></script>
+
+      <title>Insert New Tuple</title>
+   </head>
+   <body>
+  
+       <div id="container"> 
+
+      <div class="horiz">
+          <a href="#"><img src="/images/Ott.jpg"></a>
+        <div style="background-color:blue">
+
+          <h1>Enter a New Identifier</h1>
+      </div>
+      
+      <table id="new_key_input">
+         <!-- partId -->
+         <tr>
+            <th>Part Number</th>
+            <td><input type="text"  id="partId_new" value=""></input></td>
+            <td>
+               <select id="partId_select" data-placeholder="Select a Part..." class="chooser chosen-partId">
+                  <option value=""></option>
+               </select>
+            </td>
+            
+         </tr>
+         <!-- pName -->
+         <tr>
+            <th>Part Name</th>
+            <td> <input type="text"  id="pName_new" value=""></input></td>
+            <td>
+               <select id="pName_select" data-placeholder="Select a Name..." class="chooser chosen-pName">
+                  <option value=""></option>
+               </select>
+            </td>
+            
+         </tr>
+         <!-- dept -->
+         <tr>
+            <th>Department</th>
+            <td><input type="text"  id="dept_new" value=""></input></td>
+            <td>
+               <select id="dept_select" data-placeholder="Select a Department..." class="chooser chosen-dept">
+                  <option value=""></option>
+               </select>
+            </td>
+            
+         </tr>
+         <!-- op -->
+         <tr>
+            <th>Operation</th>
+            <td><input type="text"  id="op_new" value=""></input></td>
+            <td>
+               <select id="op_select" data-placeholder="Select an Operation..." class="chooser chosen-op">
+                  <option value=""></option>
+               </select>
+            </td>
+           
+         </tr>
+         <!-- machine -->
+         <tr>
+            <th>Machine</th>
+            <td><input type="text"  id="machine_new" value=""></input></td>
+            <td>
+               <select id="machine_select" data-placeholder="Select a Machine..." class="chooser chosen-machine">
+                  <option value=""></option>
+               </select>
+            </td>
+            
+         </tr>
+      </table>
+      <br/>
+      <div id="buttons">
+         <button id="reset" class="action" type="button">Reset</button>
+         <button id="submit" class="action" type="button">&nbsp;&nbsp;Submit&nbsp;&nbsp;</button>
+      </div>
+      </div>
+      <p id="insertNotice"></p>
+
+      <script src="/js/app_insert.js"></script>
+   </body>
+</html>

@@ -1,0 +1,31 @@
+var cursor = db.item.aggregate(
+
+	// Pipeline
+	[
+		// Stage 1
+		{
+			$match: {
+			
+			}
+		},
+
+		// Stage 2
+		{
+			$group: {
+				_id: { category: "$category" },
+				total: { $sum: 1 }
+			}
+		},
+
+		// Stage 3
+		{
+			$sort: {
+				"_id.category" : 1 
+			}
+		},
+
+	]
+
+
+
+);
