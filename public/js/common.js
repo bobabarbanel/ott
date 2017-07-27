@@ -1,5 +1,5 @@
 "use strict";
-/*exported cookieValue,getSpec,getParsedCookie,readCookie,setThisTab */
+/*exported cookieValue,getSpec,getParsedCookie,readCookie,setThisTab,getKey4 */
 // common.js
 var cookieValue;
 function getSpec(machine) {
@@ -39,4 +39,9 @@ function setThisTab(which) {
     //console.log("setThisTab(" + which + ")");
     $(".w3-bar a").addClass("w3-bar-item w3-button w3-hover-blue w3-padding-8 w3-border");
     $("#t" + which).removeClass("w3-hover-blue").addClass("w3-green");
+}
+
+function getKey4(){
+    let c = getParsedCookie();
+    return [c.dept,c.partId,c.op,c.machine].join("|");
 }

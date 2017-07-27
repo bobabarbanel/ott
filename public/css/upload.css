@@ -60,6 +60,23 @@ td.disabled { /* will be flashed to show change */
 .colT, .colS {
     width: 200px;
 }
+/* HOVER STYLES */
+div#pop-up {
+  display: none;
+  position: absolute;
+  width: 280px;
+  padding: 0 5px 0 5px;
+  background: #eeeeee;
+  border: 1px solid #1a1a1a;
+}
+span.popup {
+    font-size: 80%;
+    color: blue;
+    font: courier;
+    /*line-height:100%;*/
+    margin-left: 10px;
+}
+
 
 
 

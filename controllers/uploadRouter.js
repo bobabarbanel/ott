@@ -1,4 +1,4 @@
-
+"use strict";
 const assert = require('assert');
 const path = require('path');
 const express = require('express');
@@ -14,10 +14,10 @@ function fileRef(fname) {
     return { "dir": targetDirString, "filename": fname, "comment": "empty" };
 }
 function debugLog(text) {
-    if (debug) console.log(text);
+    if (debug) { console.log(text); }
 }
 //console.log("uploadRouter loaded");
-module.exports = function (dir, app) {
+module.exports = function (dir, app, db) {
 
     app.use(express.static(path.join(dir, '/public')));
     app.use(bodyParser.json());
@@ -30,26 +30,75 @@ module.exports = function (dir, app) {
         res.sendFile(dir + '/fileinput3.html');
     });
     */
-    app.put('/movefiles/', (req, res) => {
-        
-        var fname = req.body.fname;
-       
-        var from = path.join(dir, uploadDir, fname).replace(/\//, "\\");
-        var to   = path.join(dir, targetDir, fname).replace(/\//, "\\");
-        debugLog("movefiles from " + from);
-        
-        fs.move(from, to).then(
-            () => res.json({"moved 1 file": fname}),
+    app.post('/movefile/', (req, res) => {
 
+        var fileName = req.body.filename;
+        let position = (typeof req.body.position == "string") ? parseInt(req.body.position) : req.body.position;
+        let offset = (typeof req.body.offset == "string") ? parseInt(req.body.offset) : req.body.offset;
+        var from = path.join(dir, uploadDir, fileName).replace(/\//, "\\");
+        var to = path.join(dir, targetDir, fileName).replace(/\//, "\\");
+        debugLog("movefile from " + from);
+
+        fs.move(from, to).then(
+            () => {
+                let query = {
+                    "key4": req.body.key4,
+                    "tab": "Tools",
+                    "position": position,
+                    "offset": offset
+                };
+                let updates = {
+                    $set: {
+                        "function": req.body.function,
+                        "type": req.body.type
+                    },
+                    $push: { "files": fileRef(fileName) }
+                };
+                let options = { "upsert": true, "returnNewDocument": true };
+                db.collection("images").findOneAndUpdate(
+                    query,
+                    updates,
+                    options,
+                    function (err, doc) {
+                        assert.equal(err, null);
+                        if (doc != null) {
+                            console.log(doc);
+                            res.json(doc);
+                        }
+                    });
+            },
             (error) => {
-                debugLog("move error "+error.message);
-                return res.json({error:error.message});
+                debugLog("move error " + error.message);
+                return res.json({ error: error.message });
             }).catch(function () {
-                   console.log("movefiles Promise Rejected");
-              });
+                console.log("movefiles Promise Rejected");
+            });
     });
 
+    app.post('/imagefiles/', (req, res) => {
+        let position = parseInt(req.body.position);
+        let offset = parseInt(req.body.offset);
+        
+        let myPromise = db.collection("images").aggregate([
+            {
+                $match: {
+                    "key4": req.body.key4,
+                    "position": position,
+                    "offset": offset,
+                    "tab": req.body.tab
+                }
+            },
+            { $project: { "files.filename": 1, _id: 0 } },
+            { $unwind: { path: "$files" } }
+        ]).toArray();
 
-    
-    
-};
+        myPromise.then(
+            (r) => {
+                let fileList = r.map(obj => obj.files.filename);
+                res.json(fileList);
+            },
+            () => res.json([])
+        );
+
+    });
+}
