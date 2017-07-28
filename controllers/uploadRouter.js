@@ -5,9 +5,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs-extra');
 
-const debug = true;
+const debug = false;
 const uploadDir = "uploadedImages";
-const targetDir = "public\\images\\Tools\\img"; // /images/Tools/img
+const targetDir = "public/images/Tools/img"; 
 const targetDirString = "/images/Tools/img";
 
 function fileRef(fname) {
@@ -35,8 +35,8 @@ module.exports = function (dir, app, db) {
         var fileName = req.body.filename;
         let position = (typeof req.body.position == "string") ? parseInt(req.body.position) : req.body.position;
         let offset = (typeof req.body.offset == "string") ? parseInt(req.body.offset) : req.body.offset;
-        var from = path.join(dir, uploadDir, fileName).replace(/\//, "\\");
-        var to = path.join(dir, targetDir, fileName).replace(/\//, "\\");
+        var from = path.normalize(dir + "/" + uploadDir + "/" + fileName); //.replace(/\//, "\\");
+        var to = path.normalize(dir + "/" + targetDir + "/" + fileName); //.replace(/\//, "\\");
         debugLog("movefile from " + from);
 
         fs.move(from, to).then(
@@ -93,9 +93,8 @@ module.exports = function (dir, app, db) {
         ]).toArray();
 
         myPromise.then(
-            (r) => {
-                let fileList = r.map(obj => obj.files.filename);
-                res.json(fileList);
+            r => {
+                res.json(r.map(obj => obj.files.filename));
             },
             () => res.json([])
         );

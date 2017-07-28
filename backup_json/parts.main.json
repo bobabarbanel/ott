@@ -1,0 +1,194 @@
+[
+{ 
+    "_id" : "Lathe|NLX1500|20|BUSHING|112A3253-1", 
+    "dept" : "Lathe", 
+    "machine" : "NLX1500", 
+    "op" : "20", 
+    "pName" : "BUSHING", 
+    "partId" : "112A3253-1"
+},
+{ 
+    "_id" : "Lathe|SL403B|25|BUSHING|112T1032-6", 
+    "dept" : "Lathe", 
+    "machine" : "SL403B", 
+    "op" : "25", 
+    "pName" : "BUSHING", 
+    "partId" : "112T1032-6"
+},
+{ 
+    "_id" : "Lathe|ZL253-2|20|BUSHING|113T1347-9159", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-2", 
+    "op" : "20", 
+    "pName" : "BUSHING", 
+    "partId" : "113T1347-9159"
+},
+{ 
+    "_id" : "Lathe|ZL253-1|30|CAP|218T1113-16", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-1", 
+    "op" : "30", 
+    "pName" : "CAP", 
+    "partId" : "218T1113-16"
+},
+{ 
+    "_id" : "Lathe|ZL253-1|50|PIN|251W4187-8", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-1", 
+    "op" : "50", 
+    "pName" : "PIN", 
+    "partId" : "251W4187-8"
+},
+{ 
+    "_id" : "Lathe|ZL253-1|60|PIN|251W4187-8", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-1", 
+    "op" : "60", 
+    "pName" : "PIN", 
+    "partId" : "251W4187-8"
+},
+{ 
+    "_id" : "Lathe|LC40-4A|30|BRACKET|254A1267-1", 
+    "dept" : "Lathe", 
+    "machine" : "LC40-4A", 
+    "op" : "30", 
+    "pName" : "BRACKET", 
+    "partId" : "254A1267-1"
+},
+{ 
+    "_id" : "Lathe|NLX1500|20|BOSS|342W2002-1", 
+    "dept" : "Lathe", 
+    "machine" : "NLX1500", 
+    "op" : "20", 
+    "pName" : "BOSS", 
+    "partId" : "342W2002-1"
+},
+{ 
+    "_id" : "Lathe|LC40-2A|40|BRACKET|276A3118-1", 
+    "dept" : "Lathe", 
+    "machine" : "LC40-2A", 
+    "op" : "40", 
+    "pName" : "BRACKET", 
+    "partId" : "276A3118-1"
+},
+{ 
+    "_id" : "Lathe|NLX2500|20|NUT|113T1262-2", 
+    "dept" : "Lathe", 
+    "machine" : "NLX2500", 
+    "op" : "20", 
+    "pName" : "NUT", 
+    "partId" : "113T1262-2"
+},
+{ 
+    "_id" : "Lathe|NL2500|20|NUT|113T1262-9", 
+    "dept" : "Lathe", 
+    "machine" : "NL2500", 
+    "op" : "20", 
+    "pName" : "NUT", 
+    "partId" : "113T1262-9"
+},
+{ 
+    "_id" : "Lathe|ZL253-1|80|BEARING RETAINER|113T1362-3", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-1", 
+    "op" : "80", 
+    "pName" : "BEARING RETAINER", 
+    "partId" : "113T1362-3"
+},
+{ 
+    "_id" : "Lathe|NL1500|20|NUT|183W0101-3", 
+    "dept" : "Lathe", 
+    "machine" : "NL1500", 
+    "op" : "20", 
+    "pName" : "NUT", 
+    "partId" : "183W0101-3"
+},
+{ 
+    "_id" : "Lathe|LU35-4A|40|FLANGE|212A1115-1", 
+    "dept" : "Lathe", 
+    "machine" : "LU35-4A", 
+    "op" : "40", 
+    "pName" : "FLANGE", 
+    "partId" : "212A1115-1"
+},
+{ 
+    "_id" : "Lathe|LU35-4A|40|FLANGE|212T3703-2", 
+    "dept" : "Lathe", 
+    "machine" : "LU35-4A", 
+    "op" : "40", 
+    "pName" : "FLANGE", 
+    "partId" : "212T3703-2"
+},
+{ 
+    "_id" : "Lathe|LU35-4A|50|FLANGE|212T3703-2", 
+    "dept" : "Lathe", 
+    "machine" : "LU35-4A", 
+    "op" : "50", 
+    "pName" : "FLANGE", 
+    "partId" : "212T3703-2"
+},
+{ 
+    "_id" : "Lathe|NLX2500|100|SHAFT|251A1627-3", 
+    "dept" : "Lathe", 
+    "machine" : "NLX2500", 
+    "op" : "100", 
+    "pName" : "SHAFT", 
+    "partId" : "251A1627-3"
+},
+{ 
+    "_id" : "Lathe|LC40-2A|20|SPACER|251A4801-1", 
+    "dept" : "Lathe", 
+    "machine" : "LC40-2A", 
+    "op" : "20", 
+    "pName" : "SPACER", 
+    "partId" : "251A4801-1"
+},
+{ 
+    "_id" : "Lathe|ZL253-1|30|SPACER|251A4801-1", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-1", 
+    "op" : "30", 
+    "pName" : "SPACER", 
+    "partId" : "251A4801-1"
+},
+{ 
+    "_id" : "Lathe|NL3000-250|SHAFT|256T3183-2", 
+    "dept" : "Lathe", 
+    "machine" : "NL3000-2", 
+    "op" : "50", 
+    "pName" : "SHAFT", 
+    "partId" : "256T3183-2"
+},
+{ 
+    "_id" : "Lathe|ZL253-130|BEARING CAP|256W2613-1", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-1", 
+    "op" : "30", 
+    "pName" : "BEARING CAP", 
+    "partId" : "256W2613-1"
+},
+{ 
+    "_id" : "Lathe|NL3000-1|40|BEARING CAP|256W2613-1", 
+    "dept" : "Lathe", 
+    "machine" : "NL3000-1", 
+    "op" : "40", 
+    "pName" : "BEARING CAP", 
+    "partId" : "256W2613-1"
+},
+{ 
+    "_id" : "Lathe|ZL253-1|50|BEARING CAP|256W2613-1", 
+    "dept" : "Lathe", 
+    "machine" : "ZL253-1", 
+    "op" : "50", 
+    "pName" : "BEARING CAP", 
+    "partId" : "256W2613-1"
+},
+{ 
+    "_id" : "Lathe|LC40-2A|30|GUIDE|A251A4802-1", 
+    "dept" : "Lathe", 
+    "machine" : "LC40-2A", 
+    "op" : "30", 
+    "pName" : "GUIDE", 
+    "partId" : "A251A4802-1"
+}
+]

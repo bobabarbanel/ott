@@ -76,8 +76,7 @@ function paintPage(machineSpecs, toolData) {
 
     });
 
-    let moveLeft = 20;
-    let moveDown = 10;
+
 
     $('.hoverme').hover(
         function () {
@@ -113,6 +112,9 @@ function paintPage(machineSpecs, toolData) {
             $('div#pop-up').hide();
         });
     $('.hoverme').mousemove(function (e) {
+        // shift popup to avoid mouse
+        let moveLeft = -300;
+        let moveDown = 10;
         $("div#pop-up")
             .css('top', e.pageY + moveDown)
             .css('left', e.pageX + moveLeft);
@@ -163,10 +165,10 @@ function groupSeparator(table) {
 
     tr.append($('<td class="digit"/>'));
     tr.append($('<td class="digit"/>'));
-    tr.append($('<td/>'));
-    tr.append($('<td/>'));
-    tr.append($('<td/>'));
-    tr.append($('<td/>'));
+    for(var i=0;i<4;i++) {
+        tr.append($('<td/>'));
+    }
+
     table.append(tr);
 }
 
@@ -176,10 +178,9 @@ function doRows(specs, turret, spindle, table, haves) {
 
     tr.append($('<th class="digit"/>').text(turret));
     tr.append($('<th class="digit"/>').text(spindle));
-    tr.append($('<td/>'));
-    tr.append($('<td/>'));
-    tr.append($('<td/>'));
-    tr.append($('<td/>'));
+    for(var i=0;i<4;i++) {
+        tr.append($('<td/>'));
+    }
     table.append(tr);
 
     tr = $("<tr/>");
