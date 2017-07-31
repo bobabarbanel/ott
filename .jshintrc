@@ -94,6 +94,7 @@
 "getCookie",
 "setThisTab",
 "getSpec",
+"getKey4id",
 "getKey4"
   ]
 }
