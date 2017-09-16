@@ -1,0 +1,79 @@
+.chosen-container {
+	font-size: 16px;
+}
+
+div a.chosen-single:not(.chosen-default) {
+	background: pink;
+}
+div a.chosen-single:not(.chosen-default) span{
+	color: black;
+}
+a.chosen-single:not(.chosen-default) span{
+	color: white;
+	font-weight: bold;
+	background-color: inherit;
+}
+
+.chosen-container .chosen-drop {
+	background-color: #eef;
+}
+.chosen-container-single .chosen-single {
+	border: 2px solid #C7C7F6;
+	height: 25px;
+}	
+.chosen-disabled .chosen-single {
+  opacity: 0.8 !important;
+  cursor: default;
+}
+
+h1.task {
+    color: white;
+    background-color: blue;
+    margin-left: 80px;
+    text-align: center;
+}
+
+#container .horiz {
+	display: inline-block;
+}
+
+#buttons {
+	display: inline-block;
+}
+.action {
+	margin-left: 40px;
+}
+#run {
+	background: blue;
+	color: white;
+}
+
+
+#new_key_input { /* the table */
+    margin-left: 100px;
+}
+
+#insertNotice {
+	margin-left:100px;
+	color: white;
+	width: 400px;
+	display: none;
+	font-size: 2em;
+	text-align: center;
+}
+
+#machine_warning {
+	width: 260px;
+    color: red;
+}
+th.field {
+    font-size: 16px;
+    text-align: right;
+    margin-right: 10px;
+}
+td, th {
+    padding: 5px;
+}
+
+
+	

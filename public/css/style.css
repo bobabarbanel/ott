@@ -3,12 +3,13 @@ body {
 	background-attachment: fixed;
 	background-position: center; 
 }
-.chosen-container {
-	font-size: 16px;
-}
+
 #error {
 	font-size: 32px;
-	color: red;
+	color: blueviolet;
+}
+.chosen-container {
+	font-size: 16px;
 }
 
 div a.chosen-single:not(.chosen-default) {

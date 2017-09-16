@@ -1,0 +1,21 @@
+Notes 8/18
+Tooling - add setup sheet comment
+Float menu everywhere
+Missing tooling image - Image Needed
+More compact
+Scroll correction
+
+
+Offsets : 3 "types" / categories
+Offsets Work also has spindle ranges, MAY ALSO have G54 offset text from setup
+
+Possible: reg user ADDs info setup which then appears when user viewing setup sheet - impacts other tabs
+
+create date, publish date records
+notebook entires - needs design
+
+log of events for notebooks and for admin
+
+
+
+Later: long comments popup

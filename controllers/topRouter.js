@@ -41,7 +41,6 @@ module.exports = function(dir, app, db) {
 
 	app.get('/insert', (req, res) => {
 		// get parts data to start
-		//var count = 0;
 		data = [];
 		var cursor = db.collection('main')
 			.find( {}, { '_id': 0, dept: 1,  op: 1, partId: 1, machine: 1, pName: 1} ).sort({ partId: 1 });
@@ -52,17 +51,15 @@ module.exports = function(dir, app, db) {
 			 data.push(doc);
 		  } 
 		});
-		// then show main search front end index.html file
-		
-		// console.log("controllers/topRouter.js");
+
 		res.sendFile(dir + '/insert.html');
 	});
 
 	app.get('/machine/:mnum', (req, res) => {
 		//console.log(req.params.mnum);
-		var query = {"machines": req.params.mnum};
+		var query = {"machines.mid": req.params.mnum};
 		//console.log('/machine/:mnum ' + req.params.mnum);
-		db.collection('machineSpecs').findOne( query, {"_id":0, "machines":0} ).then(
+		db.collection('machineSpecs').findOne( query, {"_id":0} ).then(
 								doc => 
 									{
 										//console.log(doc);
@@ -95,18 +92,7 @@ module.exports = function(dir, app, db) {
 		);
 		return;
 	});
-	/*
-	app.post('/imageComment', (req, res) => {	
-		//console.log("/imageComment " + req.body.dir);
-		//console.log("/imageComment " + req.body.filename);
-		db.collection('imageComments')
-			.findOne( {dir: req.body.dir, filename: req.body.filename}, 
-			{ _id: 0, dir: 0,  filename: 0} ).then((result) => {
-			//console.log("/imageComment " + result.comment);
-			res.send(result.comment);
-		});
-	});
-	*/
+
 	app.post('/addkey', (req, res) => {	
 		
 		db.collection('main').insertOne(req.body).then(
@@ -150,9 +136,10 @@ module.exports = function(dir, app, db) {
 
 
 	// send json data
-	app.get('/data', (req, res) => res.json(data));
-	// send json tabImages data
-	//app.get('/tabdata', (req, res) => res.json(tabImages));
+	app.get('/data', 
+		(req, res) => 
+		res.json(data));
+
 
 	// do Mongo query
 	app.get('/parts', (req, res) => {

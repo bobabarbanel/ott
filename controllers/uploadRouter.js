@@ -126,31 +126,31 @@ module.exports = function (dir, app, db) {
                 }
             }
         );
-});
+    });
 
-app.post('/imagefiles/', (req, res) => {
-    let position = parseInt(req.body.position);
-    let offset = parseInt(req.body.offset);
+    app.post('/imagefiles/', (req, res) => {
+        let position = parseInt(req.body.position);
+        let offset = parseInt(req.body.offset);
+        //console.log('/imagefiles/' + " pos " + pos + " off " + offset);
+        let myPromise = db.collection("images").aggregate([
+            {
+                $match: {
+                    "key4": req.body.key4,
+                    "position": position,
+                    "offset": offset,
+                    "tab": req.body.tab
+                }
+            },
+            { $project: { "files.filename": 1, _id: 0 } },
+            { $unwind: { path: "$files" } }
+        ]).toArray();
 
-    let myPromise = db.collection("images").aggregate([
-        {
-            $match: {
-                "key4": req.body.key4,
-                "position": position,
-                "offset": offset,
-                "tab": req.body.tab
-            }
-        },
-        { $project: { "files.filename": 1, _id: 0 } },
-        { $unwind: { path: "$files" } }
-    ]).toArray();
+        myPromise.then(
+            r => {
+                res.json(r.map(obj => obj.files.filename));
+            },
+            () => res.json([])
+        );
 
-    myPromise.then(
-        r => {
-            res.json(r.map(obj => obj.files.filename));
-        },
-        () => res.json([])
-    );
-
-});
+    });
 };

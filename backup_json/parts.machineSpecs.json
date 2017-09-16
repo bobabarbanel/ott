@@ -1,32 +1,97 @@
 { 
-    "machines": ["LC40-2A","SL40B", "NL3000"],
-    "Turret1" : { "range": [1,12] ,
-		  "Spindle1": [1,12] } 
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d5"), 
+    "machines" : [
+        { mid: "LC40-2A", workoffset: ["Z0"] },
+		{ mid: "SL40B",   workoffset: ["G54", "G55", "G56", "G57", "G58", "G59" ] },
+		{ mid: "LC40-2A", workoffset: ["G54", "G55", "G56", "G57", "G58", "G59"] }
 
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ]
+    }
 }
-
 { 
-    "machines" : ["ZL253-1",  "ZL253-2"],
-    "Turret1" : {"range": [1,10] ,
-		  "Spindle1": [1,10]},
-    "Turret2" : {"range": [1,8] ,
-		  "Spindle1": [1,8]}  
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d6"), 
+    "machines" : [
+	{ mid: "ZL253-1",   workoffset: ["G54", "G55", "G56", "G57", "G58", "G59" ] },
+	{ mid: "ZL253-2",   workoffset: ["G54", "G55", "G56", "G57", "G58", "G59" ] }
 
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(10)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(10)
+        ]
+    }, 
+    "Turret2" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ]
+    }
 }
 { 
-    "machines" : [ "LU35-4A", "LC40-4A"],
-    "Turret1" :  { "range": [1,12] ,
-		  "Spindle1": [1,12] },
-    "Turret2" : { "range": [1,8] ,
-		  "Spindle1": [1,8] }  
-
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d7"), 
+    "machines" : [
+        { mid: "LC35-4A", workoffset: ["Z0"] },
+        { mid: "LC40-4A", workoffset: ["Z0"] }
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ]
+    }, 
+    "Turret2" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ]
+    }
 }
-
-
 { 
-    "machines" : ["NLX2500", "NLX1500",  "NL2500", "NL1500"],
-    "Turret1" : { "range": [1,12] ,
-		  "Spindle1": [1,12],
-		  "Spindle2": [17,28]
-		}
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d8"), 
+    "machines" : [
+        { mid: "NLX2500",   workoffset: ["G54", "G55", "G56", "G57", "G58", "G59" ] },
+        { mid: "NLX1500",   workoffset: ["G54", "G55", "G56", "G57", "G58", "G59" ] },
+        { mid: "NL2500",   workoffset: ["G54", "G55", "G56", "G57", "G58", "G59" ] },
+        { mid: "NL1500",   workoffset: ["G54", "G55", "G56", "G57", "G58", "G59" ] }
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle2" : [
+            NumberInt(17), 
+            NumberInt(28)
+        ]
+    }
 }

@@ -1,94 +1,338 @@
 [
-    { 
-	"key4": "Lathe|A251A4802-1|30|LC40-2A",
-	
-	"tab" : "Tools", 
-	"function" : "Rough Turn",
-"type": "Turning Tool",
-	"position" : NumberInt(1), 
-	"offset": NumberInt(1),
-	"files" : [
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99c7.jpg", "comment": "comment 99c7" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99cd.jpg", "comment": "comment 99cd" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_999c.jpg", "comment": "comment 999c" }
+{ 
 
-	]
-    },
-    { 
-	
-	"key4": "Lathe|A251A4802-1|30|LC40-2A",
-	"tab" : "Tools", 
-	"function" : "Finish Turn", 
-"type": "Turning Tool",
-	"position" : NumberInt(2), 
-	"offset": NumberInt(2),
-	"files" : [
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99c9.jpg", "comment": "comment 99c9" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99ce.jpg", "comment": "comment 99ce" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_999d.jpg", "comment": "comment 999d" }
-            
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Work Holders", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_001.jpg", 
+            "comment" : "A251A4802-1_30_LC40-2A_1_1_001"
+        }, 
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_002.jpg", 
+            "comment" : "A251A4802-1_30_LC40-2A_1_1_002"
+        }, 
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_003.jpg", 
+            "comment" : "A251A4802-1_30_LC40-2A_1_1_003"
+        }, 
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_004.jpg", 
+            "comment" : "A251A4802-1_30_LC40-2A_1_1_004"
+        }
+        
+    ]
+},
+{ 
 
-	]
-    }
-    { 
-	
-	"key4": "Lathe|A251A4802-1|30|LC40-2A",
-	"tab" : "Tools", 
-	"function" : "Cut-Off", 
-"type": "Turning Tool",
-	"position" : NumberInt(4), 
-	"offset": NumberInt(4),
-	"files" : [
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99a6.jpg", "comment": "comment 99a6" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99b6.jpg", "comment": "comment 99b6" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99e9.jpg", "comment": "comment 99e9" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_999e.jpg", "comment": "comment 999e" }
-            
-	]
-    }
-    { 
-	
-	"key4": "Lathe|A251A4802-1|30|LC40-2A",
-	"tab" : "Tools", 
-	"function" : "Drill", 
-"type": "Drill",
-	"position" : NumberInt(8), 
-	"offset": NumberInt(8),
-	"files" : [
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99de.jpg", "comment": "comment 99de" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_999f.jpg", "comment": "comment 999f" }
-	    
-	]
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Fixtures", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
 
-    }
-    { 
-	
-	"key4": "Lathe|A251A4802-1|30|LC40-2A",
-	"tab" : "Tools", 
-	"function" : "Rough Bore", 
-"type": "Boring Tool",
-	"position" : NumberInt(10), 
-	"offset": NumberInt(10),
-	"files" : [
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99a2.jpg", "comment": "comment 99a2" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99b8.jpg", "comment": "comment 99b8" }
-            
-	]
-    }
-    { 
-	
-	"key4": "Lathe|A251A4802-1|30|LC40-2A",
-	"tab" : "Tools", 
-	"function" : "Finish Bore", 
-"type": "Boring Tool",
-	"position" : NumberInt(11), 
-	"offset": NumberInt(11),
-	"files" : [
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99a3.jpg", "comment": "comment 99a3" },
-            { "dir": "/images/Tools/img", "filename": "UNADJUSTEDNONRAW_thumb_99b7.jpg", "comment": "comment 99b7" } 
-            
-	]
-    }
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Tailstock", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
 
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Tailstock Pressure", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Job Box", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Material", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Part Stick Out", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Part Clamped", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "Spindle Liner", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99ce"
+        }
+        
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tooling", 
+    "title" : "DrawTube Pressure", 
+    "files" : [
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_003.jpg", 
+            "comment" : "A251A4802-1_30_LC40-2A_1_1_003"
+        }, 
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99b6.jpg", 
+            "comment" : "UNADJUSTEDNONRAW_thumb_99b6"
+        }, 
+        {
+            "dir" : "/images/Tooling/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_005.jpg", 
+            "comment" : "A251A4802-1_30_LC40-2A_1_1_005"
+        }
+        
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tools", 
+    "function" : "Rough Turn", 
+    "type" : "Turning Tool", 
+    "position" : NumberInt(1), 
+    "offset" : NumberInt(1), 
+    "files" : [
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99c7.jpg", 
+            "comment" : "comment 99c7"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99cd.jpg", 
+            "comment" : "comment 99cd"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_999c.jpg", 
+            "comment" : "comment 999c"
+        }, 
+        {
+            "dir" : "/images/Tools/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_001.jpg", 
+            "comment" : "empty"
+        }, 
+        {
+            "dir" : "/images/Tools/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_002.jpg", 
+            "comment" : "empty"
+        }, 
+        {
+            "dir" : "/images/Tools/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_003.jpg", 
+            "comment" : "empty"
+        }, 
+        {
+            "dir" : "/images/Tools/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_004.jpg", 
+            "comment" : "empty"
+        }, 
+        {
+            "dir" : "/images/Tools/LC", 
+            "filename" : "A251A4802-1_30_LC40-2A_1_1_005.jpg", 
+            "comment" : "empty"
+        }
+    ]
+},
+{ 
+ 
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tools", 
+    "function" : "Finish Turn", 
+    "type" : "Turning Tool", 
+    "position" : NumberInt(2), 
+    "offset" : NumberInt(2), 
+    "files" : [
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99c9.jpg", 
+            "comment" : "comment 99c9"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99ce.jpg", 
+            "comment" : "comment 99ce"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_999d.jpg", 
+            "comment" : "comment 999d"
+        }
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tools", 
+    "function" : "Cut-Off", 
+    "type" : "Turning Tool", 
+    "position" : NumberInt(4), 
+    "offset" : NumberInt(4), 
+    "files" : [
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99a6.jpg", 
+            "comment" : "comment 99a6"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99b6.jpg", 
+            "comment" : "comment 99b6"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99e9.jpg", 
+            "comment" : "comment 99e9"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_999e.jpg", 
+            "comment" : "comment 999e"
+        }
+    ]
+},
+{ 
+ 
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tools", 
+    "function" : "Drill", 
+    "type" : "Drill", 
+    "position" : NumberInt(8), 
+    "offset" : NumberInt(8), 
+    "files" : [
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99de.jpg", 
+            "comment" : "comment 99de"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_999f.jpg", 
+            "comment" : "comment 999f"
+        }
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tools", 
+    "function" : "Rough Bore", 
+    "type" : "Boring Tool", 
+    "position" : NumberInt(10), 
+    "offset" : NumberInt(10), 
+    "files" : [
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99a2.jpg", 
+            "comment" : "comment 99a2"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99b8.jpg", 
+            "comment" : "comment 99b8"
+        }
+    ]
+},
+{ 
+
+    "key4" : "Lathe|A251A4802-1|30|LC40-2A", 
+    "tab" : "Tools", 
+    "function" : "Finish Bore", 
+    "type" : "Boring Tool", 
+    "position" : NumberInt(11), 
+    "offset" : NumberInt(11), 
+    "files" : [
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99a3.jpg", 
+            "comment" : "comment 99a3"
+        }, 
+        {
+            "dir" : "/images/Tools/img", 
+            "filename" : "UNADJUSTEDNONRAW_thumb_99b7.jpg", 
+            "comment" : "comment 99b7"
+        }
+    ]
+}
 ]
-
