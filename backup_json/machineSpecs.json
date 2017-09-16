@@ -1,103 +1,190 @@
-[
- {
-   "_id": "LC40-2A",
-   "Turret1": "1-12",
-   "Turret2": "",
-   "Spindle1": "",
-   "Spindle2": "",
-   "qTurret": 1,
-   "qSpindle": 1
- },
- {
-   "_id": "SL40B",
-   "Turret1": "1-12",
-   "Turret2": "",
-   "Spindle1": "",
-   "Spindle2": "",
-   "qTurret": 1,
-   "qSpindle": 1
- },
- {
-   "_id": "NL3000",
-   "Turret1": "1-12",
-   "Turret2": "",
-   "Spindle1": "",
-   "Spindle2": "",
-   "qTurret": 1,
-   "qSpindle": 1
- },
-
- {
-   "_id": "ZL253-1",
-   "Turret1": "1-10",
-   "Turret2": "1-8",
-   "Spindle1": "",
-   "Spindle2": "",
-   "qTurret": 2,
-   "qSpindle": 1
- },
- {
-   "_id": "ZL253-2",
-   "Turret1": "1-10",
-   "Turret2": "1-8",
-   "Spindle1": "",
-   "Spindle2": "",
-   "qTurret": 2,
-   "qSpindle": 1
- },
- {
-   "_id": "LC40-4A",
-   "Turret1": "1-12",
-   "Turret2": "1-8",
-   "Spindle1": "",
-   "Spindle2": "",
-   "qTurret": 2,
-   "qSpindle": 1
- },
- {
-   "_id": "LU35-4A",
-   "Turret1": "1-12",
-   "Turret2": "1-8",
-   "Spindle1": "",
-   "Spindle2": "",
-   "qTurret": 2,
-   "qSpindle": 1
- },
-
- {
-   "_id": "NLX2500",
-   "Turret1": "1-12",
-   "Turret2": "",
-   "Spindle1": "1-12",
-   "Spindle2": "17-28",
-   "qTurret": 1,
-   "qSpindle": 2
- },
- {
-   "_id": "NLX1500",
-   "Turret1": "1-12",
-   "Turret2": "",
-   "Spindle1": "1-12",
-   "Spindle2": "17-28",
-   "qTurret": 1,
-   "qSpindle": 2
- },
- {
-   "_id": "NL2500",
-   "Turret1": "1-12",
-   "Turret2": "",
-   "Spindle1": "1-12",
-   "Spindle2": "17-28",
-   "qTurret": 1,
-   "qSpindle": 2
- },
- {
-   "_id": "NL1500",
-   "Turret1": "1-12",
-   "Turret2": "",
-   "Spindle1": "1-12",
-   "Spindle2": "17-28",
-   "qTurret": 1,
-   "qSpindle": 2
- }
-]
+{ 
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d5"), 
+    "machines" : [
+        {
+            "mid" : "LC40-2A", 
+            "workoffset" : [
+                "Z0"
+            ]
+        }, 
+        {
+            "mid" : "SL40B", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }, 
+        {
+            "mid" : "LC40-2A", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ]
+    }
+}
+{ 
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d6"), 
+    "machines" : [
+        {
+            "mid" : "ZL253-1", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }, 
+        {
+            "mid" : "ZL253-2", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(10)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(10)
+        ]
+    }, 
+    "Turret2" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ]
+    }
+}
+{ 
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d7"), 
+    "machines" : [
+        {
+            "mid" : "LC35-4A", 
+            "workoffset" : [
+                "Z0"
+            ]
+        }, 
+        {
+            "mid" : "LC40-4A", 
+            "workoffset" : [
+                "Z0"
+            ]
+        }
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ]
+    }, 
+    "Turret2" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(8)
+        ]
+    }
+}
+{ 
+    "_id" : ObjectId("596149e92fbcdb3f24adf5d8"), 
+    "machines" : [
+        {
+            "mid" : "NLX2500", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }, 
+        {
+            "mid" : "NLX1500", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }, 
+        {
+            "mid" : "NL2500", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }, 
+        {
+            "mid" : "NL1500", 
+            "workoffset" : [
+                "G54", 
+                "G55", 
+                "G56", 
+                "G57", 
+                "G58", 
+                "G59"
+            ]
+        }
+    ], 
+    "Turret1" : {
+        "range" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle1" : [
+            NumberInt(1), 
+            NumberInt(12)
+        ], 
+        "Spindle2" : [
+            NumberInt(17), 
+            NumberInt(28)
+        ]
+    }
+}
