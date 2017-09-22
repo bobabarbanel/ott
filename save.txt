@@ -1,0 +1,47 @@
+/*
+        let key4 = req.body.key4;
+        let fileName = req.body.filename;
+        debugLog("copyFile " + fileName, true);
+        let tail = fileName.substring(fileName.lastIndexOf("."));
+
+        let position = (typeof req.body.position === "string")
+            ? parseInt(req.body.position) : req.body.position;
+        let offset = (typeof req.body.offset === "string")
+            ? parseInt(req.body.offset) : req.body.offset;
+        let from = path.normalize(dir + "/" + uploadDir + "/" + fileName);
+
+        let ftd = calcFullTargetDir(key4, SECTION);
+
+        debugLog("ftd " + ftd, true);
+        // public/images/Tools/img/MLetters (first 2 letters of machine name)
+        let fullPath = path.normalize(dir + "/public/" + ftd);
+        if (fs.existsSync(fullPath)) {
+            debugLog("******* dir exists: " + fullPath, true);
+        } else {
+            debugLog("******* dir NOT exists creating: " + fullPath, true);
+            fs.mkdirSync(fullPath);
+        }
+
+        //  public/images/Tools/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
+        let base = calcFullTargetBaseFileName(key4, position, offset);
+        debugLog("base " + base, true);
+        let ffn = base + "_" + pad3(1) + tail; // _001 file
+        debugLog("ffn " + ffn, true);
+
+        var to = path.normalize(addWebSitePublic(dir, ftd, ffn));
+        debugLog("copyFile to " + to, true);
+        // does the target file already exist with default name?
+        let addOn = 2;
+        while (fs.existsSync(to)) { // while file 'to' exists
+            //debugLog("using base " + base);
+            //debugLog("exists ... rename loop " + addOn);
+            // add _002 etc as needed
+            ffn = base + "_" + pad3(addOn++, 3) + tail; // file changed to 002, 003, ...
+            to = path.normalize(addWebSitePublic(dir, ftd, ffn));
+            debugLog("try movefile to " + to);
+        }
+
+        debugLog("*** final new movefile to " + to, true);
+        debugLog("*** last exists check " + fs.existsSync(to), true);
+        copyFile(from, to);
+        //enfs.moveSync(from, to); // RMA replace with copy rename

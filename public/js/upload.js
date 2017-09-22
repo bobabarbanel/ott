@@ -5,10 +5,12 @@ var cookieValue = "not set";
 var key4;
 const SECTION = "Tools";
 
-var debug = true;
+var debug = false;
 function debugLog(text) { if (debug) { console.log(text); } }
 
 $(function () {
+    //$('.progress-bar').text('0%');
+    //$('.progress-bar').width('0%');
     function getSheetTagsFiles(tab) {
         //console.log("getSheetTagsFiles");
         let key = JSON.parse(getCookie());
@@ -23,7 +25,11 @@ $(function () {
                 },
                 dataType: 'json'
             })
-                .done((result) => resolve(result))
+                .done(
+                result => {
+
+                    resolve(result);
+                })
                 .fail((request, status, error) => reject(error));
         });
     }
@@ -43,7 +49,8 @@ $(function () {
             $("#cookie").text(getCookie()); // trace
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
-                    getSheetTagsFiles(SECTION).then((toolData) => {
+                    getSheetTagsFiles(SECTION).then(toolData => {
+
                         paintPage(machineSpecs, toolData);
                     });
                 });
@@ -95,7 +102,9 @@ $(function () {
 
         });
 
-
+        $('.hidehover').hover(
+            () => $('div#pop-up').hide()
+        );
 
 
         $('.hoverme').hover(
@@ -108,14 +117,14 @@ $(function () {
                 let div = $('div#pop-up');
                 if ($(id).text() !== "0") {
                     getFileNames(SECTION, idFields[1], idFields[2]).then(
-                        (fileList) => {
+                        fileList => {
 
-                            div.empty().text(
+                            div.empty().html(
                                 "Position " + idFields[1] +
                                 ", Offset " + idFields[2] +
-                                " (" + $(id).text() + " images)");
+                                " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(" + $(id).text() + " images)");
 
-                            fileList.forEach(fileName => {
+                            fileList.sort().forEach(fileName => {
                                 div.append($("<br/>"))
                                     .append($('<span class="popup"/>')
                                         .text(fileName));
@@ -141,50 +150,6 @@ $(function () {
                 .css('left', e.pageX + moveLeft);
         });
 
-        $(".fileupload").on("change", function () {
-            $('div#pop-up').hide();
-
-            var idFields = $(this).attr("id").split("_");
-            var func = $("#" + idStr(idFields[1], idFields[2], "function")).val();
-            var type = $("#" + idStr(idFields[1], idFields[2], "type")).val();
-            debugLog("fileupload change " + $(this).attr("id") + " " + func + " " + type);
-            if ($(this)[0].files !== undefined) {
-
-
-                let files = $(this)[0].files;
-                let fl = files.length;
-                debugLog("change files " + fl);
-                alert("moving files " + fl);
-                let f = 0;
-                let fnameList = [];
-                while (f < fl) {
-                    let fileName = files[f++].name;
-                    debugLog("\t" + fileName);
-                    fnameList.push(fileName);
-                }
-                debugLog("################### # of files " + fl);
-
-                fnameList.forEach((fileName) => {
-                    alert("moving  " + fileName);
-                    debugLog("\n\n**********\ncalling doMove1\t" + fileName);
-                    // should be synchronus
-                    doMove1(fileName, func, type, idFields[1], idFields[2])
-                        .then(
-                        (result) => {
-                            debugLog("change files moved " + JSON.stringify(result));
-                            // update count of files
-                            let id = '#' + idStr(idFields[1], idFields[2], "count");
-                            $(id).text(parseInt($(id).text()) + 1);
-                            $('div#pop-up').hide();
-                        },
-                        (err) => {
-                            debugLog("change error: " + err.error);
-                        }
-                        );
-                });
-            }
-        });
-
 
         function groupSeparator(table) {
             let tr = $('<tr class="sep"/>');
@@ -204,9 +169,12 @@ $(function () {
 
             tr.append($('<th class="digit"/>').text(turret));
             tr.append($('<th class="digit"/>').text(spindle));
-            for (var i = 0; i < 4; i++) {
+            for (var i = 0; i < 3; i++) {
                 tr.append($('<td/>'));
             }
+            // add progress bar in this header row for last column
+            let td = $('<td/>').html('<div id="myProgress"><div id="myBar"></div></div>');
+            tr.append(td);
             table.append(tr);
 
             tr = $("<tr/>");
@@ -220,12 +188,12 @@ $(function () {
                 let tr = $('<tr class="' + trClass + '"/>');
 
                 // Turret
-                let td = $('<td class="digit"/>');
+                let td = $('<td class="digit hidehover"/>');
                 td.text(t);
                 tr.append(td);
 
                 // Spindle
-                td = $('<td class="digit"/>');
+                td = $('<td class="digit hidehover"/>');
                 td.text(s);
                 tr.append(td);
                 let tData;
@@ -234,11 +202,12 @@ $(function () {
                 } else {
                     tData = { "function": "N/A", "type": "N/A", "files": [] };
                 }
+                console.log([t, s, tData.files.length]);
 
                 let empty = 0; // count the empty name fields (function and type)
 
                 // Function Name
-                td = $('<td/>');
+                td = $('<td class="hidehover"/>');
                 let f_input = $('<input class="tinput" name="function" type="text"/>');
                 f_input.attr("id", idStr(t, s, "function"));
                 if ((tData.function === "N/A")) {
@@ -254,7 +223,7 @@ $(function () {
                 tr.append(td);
 
                 // Type Name
-                td = $('<td/>');
+                td = $('<td class="hidehover"/>');
                 let t_input = $('<input class="tinput" name="type" type="text"/>');
                 t_input.attr("id", idStr(t, s, "type"));
                 if ((tData.type === "N/A")) {
@@ -276,12 +245,15 @@ $(function () {
                 tr.append(td);
 
                 // Files Uploading Actuator
-                td = $('<td/>');
-                let u_input = $('<input class="fileupload" type="file" name="files[]" multiple/>');
-                u_input.attr("id", idStr(t, s, "upload"));
+                td = $('<td class="hidehover"/>');
+                //let form = $('<form>');
+                let u_input = $('<input class="fileUpload" type="file" name="uploads[]" multiple/>');
 
-                // inputs[idStr(t, s, "upload")] = u_input;
-                u_input.parent().addClass("disabled");
+                u_input.attr("id", idStr(t, s, "upload"));
+                //form.append(u_input);
+                //form.append($('<input value="' + idStr(t, s, "upload") + '" type="text" name="nums">'));
+                //inputs[idStr(t, s, "upload")] = u_input;
+                u_input.parent().addClass("disabled"); // disable the td
                 u_input.prop("disabled", true);
                 td.append(u_input);
                 tr.append(td);
@@ -293,27 +265,104 @@ $(function () {
             }
         }
 
-        function doMove1(fileName, func, type, position, offset) {
-            debugLog("doMove files ajax " + fileName);
-            var jQueryPromise = $.ajax({
-                url: "/movefile",
-                type: 'post',
-                data: {
-                    "key4": key4, // from cookie
-                    "tab": SECTION,
-                    "function": func,
-                    "type": type,
-                    "position": position,
-                    "offset": offset,
-                    "filename": fileName
-                },
-                dataType: 'json'
-            });
-            var realPromise = new Promise(function (fulfill, reject) {
-                jQueryPromise.then(fulfill, reject);
-            });
-            return realPromise;
-        }
+        $('.fileUpload').on('change', function () {
+            //console.log("fileUpload change");
+            //$('.progress-bar').text('0%');
+            //$('.progress-bar').width('0%');
+            $("div#pop-up").hide();
+            var idFields = $(this).attr("id").split("_");
+            var func = $("#" + idStr(idFields[1], idFields[2], "function")).val();
+            var type = $("#" + idStr(idFields[1], idFields[2], "type")).val();
+            //console.log("fileupload change " + $(this).attr("id") + " " + func + " " + type);
+            var position = idFields[1];
+            var offset = idFields[2];
+            var tab = SECTION;
+            $("#myBar").show().width('0%').text("0%");
+            var files = $(this).get(0).files;
+
+            if (files.length > 0) {
+                // create a FormData object which will be sent as the data payload in the
+                // AJAX request
+                var formData = new FormData();
+                // add data used to put images in database
+                formData.append("func", func);
+                formData.append("type", type);
+                formData.append("key4", JSON.stringify(key4)); // from cookie
+                formData.append("tab", tab);
+                formData.append("position", position);
+                formData.append("offset", offset);
+
+                // loop through all the selected files and add them to the formData object
+                for (var i = 0; i < files.length; i++) {
+                    // add the files to formData object for the data payload
+                    formData.append('uploads[]', files[i], files[i].name);
+                }
+                new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: "/upload",
+                        type: 'post',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        xhr: () => {
+                            // create an XMLHttpRequest
+                            var xhr = new XMLHttpRequest();
+
+                            // listen to the 'progress' event
+                            xhr.upload.addEventListener('progress', function (e) {
+
+                                if (e.lengthComputable) {
+                                    // calculate the percentage of upload completed
+                                    var done = e.position || e.loaded,
+                                        total = e.totalSize || e.total;
+                                    var present = Math.floor(done / total * 100);
+
+                                    // update progress bar with the new percentage
+                                    $('#myBar')
+                                        .text(present + '%')
+                                        .width(present + '%');
+
+                                    // once the upload reaches 100%, set the progress bar text to done
+                                    if (present === 100) {
+                                        $('#myBar').html('Done');
+                                        setTimeout(
+                                            () =>
+                                                $("#myBar").width('0%').text(""),
+                                            3000);
+                                    }
+
+                                }
+
+
+                            }, false);
+
+                            return xhr;
+
+                        }
+                    })
+                        .done(
+                        result => {
+                            //console.log("/upload success "+JSON.stringify(result));
+                            resolve(result);
+                        })
+                        .fail((request, status, error) => reject(error))
+
+
+                }).then(
+                    success => {
+                        //console.log("/upload then success "+JSON.stringify(success));
+                        let id = '#' + idStr(position, offset, "count");
+
+                        $(id).text(parseInt($(id).text()) + success.count);
+                    },
+                    error => {
+                        //console.log("/upload then failure "+error); 
+                    }
+                    );
+            }
+
+            return;
+        });
 
         function buttonActivity(t, s) {
             // enables or disables the upload button depending on values 
@@ -364,7 +413,7 @@ $(function () {
 
 
         function getFileNames(tab, position, offset) {
-            //console.log("getSheetTagsFiles");
+            //console.log("getFileNames " + tab + "," + position + "," + offset);
 
             return new Promise((resolve, reject) => {
                 $.ajax({
@@ -378,7 +427,31 @@ $(function () {
                     },
                     dataType: 'json'
                 })
-                    .done((result) => resolve(result))
+                    .done((result) => {
+                        //console.log("getFileNames " + result);
+                        resolve(result);
+                    })
+                    .fail((request, status, error) => reject(error));
+            });
+        }
+        function getFileCount(tab, position, offset) {
+
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: "/countfiles",
+                    type: 'post',
+                    data: {
+                        "key4": getKey4id(),
+                        "tab": tab,
+                        "position": position,
+                        "offset": offset
+                    },
+                    dataType: 'json'
+                })
+                    .done(result => {
+                        //console.log("getFileCount " + result.path);
+                        resolve(result.path);
+                    })
                     .fail((request, status, error) => reject(error));
             });
         }

@@ -122,7 +122,9 @@ module.exports = function(dir, app, db) {
 			.toArray();
 
 		myPromise.then(
-			r => res.json(r),
+			r => {
+				res.json(r);
+			},
 			e => res.json([])
 		);
 		return;
@@ -130,7 +132,7 @@ module.exports = function(dir, app, db) {
 			
 
 	app.get('/noget', (req, res) => {
-		console.log("/noget-index.html");
+		//console.log("/noget-index.html");
 		res.sendFile(dir + '/index.html');
 	});
 

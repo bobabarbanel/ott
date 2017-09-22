@@ -1,18 +1,19 @@
 "use strict";
+// uploadRouter.js
 const assert = require('assert');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs-extra');
-var enfs = require("enfsmove");
+const util = require('util');
+const formidable = require('formidable');
 
 const uploadDir = "uploadedImages"; // place to which images are uploaded
 const SECTION = "Tools";
-const debug = true;
-function debugLog(text) {
-    if (debug) { console.log(text); }
+const debug = false;
+function debugLog(text, extra) {
+    if (debug && extra !== undefined) { console.log("\n" + text); }
 }
-
 
 function fileRef(aDir, aFname) {
     let obj = {
@@ -24,9 +25,6 @@ function fileRef(aDir, aFname) {
     return obj;
 }
 
-
-
-//console.log("uploadRouter loaded");
 module.exports = function (dir, app, db) {
     const targetHeadString = "/images"; // needs section and more
 
@@ -34,7 +32,7 @@ module.exports = function (dir, app, db) {
         // Directory path determined using first+second letter of Machine name,
         // and fixed targetHeadString. Has leading "public/".
         debugLog("calcFullTargetDir key4 " + JSON.stringify(key4));
-        var machine = key4.machine.substring(0, 2);
+        let machine = key4.machine.substring(0, 2);
         // e.g., /images/Tools/LC
         return [targetHeadString, section, machine].join("/");
     }
@@ -45,87 +43,107 @@ module.exports = function (dir, app, db) {
         return [key4.partId, key4.op, key4.machine, position, offset].join("_");
     }
     function pad3(num) {
-        var s = "000000000000" + num;
+        let s = "000000000000" + num;
         return s.substr(s.length - 3);
     }
-    //debugLog("files functions defined");
+
     app.use(express.static(path.join(dir, '/public')));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
-    app.post('/movefile/', (req, res) => {
-        let key4 = req.body.key4;
-        let fileName = req.body.filename;
-        debugLog("movefile " + fileName);
-        let tail = fileName.substring(fileName.lastIndexOf("."));
+    app.post('/upload', (req, res) => {
+        let retVal = [];
+        let form = new formidable.IncomingForm();
+        form.multiples = true;
+        let myFiles = [];;
+        form.parse(req, function (err, fields, files) {
 
-        let position = (typeof req.body.position === "string")
-            ? parseInt(req.body.position) : req.body.position;
-        let offset = (typeof req.body.offset === "string")
-            ? parseInt(req.body.offset) : req.body.offset;
-        let from = path.normalize(dir + "/" + uploadDir + "/" + fileName);
+            let key4 = JSON.parse(fields['key4']);
 
-        let ftd = calcFullTargetDir(key4, SECTION);
+            let position = (typeof fields['position'] === "string")
+                ? parseInt(fields['position']) : fields['position'];
+            let offset = (typeof fields['offset'] === "string")
+                ? parseInt(fields['offset']) : fields['offset'];
+            let tab = fields['tab'];
+            let func = fields['func'];
+            let type = fields['type'];
 
-        debugLog("ftd " + ftd);
-        // public/images/Tools/img/MLetter (first letter of machine name)
-        let fullPath = path.normalize(dir + "/" + ftd);
-        if (fs.existsSync(fullPath)) {
-            debugLog("dir exists: " + fullPath);
-        } else {
-            debugLog("dir NOT exists creating: " + fullPath);
-            fs.mkdirsSync(fullPath);
-        }
+            myFiles = files['uploads[]'];
 
-        // [public/images/Tools/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
-        //  Lathe_A251A4802-1_30_LC40-2A_10_10.jpg] 
-        let base = calcFullTargetBaseFileName(key4, position, offset);
-        let ffn = base + "_" + pad3(1) + tail;
-        debugLog("ffn " + ffn);
+            // if only a single file is selected, it does NOT come in array
+            if (myFiles.length === undefined) myFiles = [myFiles];
 
-        var to = path.normalize(addWebSitePublic(dir, ftd, ffn));
-        debugLog("movefile to " + to);
-        // does the target file already exist with default name?
-        let addOn = 2;
-        while (fs.existsSync(to)) { // while file 'to' exists
-            //debugLog("using base " + base);
-            //debugLog("exists ... rename loop " + addOn);
-            // add _002 etc as needed
-            ffn = base + "_" + pad3(addOn++, 3) + tail;
-            to = path.normalize(addWebSitePublic(dir, ftd, ffn));
-            //debugLog("try movefile to " + to);
-        }
+            let ftd = calcFullTargetDir(key4, SECTION);
 
-        debugLog("*** final new movefile to " + to);
-        debugLog("*** last exists check " + fs.existsSync(to));
-
-        enfs.moveSync(from, to);
-
-        let query = {
-            "key4": [key4.dept, key4.partId, key4.op, key4.machine].join("|"),
-            "tab": "Tools",
-            "position": position,
-            "offset": offset
-        };
-        let updates = {
-            $set: {
-                "function": req.body.function,
-                "type": req.body.type
-            },
-            $push: { "files": fileRef(ftd, ffn) }
-        };
-        let options = { "upsert": true, "returnNewDocument": true };
-        debugLog("doing findOneAndUpdate");
-        db.collection("images").findOneAndUpdate(
-            query, updates, options,
-            function (err, doc) {
-                assert.equal(err, null);
-                if (doc !== null) {
-                    console.log(doc);
-                    res.json(doc);
-                }
+            //console.log("ftdir " + ftd);
+            // public/images/Tools/img/MLetters (first 2 letters of machine name)
+            let fullPath = path.normalize(dir + "/public/" + ftd);
+            if (fs.existsSync(fullPath)) {
+                //console.log("******* dir exists: " + fullPath);
+            } else {
+                //console.log("******* dir NOT exists creating: " + fullPath);
+                fs.mkdirSync(fullPath);
             }
-        );
+            let tailnum = 1;
+            let uploadCount = 0;
+            for (let i = 0; i < myFiles.length; i++) {
+                let fileName = myFiles[i].name;
+                //console.log("file name " + fileName);
+                let tail = fileName.substring(fileName.lastIndexOf("."));
+
+                //  public/images/Tools/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
+                let base = calcFullTargetBaseFileName(key4, position, offset);
+                //console.log("base " + base);
+                let ffn = base + "_" + pad3(tailnum++) + tail; // _001 file
+                //console.log("ffname " + ffn);
+
+                let to = path.normalize(addWebSitePublic(dir, ftd, ffn));
+                //console.log("rename File to " + to);
+                // does the target file already exist with default name?
+
+                while (fs.existsSync(to)) { // while file 'to' exists
+                    // add _002 etc as needed
+                    ffn = base + "_" + pad3(tailnum++, 3) + tail; // file changed to 002, 003, ...
+                    to = path.normalize(addWebSitePublic(dir, ftd, ffn));
+                    //console.log("rename again " + to);
+                }
+
+                //console.log("*** final new movefile to " + to);
+                //console.log("*** last exists check " + fs.existsSync(to));
+                fs.renameSync(myFiles[i].path, to);
+                let mongoKey4 = [key4.dept, key4.partId, key4.op, key4.machine].join("|");
+                let query = {
+                    "key4": mongoKey4,
+                    "tab": tab,
+                    "position": position,
+                    "offset": offset
+                };
+                let updates = {
+                    $set: {
+                        "function": func,
+                        "type": type
+                    },
+                    $push: { "files": fileRef(ftd, ffn) }
+                };
+                let options = { "upsert": true, "returnNewDocument": true };
+                //console.log("doing findOneAndUpdate\n\t" + mongoKey4 + " p " + position + " o " + offset +
+                    //" f " + func + " t " + type);
+                db.collection("images").findOneAndUpdate(
+                    query, updates, options,
+                    function (err, doc) {
+                        assert.equal(err, null);
+                        if (doc !== null) { 
+                            if(++uploadCount == myFiles.length) {
+                                res.json({"count": uploadCount});
+                                return;
+                            }
+                        }
+                    }
+                );
+            }
+            
+        });
+        
     });
 
     app.post('/imagefiles/', (req, res) => {
@@ -153,4 +171,5 @@ module.exports = function (dir, app, db) {
         );
 
     });
+
 };

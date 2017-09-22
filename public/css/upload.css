@@ -77,6 +77,20 @@ span.popup {
     margin-left: 10px;
 }
 
+#myProgress {
+    width: 300px;
+    background-color: #ddd;
+    margin: 10 auto;
+}
+  
+#myBar {
+    width: 0%;
+    height: 20px;
+    background-color: #4CAF50;
+}
+
+
+
 
 
 
