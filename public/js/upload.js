@@ -12,7 +12,7 @@ $(function () {
     //$('.progress-bar').text('0%');
     //$('.progress-bar').width('0%');
     function getSheetTagsFiles(tab) {
-        //console.log("getSheetTagsFiles");
+        //debugLog("getSheetTagsFiles");
         let key = JSON.parse(getCookie());
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -41,23 +41,28 @@ $(function () {
             cookieValue = unescape(readCookie(COOKIE));
             key4 = getKey4();
             debugLog("upload.js key4 being set " + JSON.stringify(key4));
-            //console.log("upload Cookie: " + getCookie());
+            //debugLog("upload Cookie: " + getCookie());
             var title = "Uploads " + getParsedCookie().partId;
-            //console.log("title " + title);
-            $("title").text(title);
+            debugLog("title " + cookieValue);
+            var key5 = getParsedCookie();
+            $("#job").text(
+                [
+                    key5.partId, key5.pName, key5.dept, key5.op, key5.machine
+                ].join(" : ")
+            );
 
-            $("#cookie").text(getCookie()); // trace
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
                     getSheetTagsFiles(SECTION).then(toolData => {
-
                         paintPage(machineSpecs, toolData);
                     });
                 });
+
+
             ////////////////////////////////////////////////////////////
         })
         .fail(function (/*jqxhr, settings, exception*/) {
-            console.log("getScript " + "Triggered ajaxError handler.");
+            debugLog("getScript " + "Triggered ajaxError handler.");
         }
         );
 
@@ -71,7 +76,14 @@ $(function () {
 
         let haves = {}; // lookup for position-offset pairs
         toolData.forEach(tDoc => {
-            haves[tDoc.position + "-" + tDoc.offset] = tDoc;
+            haves[
+                [
+                    tDoc.turret,
+                    tDoc.position,
+                    tDoc.spindle,
+                    tDoc.offset
+                ].join('_')
+            ] = tDoc;
         });
 
         ["Turret1", "Turret2"].forEach((turret) => {
@@ -80,7 +92,6 @@ $(function () {
                 if (machineSpecs[turret].Spindle2 !== undefined) {
                     doRows(machineSpecs, turret, "Spindle2", table, haves);
                 }
-
             }
         });
         $("content").append(table);
@@ -96,7 +107,7 @@ $(function () {
                 //change action
                 let idFields = $(this).attr("id").split("_");
 
-                buttonActivity(idFields[1], idFields[2]);
+                buttonActivity(idFields);
                 //alert($(this).val());
             }
 
@@ -112,17 +123,22 @@ $(function () {
                 // get current count
                 // else generate list of files
                 let idFields = $(this).attr("id").split("_");
-                //$("#pop-up ul").text("Position "+idFields[1]+", Offset "+idFields[2]);
-                let id = '#' + idStr(idFields[1], idFields[2], "count");
-                let div = $('div#pop-up');
-                if ($(id).text() !== "0") {
-                    getFileNames(SECTION, idFields[1], idFields[2]).then(
-                        fileList => {
+                idFields.shift();
 
+                let id = '#' + idStr(idFields, "count");
+                //debugLog(id);
+                var num = $(id).text();
+                let div = $('div#pop-up');
+                if (num !== "0") {
+                    getFileNames(SECTION, idFields).then(
+                        fileList => {
+                            debugLog(fileList);
                             div.empty().html(
                                 "Position " + idFields[1] +
-                                ", Offset " + idFields[2] +
-                                " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(" + $(id).text() + " images)");
+                                ", Offset " + idFields[3] +
+                                " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(" +
+                                num + " image" +
+                                ((num === '1') ? '' : 's') + ')');
 
                             fileList.sort().forEach(fileName => {
                                 div.append($("<br/>"))
@@ -164,6 +180,7 @@ $(function () {
         }
 
         function doRows(specs, turret, spindle, table, haves) {
+            debugLog([turret, spindle].join(" : "));
             groupSeparator(table);
             let tr = $('<tr class="greyrow"/>');
 
@@ -174,6 +191,7 @@ $(function () {
             }
             // add progress bar in this header row for last column
             let td = $('<td/>').html('<div id="myProgress"><div id="myBar"></div></div>');
+            // RMA td need turret and spindle names
             tr.append(td);
             table.append(tr);
 
@@ -181,8 +199,11 @@ $(function () {
             let lowT = specs[turret].range[0];
             let highT = specs[turret].range[1];
             let lowS = specs[turret][spindle][0];
+            let numT = numsOf(turret);
+            let numS = numsOf(spindle);
             for (var t = lowT, s = lowS; t <= highT; t++ , s++) {
-                let link = t + "-" + s;
+                let link = [numT, t, numS, s].join("_");
+
                 let trClass = "spaced";
 
                 let tr = $('<tr class="' + trClass + '"/>');
@@ -198,38 +219,45 @@ $(function () {
                 tr.append(td);
                 let tData;
                 if (haves[link] !== undefined) {
-                    tData = haves[t + "-" + s];
+                    tData = haves[link]; // from db
                 } else {
-                    tData = { "function": "N/A", "type": "N/A", "files": [] };
+                    tData = { // no data in db
+                        "function": "N/A",
+                        "type": "N/A",
+                        "files": [],
+                        "position": t,
+                        "offset": s,
+                        "turret": parseInt(numT),
+                        "spindle": parseInt(numS)
+                    };
                 }
-                console.log([t, s, tData.files.length]);
 
-                let empty = 0; // count the empty name fields (function and type)
+                //let empty = 0; // count the empty name fields (function and type)
 
                 // Function Name
                 td = $('<td class="hidehover"/>');
                 let f_input = $('<input class="tinput" name="function" type="text"/>');
-                f_input.attr("id", idStr(t, s, "function"));
+                f_input.attr("id", idStr(link, "function"));
                 if ((tData.function === "N/A")) {
                     f_input.val("");
                     f_input.addClass("noval");
-                    empty++;
+                    //empty++;
                 } else {
                     f_input.val(tData.function);
                     f_input.removeClass("noval");
                 }
-                // inputs[idStr(t, s, "function")] = f_input;
+
                 td.append(f_input);
                 tr.append(td);
 
                 // Type Name
                 td = $('<td class="hidehover"/>');
                 let t_input = $('<input class="tinput" name="type" type="text"/>');
-                t_input.attr("id", idStr(t, s, "type"));
+                t_input.attr("id", idStr(link, "type"));
                 if ((tData.type === "N/A")) {
                     t_input.val("");
                     t_input.addClass("noval");
-                    empty++;
+                    //empty++;
                 } else {
                     t_input.val(tData.type);
                     t_input.removeClass("noval");
@@ -240,19 +268,19 @@ $(function () {
 
                 // Number of existing Images
                 td = $('<td class="hoverme"/>');
-                td.attr("id", idStr(t, s, "count"));
+                td.attr("id", idStr(link, "count"));
                 td.text(tData.files.length);
+                debugger;
                 tr.append(td);
 
                 // Files Uploading Actuator
                 td = $('<td class="hidehover"/>');
-                //let form = $('<form>');
-                let u_input = $('<input class="fileUpload" type="file" name="uploads[]" multiple/>');
 
-                u_input.attr("id", idStr(t, s, "upload"));
-                //form.append(u_input);
-                //form.append($('<input value="' + idStr(t, s, "upload") + '" type="text" name="nums">'));
-                //inputs[idStr(t, s, "upload")] = u_input;
+                let u_input = $('<input class="fileUpload" ' +
+                    'type="file" name="uploads[]" multiple/>');
+
+                u_input.attr("id", idStr(link, "upload"));
+
                 u_input.parent().addClass("disabled"); // disable the td
                 u_input.prop("disabled", true);
                 td.append(u_input);
@@ -266,16 +294,17 @@ $(function () {
         }
 
         $('.fileUpload').on('change', function () {
-            //console.log("fileUpload change");
+            //debugLog("fileUpload change");
             //$('.progress-bar').text('0%');
             //$('.progress-bar').width('0%');
             $("div#pop-up").hide();
             var idFields = $(this).attr("id").split("_");
-            var func = $("#" + idStr(idFields[1], idFields[2], "function")).val();
-            var type = $("#" + idStr(idFields[1], idFields[2], "type")).val();
-            //console.log("fileupload change " + $(this).attr("id") + " " + func + " " + type);
-            var position = idFields[1];
-            var offset = idFields[2];
+
+            var func = $("#" + idStr(idFields, "function")).val();
+            var type = $("#" + idStr(idFields, "type")).val();
+            var button, turret, position, spindle, offset;
+            [button, turret, position, spindle, offset] = idFields;
+
             var tab = SECTION;
             $("#myBar").show().width('0%').text("0%");
             var files = $(this).get(0).files;
@@ -289,7 +318,10 @@ $(function () {
                 formData.append("type", type);
                 formData.append("key4", JSON.stringify(key4)); // from cookie
                 formData.append("tab", tab);
+
+                formData.append("turret", turret);
                 formData.append("position", position);
+                formData.append("spindle", spindle);
                 formData.append("offset", offset);
 
                 // loop through all the selected files and add them to the formData object
@@ -342,7 +374,7 @@ $(function () {
                     })
                         .done(
                         result => {
-                            //console.log("/upload success "+JSON.stringify(result));
+                            //debugLog("/upload success "+JSON.stringify(result));
                             resolve(result);
                         })
                         .fail((request, status, error) => reject(error))
@@ -350,13 +382,13 @@ $(function () {
 
                 }).then(
                     success => {
-                        //console.log("/upload then success "+JSON.stringify(success));
-                        let id = '#' + idStr(position, offset, "count");
+                        //debugLog("/upload then success "+JSON.stringify(success));
+                        let id = '#' + idStr(idFields, "count");
 
                         $(id).text(parseInt($(id).text()) + success.count);
                     },
                     error => {
-                        //console.log("/upload then failure "+error); 
+                        //debugLog("/upload then failure "+error); 
                     }
                     );
             }
@@ -364,26 +396,26 @@ $(function () {
             return;
         });
 
-        function buttonActivity(t, s) {
+        function buttonActivity(idFields) {
             // enables or disables the upload button depending on values 
             // being present for
-            let u_input = $('#' + idStr(t, s, "upload"));
-            let f_input = $('#' + idStr(t, s, "function"));
-            let t_input = $('#' + idStr(t, s, "type"));
-            //console.log(t, s);
+            let u_input = $('#' + idStr(idFields, "upload"));
+            let f_input = $('#' + idStr(idFields, "function"));
+            let t_input = $('#' + idStr(idFields, "type"));
+            //debugLog(t, s);
 
             setButton(t_input, f_input, u_input, false);
         }
         function setButton(t_input, f_input, u_input, quiet) {
-            // quiet means that td containing upload button will not flash a color
+            // quiet non-false means that td containing upload button will not flash a color
             let f_val = (f_input.val() === undefined) ? "" : f_input.val();
             let t_val = (t_input.val() === undefined) ? "" : t_input.val();
 
-            //console.log("\tf\t" + f_val);
-            //console.log("\tt\t" + t_val);
+            //debugLog("\tf\t" + f_val);
+            //debugLog("\tt\t" + t_val);
             if (f_val === "" || t_val === "") { // disable
                 // disable
-                //console.log("\tdisable");
+                //debugLog("\tdisable");
                 u_input.parent().removeClass("enabled");
                 // u_input.parent().addClass("disabled");
                 u_input.prop("disabled", true);
@@ -391,7 +423,7 @@ $(function () {
 
             else {
                 // enable
-                //console.log("\tenable");
+                debugLog("\tenable");
                 u_input.prop("disabled", false);
                 u_input.parent().removeClass("disabled");
                 if (!quiet) {
@@ -405,15 +437,29 @@ $(function () {
 
         }
 
-        function idStr(t, s, tag) {
-            // returns input element id for a given turret, spindle, and type
-            return [tag, t, s].join("_");
+        function idStr(idFields, tag) {
+            // returns input element id for a given turret, spindle, tnum, snum, and type(tag)
+            let arr;
+            if (isString(idFields)) {
+                arr = idFields.split('_');
+            }
+            else {
+                arr = idFields.slice();
+            }
+
+            if (arr.length === 5) arr.shift();
+            if (arr.length !== 4) {
+                debugger;
+            }
+            arr[0].replace(/^Turret|^Spindle/, '');
+            arr[2].replace(/^Turret|^Spindle/, '');
+            return tag + '_' + arr.join("_");
         }
 
 
 
-        function getFileNames(tab, position, offset) {
-            //console.log("getFileNames " + tab + "," + position + "," + offset);
+        function getFileNames(tab, idFields) {
+            // idFields has 4 numbers: turret,position, spindle, offset
 
             return new Promise((resolve, reject) => {
                 $.ajax({
@@ -422,18 +468,21 @@ $(function () {
                     data: {
                         "key4": getKey4id(),
                         "tab": tab,
-                        "position": position,
-                        "offset": offset
+                        "turret": idFields[0],
+                        "position": idFields[1],
+                        "spindle": idFields[2],
+                        "offset": idFields[3]
                     },
                     dataType: 'json'
                 })
                     .done((result) => {
-                        //console.log("getFileNames " + result);
+                        debugLog("getFileNames " + result);
                         resolve(result);
                     })
                     .fail((request, status, error) => reject(error));
             });
         }
+
         function getFileCount(tab, position, offset) {
 
             return new Promise((resolve, reject) => {
@@ -449,7 +498,7 @@ $(function () {
                     dataType: 'json'
                 })
                     .done(result => {
-                        //console.log("getFileCount " + result.path);
+                        //debugLog("getFileCount " + result.path);
                         resolve(result.path);
                     })
                     .fail((request, status, error) => reject(error));

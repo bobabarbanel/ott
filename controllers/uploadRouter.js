@@ -60,6 +60,10 @@ module.exports = function (dir, app, db) {
 
             let key4 = JSON.parse(fields['key4']);
 
+            let turret = (typeof fields['turret'] === "string")
+                ? parseInt(fields['turret']) : fields['turret'];
+            let spindle = (typeof fields['spindle'] === "string")
+                ? parseInt(fields['spindle']) : fields['spindle'];
             let position = (typeof fields['position'] === "string")
                 ? parseInt(fields['position']) : fields['position'];
             let offset = (typeof fields['offset'] === "string")
@@ -116,7 +120,9 @@ module.exports = function (dir, app, db) {
                     "key4": mongoKey4,
                     "tab": tab,
                     "position": position,
-                    "offset": offset
+                    "offset": offset,
+                    "turret": turret,
+                    "spindle": spindle
                 };
                 let updates = {
                     $set: {
@@ -127,35 +133,35 @@ module.exports = function (dir, app, db) {
                 };
                 let options = { "upsert": true, "returnNewDocument": true };
                 //console.log("doing findOneAndUpdate\n\t" + mongoKey4 + " p " + position + " o " + offset +
-                    //" f " + func + " t " + type);
+                //" f " + func + " t " + type);
                 db.collection("images").findOneAndUpdate(
                     query, updates, options,
                     function (err, doc) {
                         assert.equal(err, null);
-                        if (doc !== null) { 
-                            if(++uploadCount == myFiles.length) {
-                                res.json({"count": uploadCount});
+                        if (doc !== null) {
+                            if (++uploadCount == myFiles.length) {
+                                res.json({ "count": uploadCount });
                                 return;
                             }
                         }
                     }
                 );
             }
-            
+
         });
-        
+
     });
 
     app.post('/imagefiles/', (req, res) => {
-        let position = parseInt(req.body.position);
-        let offset = parseInt(req.body.offset);
-        //console.log('/imagefiles/' + " pos " + pos + " off " + offset);
+
         let myPromise = db.collection("images").aggregate([
             {
                 $match: {
                     "key4": req.body.key4,
-                    "position": position,
-                    "offset": offset,
+                    "turret": parseInt(req.body.turret),
+                    "position": parseInt(req.body.position),
+                    "spindle": parseInt(req.body.spindle),
+                    "offset": parseInt(req.body.offset),
                     "tab": req.body.tab
                 }
             },
@@ -165,6 +171,8 @@ module.exports = function (dir, app, db) {
 
         myPromise.then(
             r => {
+                console.log('/imagefiles/');
+                console.log(util.inspect(r));
                 res.json(r.map(obj => obj.files.filename));
             },
             () => res.json([])

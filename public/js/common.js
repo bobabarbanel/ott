@@ -17,6 +17,7 @@ function getSpec(machine) {
             .fail((request, status, error) => reject(error));
     });
 }
+
 function getCookie() {
     return cookieValue;
 }
@@ -47,5 +48,13 @@ function getKey4() {
 }
 function getKey4id() {
     let c = getKey4();
-    return [c.dept,c.partId,c.op,c.machine].join("|");
+    return [c.dept, c.partId, c.op, c.machine].join("|");
+}
+// Returns if a value is a string
+function isString(value) {
+    return typeof value === 'string' || value instanceof String;
+};
+
+function numsOf(str) {
+    return str.replace(/[^\d]/g, '');
 }

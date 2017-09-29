@@ -1,40 +1,40 @@
 // File: controllers/topRouter.js
-const assert       = require('assert');
-const path         = require('path');
-const express      = require('express');
-const bodyParser   = require('body-parser');
+const assert = require('assert');
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 
 
-const COOKIE      = 'chosenCookie';
-module.exports = function(dir, app, db) {
-	/*const upload = */require('./uploadRouter')(dir,app,db);
+const COOKIE = 'chosenCookie';
+module.exports = function (dir, app, db) {
+	/*const upload = */require('./uploadRouter')(dir, app, db);
 	var data;
-	
+
 
 	app.use(express.static(path.join(dir, '/public')));
 	app.use(bodyParser.json());
-	app.use(bodyParser.urlencoded({extended: true}));
+	app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(cookieParser());
 
-	
+
 	// main page 
 	app.get('/', (req, res) => {
 		// get parts data to start
 		//var count = 0;
 		data = [];
 		var cursor = db.collection('main')
-			.find( {}, { '_id': 0, dept: 1,  op: 1, partId: 1, machine: 1, pName: 1} ).sort({ partId: 1 });
-		cursor.each(function(err, doc) {
-		  assert.equal(err, null);
-		  if (doc != null) {
-			 //console.log(++count);
-			 data.push(doc);
-		  } 
+			.find({}, { '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 }).sort({ partId: 1 });
+		cursor.each(function (err, doc) {
+			assert.equal(err, null);
+			if (doc != null) {
+				//console.log(++count);
+				data.push(doc);
+			}
 		});
 		// then show main search front end index.html file
-		
+
 		// console.log("controllers/topRouter.js");
 		res.sendFile(dir + '/index.html');
 	});
@@ -43,47 +43,46 @@ module.exports = function(dir, app, db) {
 		// get parts data to start
 		data = [];
 		var cursor = db.collection('main')
-			.find( {}, { '_id': 0, dept: 1,  op: 1, partId: 1, machine: 1, pName: 1} ).sort({ partId: 1 });
-		cursor.each(function(err, doc) {
-		  assert.equal(err, null);
-		  if (doc != null) {
-			 //console.log(++count);
-			 data.push(doc);
-		  } 
+			.find({}, { '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 }).sort({ partId: 1 });
+		cursor.each(function (err, doc) {
+			assert.equal(err, null);
+			if (doc != null) {
+				//console.log(++count);
+				data.push(doc);
+			}
 		});
 
 		res.sendFile(dir + '/insert.html');
 	});
 
 	app.get('/machine/:mnum', (req, res) => {
-		//console.log(req.params.mnum);
-		var query = {"machines.mid": req.params.mnum};
-		//console.log('/machine/:mnum ' + req.params.mnum);
-		db.collection('machineSpecs').findOne( query, {"_id":0} ).then(
-								doc => 
-									{
-										//console.log(doc);
-										res.json(doc);
-									},
-								err => {
-									console.log(err);
-									res.json({});
-								}
+
+		var query = { "machines.mid": req.params.mnum };
+		//console.log('/machine/mnum ' + req.params.mnum);
+		db.collection('machineSpecs').findOne(query, { "_id": 0 }).then(
+			doc => {
+				//console.log('/machine: '+doc);
+				res.json(doc);
+			},
+			err => {
+				console.log(err);
+				res.json({});
+			}
 		);
 
 	});
-	
-	app.post('/images', (req, res) => {	
+
+	app.post('/images', (req, res) => {
 		//console.log("/images post " + JSON.stringify(req.body));
 
 		//console.log("/images parameters " + req.body.key + " : : " + req.body.tab);
-		
-		var key4 = [req.body.key.dept,req.body.key.partId,req.body.key.op,req.body.key.machine].join("|");
-		
+
+		var key4 = [req.body.key.dept, req.body.key.partId, req.body.key.op, req.body.key.machine].join("|");
+
 		//console.log("/images key4 " + key4);
-		var myPromise = db.collection('images').find({"key4": key4, "tab": req.body.tab},
-		{"_id":0,"key4":0,"tab":0})
-			.sort({  position: 1, offset: 1})
+		var myPromise = db.collection('images').find({ "key4": key4, "tab": req.body.tab },
+			{ "_id": 0, "key4": 0, "tab": 0 })
+			.sort({ position: 1, offset: 1 })
 			.toArray();
 
 		myPromise.then(
@@ -93,43 +92,45 @@ module.exports = function(dir, app, db) {
 		return;
 	});
 
-	app.post('/addkey', (req, res) => {	
-		
+	app.post('/addkey', (req, res) => {
+
 		db.collection('main').insertOne(req.body).then(
 			result => {
 				res.send(result);
 			})
 			.catch(
-       			reason => {
-            		res.send({"error": reason});
-        		});
-		
-    });
-	app.post('/sheetTags', (req, res) => {	
+			reason => {
+				res.send({ "error": reason });
+			});
+
+	});
+	app.post('/sheetTags', (req, res) => {
 		//console.log("/sheetTags post " + JSON.stringify(req.body));
 
 		//console.log("/sheetTags parameters " + req.body.key + " : : " + req.body.tab + " : : " + req.body.files);
-		
-		var key4 = [req.body.key.dept,req.body.key.partId,req.body.key.op,req.body.key.machine].join("|");
+
+		var key4 = [req.body.key.dept, req.body.key.partId,
+		req.body.key.op, req.body.key.machine].join("|");
 		var includeFiles = req.body.files;
 		//console.log("/images key4 " + key4);
-		var query = {"key4": key4, "tab": req.body.tab};
-		var project = {"_id":0,"key4":0,"tab":0,"files":0};
-		if(includeFiles == 1) delete project.files;
+		var query = { "key4": key4, "tab": req.body.tab };
+		var project = { "_id": 0, "key4": 0, "tab": 0, "files": 0 };
+		if (includeFiles == 1) delete project.files;
 		var myPromise = db.collection('images')
-			.find(query,project)
-			.sort({ position: 1, offset: 1})
+			.find(query, project)
+			.sort({ position: 1, offset: 1 })
 			.toArray();
 
 		myPromise.then(
 			r => {
+				console.log(r);
 				res.json(r);
 			},
 			e => res.json([])
 		);
 		return;
 	});
-			
+
 
 	app.get('/noget', (req, res) => {
 		//console.log("/noget-index.html");
@@ -138,9 +139,9 @@ module.exports = function(dir, app, db) {
 
 
 	// send json data
-	app.get('/data', 
-		(req, res) => 
-		res.json(data));
+	app.get('/data',
+		(req, res) =>
+			res.json(data));
 
 
 	// do Mongo query
@@ -149,14 +150,14 @@ module.exports = function(dir, app, db) {
 
 		data = [];
 		// project out the ids
-		var cursor = db.collection('main').find( {}, 
-			{ '_id': 0, dept: 1,  op: 1, partId: 1, machine: 1, pName: 1} );
-		cursor.each(function(err, doc) {
-		  assert.equal(err, null);
-		  if (doc != null) {
-			 data.push(doc);
-		  } 
-		}); 
+		var cursor = db.collection('main').find({},
+			{ '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 });
+		cursor.each(function (err, doc) {
+			assert.equal(err, null);
+			if (doc != null) {
+				data.push(doc);
+			}
+		});
 		res.redirect('/noget');
 	});
 
@@ -169,14 +170,37 @@ module.exports = function(dir, app, db) {
 		res.send("chosen set to " + cookie_value);
 		//console.log("res.send");
 	});
+
+	app.post('/pname', (req, res) => {
+		console.log("/pname post " + JSON.stringify(req.body));
+		
+		var query = { 
+			"dept": req.body.dept,
+			"machine": req.body.machine,
+			"op": req.body.op,
+			"partId": req.body.partId
+		 };
+		var project = { "pName": 1 };
+		var myPromise = db.collection('main')
+			.findOne(query, project);
+
+		myPromise.then(
+			r => {
+				console.log("part name: " + r);
+				res.json(r);
+			},
+			e => res.json("none")
+		);
+		return;
+	});
 	/*function vals(q) {
 	  return [q.partId, q.dept, q.pName, q.op, q.machine].join(",");
     }*/
-	
-	
+
+
 	app.get('/reset', (req, res) => {
 		//console.log("start app/reset");
-	
+
 		data = null;
 		res.clearCookie(COOKIE);
 		res.send("variables reset");
