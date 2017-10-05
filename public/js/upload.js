@@ -70,8 +70,19 @@ $(function () {
     function paintPage(machineSpecs, toolData) {
         let table = $('<table class="inputTable" id="setup"/>');
         let tr = $('<tr class="colnames"/>');
-        ["Position<br/>#", "Offset<br/>#", "Function", "Type", "# Images", "Upload Images"]
-            .forEach((head) => tr.append($("<th/>").html(head)));
+        let action = '&nbsp;'.repeat(30) + 'Action' + '&nbsp;'.repeat(30);
+        let columns = [ // title and class
+            ["Position<br/>#", "pCol"],
+            ["Offset<br/>#", "oCol"],
+            ["Function", "fCol"],
+            ["Type", "tCol"],
+            ["# Images", "iCol"],
+            [action, "aCol"]
+        ];
+        columns.forEach(head => {
+            tr.append($('<th ' + 'class="' + head[1] + '"/>"').html(head[0]));
+        });
+
         table.append(tr);
 
         let haves = {}; // lookup for position-offset pairs
@@ -86,31 +97,65 @@ $(function () {
             ] = tDoc;
         });
 
-        ["Turret1", "Turret2"].forEach((turret) => {
-            if (machineSpecs[turret] !== undefined) {
-                doRows(machineSpecs, turret, "Spindle1", table, haves);
-                if (machineSpecs[turret].Spindle2 !== undefined) {
-                    doRows(machineSpecs, turret, "Spindle2", table, haves);
+        ["Turret1", "Turret2"].forEach(turretStr => {
+            if (machineSpecs[turretStr] !== undefined) {
+                doRows(machineSpecs, turretStr, "Spindle1", table, haves);
+                if (machineSpecs[turretStr].Spindle2 !== undefined) {
+                    doRows(machineSpecs, turretStr, "Spindle2", table, haves);
                 }
             }
         });
         $("content").append(table);
+
+
+        $('.savebutton').on("click",
+            function (event) {
+                let rowID = $(this).parent().parent().attr('id');
+                let that = this;
+                saveContainer(rowID, SECTION).then(
+                    success => {
+                        $(that).hide();
+                        $('#'+idStr(rowID,'upload')).show();
+                        $('#'+rowID).attr('saved','1');
+                        $('#'+idStr(rowID,'function')).prop('disabled', true);
+                        $('#'+idStr(rowID,'type')).prop('disabled', true);
+
+                    },
+                    error => {
+                        alert(error);
+                        alert("Unable to create document in 'images' collection.")
+                    }
+                );
+            }
+        );
+
+        
         $(".tinput").on("input", function () {
             if ($(this).val() !== undefined && $(this).val() !== "") {
                 $(this).removeClass("noval");
-            }
-            if ($(this).data("lastval") !== $(this).val()) {
-                $(this).data("lastval", $(this).val());
-                if ($(this).val() === "") {
-                    $(this).addClass("noval");
+               
+                let rowID = $(this).parent().parent().attr('id');
+                let oIv = $('#'+idStr(rowID,'function')).val();
+                if(oIv !== undefined && oIv !== "") {
+                    let sB = $('#'+idStr(rowID,'buttons')).find('button');
+                    sB.prop('disabled',false);
+                    sB.css('background','yellow');
                 }
-                //change action
-                let idFields = $(this).attr("id").split("_");
-
-                buttonActivity(idFields);
-                //alert($(this).val());
+                
             }
-
+        });
+        $(".finput").on("input", function () {
+            if ($(this).val() !== undefined && $(this).val() !== "") {
+                $(this).removeClass("noval");
+               
+                let rowID = $(this).parent().parent().attr('id');
+                let oIv = $('#'+idStr(rowID,'type')).val();
+                if(oIv !== undefined && oIv !== "") {
+                    let sB = $('#'+idStr(rowID,'buttons')).find('button');
+                    sB.prop('disabled',false);
+                    sB.css('background','yellow');
+                }
+            }
         });
 
         $('.hidehover').hover(
@@ -179,34 +224,37 @@ $(function () {
             table.append(tr);
         }
 
-        function doRows(specs, turret, spindle, table, haves) {
-            debugLog([turret, spindle].join(" : "));
+        function doRows(specs, turretStr, spindleStr, table, haves) {
+
+            debugLog([turretStr, spindleStr].join(" : "));
             groupSeparator(table);
             let tr = $('<tr class="greyrow"/>');
-
-            tr.append($('<th class="digit"/>').text(turret));
-            tr.append($('<th class="digit"/>').text(spindle));
+            tr.append($('<th class="digit hidehover"/>').text(turretStr));
+            tr.append($('<th class="digit hidehover"/>').text(spindleStr));
             for (var i = 0; i < 3; i++) {
-                tr.append($('<td/>'));
+                tr.append($('<td class="hidehover"/>'));
             }
             // add progress bar in this header row for last column
-            let td = $('<td/>').html('<div id="myProgress"><div id="myBar"></div></div>');
-            // RMA td need turret and spindle names
+            let td = $('<td class="hidehover"/>');//;.html('<div id="myProgress"><div id="myBar"></div></div>');
+
             tr.append(td);
             table.append(tr);
 
             tr = $("<tr/>");
-            let lowT = specs[turret].range[0];
-            let highT = specs[turret].range[1];
-            let lowS = specs[turret][spindle][0];
-            let numT = numsOf(turret);
-            let numS = numsOf(spindle);
+            let lowT = specs[turretStr].range[0];
+            let highT = specs[turretStr].range[1];
+            let lowS = specs[turretStr][spindleStr][0];
+            let numT = numsOf(turretStr);
+            let numS = numsOf(spindleStr);
             for (var t = lowT, s = lowS; t <= highT; t++ , s++) {
                 let link = [numT, t, numS, s].join("_");
 
                 let trClass = "spaced";
 
                 let tr = $('<tr class="' + trClass + '"/>');
+                tr.attr("id", [
+                    [turretStr, t, spindleStr, s].join("_")
+                ]);
 
                 // Turret
                 let td = $('<td class="digit hidehover"/>');
@@ -220,31 +268,30 @@ $(function () {
                 let tData;
                 if (haves[link] !== undefined) {
                     tData = haves[link]; // from db
+                    tr.attr("saved","1");
                 } else {
                     tData = { // no data in db
                         "function": "N/A",
                         "type": "N/A",
                         "files": [],
+                        "turret": parseInt(numT), // RMA Needs to Change??
                         "position": t,
-                        "offset": s,
-                        "turret": parseInt(numT),
-                        "spindle": parseInt(numS)
+                        "spindle": parseInt(numS),
+                        "offset": s
                     };
                 }
 
-                //let empty = 0; // count the empty name fields (function and type)
-
                 // Function Name
                 td = $('<td class="hidehover"/>');
-                let f_input = $('<input class="tinput" name="function" type="text"/>');
+                let f_input = $('<input class="finput" name="function" type="text"/>');
                 f_input.attr("id", idStr(link, "function"));
                 if ((tData.function === "N/A")) {
                     f_input.val("");
                     f_input.addClass("noval");
-                    //empty++;
                 } else {
                     f_input.val(tData.function);
                     f_input.removeClass("noval");
+                    f_input.prop('disabled', true);
                 }
 
                 td.append(f_input);
@@ -261,6 +308,7 @@ $(function () {
                 } else {
                     t_input.val(tData.type);
                     t_input.removeClass("noval");
+                    t_input.prop('disabled', true);
                 }
 
                 td.append(t_input);
@@ -270,33 +318,92 @@ $(function () {
                 td = $('<td class="hoverme"/>');
                 td.attr("id", idStr(link, "count"));
                 td.text(tData.files.length);
-                debugger;
                 tr.append(td);
 
-                // Files Uploading Actuator
-                td = $('<td class="hidehover"/>');
+                // Last columns has two buttons. Only one shows at a time.
+                // Button to save document without files, thus keeping function and type
+                var buttonTd = $('<td class="hidehover bcolumn"/>');
+                buttonTd.attr("id", idStr(link, "buttons"));
 
+                // Save button for t and f names
+                let s_button = $('<button class="savebutton"/>');
+                s_button.name = "Save";
+                s_button.text("Save");
+
+                buttonTd.append(s_button);
+
+
+                // Files Uploading Actuator
                 let u_input = $('<input class="fileUpload" ' +
                     'type="file" name="uploads[]" multiple/>');
 
                 u_input.attr("id", idStr(link, "upload"));
+                //u_input.parent().addClass("disabled"); // disable the td
+                //u_input.prop("disabled", true);
+                buttonTd.append(u_input);
+                tr.append(buttonTd);
 
-                u_input.parent().addClass("disabled"); // disable the td
-                u_input.prop("disabled", true);
-                td.append(u_input);
-                tr.append(td);
-                setButton(t_input, f_input, u_input, true);
-
-                tr.append(td);
+                adjustButtons(tr, u_input, f_input, t_input, s_button);
 
                 table.append(tr);
             }
         }
 
-        $('.fileUpload').on('change', function () {
-            //debugLog("fileUpload change");
-            //$('.progress-bar').text('0%');
-            //$('.progress-bar').width('0%');
+        function adjustButtons(tr, uI, fI, tI, sB) {
+            
+            if(fI.val() === '' || tI.val() === '') {
+                sB.show();
+                uI.hide();
+                if(tr.attr('saved') !== "1") {
+                    sB.prop('disabled',true);
+                    sB.css('background','#DDD');
+                }
+            } else {
+                if(tr.attr('saved') === "1") {
+                    sB.hide();
+                    uI.show();
+                }
+            }
+        }
+
+        // create image document, initially empty for files
+        function saveContainer(rowID, tab) {
+            let tr = $('#' + rowID);
+            let idFields = rowID.split('_');
+            let turret = numsOf(idFields[0]);
+            let position = idFields[1];
+            let spindle = numsOf(idFields[2]);
+            let offset = idFields[3];
+            let funct = $('#' + idStr(idFields, "function")).val();
+            let type = $('#' + idStr(idFields, "type")).val();
+
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                        url: "/create_container",
+                        type: 'post',
+                        data: {
+                            "key4": getKey4id(),
+                            "tab": tab,
+                            "function": funct,
+                            "type": type,
+                            "turret": turret,
+                            "position": position,
+                            "spindle": spindle,
+                            "offset": offset
+                        }
+        
+                    }).done(
+                        result => {
+                            console.log(JSON.stringify(result));
+                            resolve(result);
+                        })
+                    .fail((request, status, error) => reject(error))
+            });
+        };
+
+
+
+        function fileUpload(event) {
             $("div#pop-up").hide();
             var idFields = $(this).attr("id").split("_");
 
@@ -306,7 +413,7 @@ $(function () {
             [button, turret, position, spindle, offset] = idFields;
 
             var tab = SECTION;
-            $("#myBar").show().width('0%').text("0%");
+
             var files = $(this).get(0).files;
 
             if (files.length > 0) {
@@ -335,42 +442,8 @@ $(function () {
                         type: 'post',
                         data: formData,
                         processData: false,
-                        contentType: false,
-                        xhr: () => {
-                            // create an XMLHttpRequest
-                            var xhr = new XMLHttpRequest();
+                        contentType: false
 
-                            // listen to the 'progress' event
-                            xhr.upload.addEventListener('progress', function (e) {
-
-                                if (e.lengthComputable) {
-                                    // calculate the percentage of upload completed
-                                    var done = e.position || e.loaded,
-                                        total = e.totalSize || e.total;
-                                    var present = Math.floor(done / total * 100);
-
-                                    // update progress bar with the new percentage
-                                    $('#myBar')
-                                        .text(present + '%')
-                                        .width(present + '%');
-
-                                    // once the upload reaches 100%, set the progress bar text to done
-                                    if (present === 100) {
-                                        $('#myBar').html('Done');
-                                        setTimeout(
-                                            () =>
-                                                $("#myBar").width('0%').text(""),
-                                            3000);
-                                    }
-
-                                }
-
-
-                            }, false);
-
-                            return xhr;
-
-                        }
                     })
                         .done(
                         result => {
@@ -378,13 +451,9 @@ $(function () {
                             resolve(result);
                         })
                         .fail((request, status, error) => reject(error))
-
-
                 }).then(
                     success => {
-                        //debugLog("/upload then success "+JSON.stringify(success));
                         let id = '#' + idStr(idFields, "count");
-
                         $(id).text(parseInt($(id).text()) + success.count);
                     },
                     error => {
@@ -392,50 +461,61 @@ $(function () {
                     }
                     );
             }
-
             return;
-        });
+        };
 
-        function buttonActivity(idFields) {
-            // enables or disables the upload button depending on values 
-            // being present for
-            let u_input = $('#' + idStr(idFields, "upload"));
-            let f_input = $('#' + idStr(idFields, "function"));
-            let t_input = $('#' + idStr(idFields, "type"));
-            //debugLog(t, s);
+        $('.fileUpload').on('change', fileUpload);
 
-            setButton(t_input, f_input, u_input, false);
-        }
-        function setButton(t_input, f_input, u_input, quiet) {
-            // quiet non-false means that td containing upload button will not flash a color
-            let f_val = (f_input.val() === undefined) ? "" : f_input.val();
-            let t_val = (t_input.val() === undefined) ? "" : t_input.val();
+        // function saveActivity(idFields) {
+        //     // enables or disables the upload button depending on values 
+        //     // being present for
+        //     let button = $('#' + idStr(idFields, "upload"));
 
-            //debugLog("\tf\t" + f_val);
-            //debugLog("\tt\t" + t_val);
-            if (f_val === "" || t_val === "") { // disable
-                // disable
-                //debugLog("\tdisable");
-                u_input.parent().removeClass("enabled");
-                // u_input.parent().addClass("disabled");
-                u_input.prop("disabled", true);
-            }
+        // }
+        // function buttonActivity(idFields) {
+        //     return;
+        //     // enables or disables the upload button depending on values 
+        //     // being present for
+        //     let u_input = $('#' + idStr(idFields, "upload"));
+        //     let f_input = $('#' + idStr(idFields, "function"));
+        //     let t_input = $('#' + idStr(idFields, "type"));
+        //     //debugLog(t, s);
 
-            else {
-                // enable
-                debugLog("\tenable");
-                u_input.prop("disabled", false);
-                u_input.parent().removeClass("disabled");
-                if (!quiet) {
-                    u_input.parent().addClass("enabled");
-                    // flash background in <td>
-                    setTimeout(function () {
-                        u_input.parent().removeClass("enabled");
-                    }, 1000);
-                }
-            }
+        //     setButton(t_input, f_input, u_input, false);
+        // }
+        // function setButton(t_input, f_input, u_input, quiet) {
+        //     return;
+        //     // quiet non-false means that td containing upload button will not flash a color
+        //     let f_val = (f_input.val() === undefined) ? "" : f_input.val();
+        //     let t_val = (t_input.val() === undefined) ? "" : t_input.val();
 
-        }
+        //     //debugLog("\tf\t" + f_val);
+        //     //debugLog("\tt\t" + t_val);
+
+        //     if (f_val === "" || t_val === "") { // disable
+        //         // disable
+        //         //debugLog("\tdisable");
+        //         u_input.parent().removeClass("enabled");
+        //         // u_input.parent().addClass("disabled");
+        //         u_input.prop("disabled", true);
+        //     }
+
+
+        //     else {
+        //         // enable
+        //         debugLog("\tenable");
+        //         u_input.prop("disabled", false);
+        //         u_input.parent().removeClass("disabled");
+        //         if (!quiet) {
+        //             u_input.parent().addClass("enabled");
+        //             // flash background in <td>
+        //             setTimeout(function () {
+        //                 u_input.parent().removeClass("enabled");
+        //             }, 1000);
+        //         }
+        //     }
+
+        // }
 
         function idStr(idFields, tag) {
             // returns input element id for a given turret, spindle, tnum, snum, and type(tag)
@@ -451,8 +531,8 @@ $(function () {
             if (arr.length !== 4) {
                 debugger;
             }
-            arr[0].replace(/^Turret|^Spindle/, '');
-            arr[2].replace(/^Turret|^Spindle/, '');
+            arr[0] = arr[0].replace(/^Turret|^Spindle/, '');
+            arr[2] = arr[2].replace(/^Turret|^Spindle/, '');
             return tag + '_' + arr.join("_");
         }
 

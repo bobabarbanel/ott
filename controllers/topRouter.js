@@ -123,7 +123,7 @@ module.exports = function (dir, app, db) {
 
 		myPromise.then(
 			r => {
-				console.log(r);
+				//console.log(r);
 				res.json(r);
 			},
 			e => res.json([])
@@ -172,7 +172,7 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post('/pname', (req, res) => {
-		console.log("/pname post " + JSON.stringify(req.body));
+		//console.log("/pname post " + JSON.stringify(req.body));
 		
 		var query = { 
 			"dept": req.body.dept,
@@ -186,7 +186,7 @@ module.exports = function (dir, app, db) {
 
 		myPromise.then(
 			r => {
-				console.log("part name: " + r);
+				//console.log("part name: " + r);
 				res.json(r);
 			},
 			e => res.json("none")

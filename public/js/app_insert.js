@@ -1,6 +1,6 @@
 
 $(function () {
-    console.log("app_insert.js");
+    //console.log("app_insert.js");
 
     $("#submit").hide();
     doGetData();
@@ -76,7 +76,7 @@ function doGetData() {
             jsonData = data; // now global
             // Choosers
             FIELDS.forEach(initField); // KEY5 empty to start
-            console.log("doGetData complete " + data.length);
+            //console.log("doGetData complete " + data.length);
             $("#submit").hide();
         }); // need error handler for this Promise
 }
@@ -119,7 +119,7 @@ function doneChoosing() {
 var existingWindow;
 
 function handleChoice() {
-    console.log("handleChoice " + KEY5.partId);
+    //console.log("handleChoice " + KEY5.partId);
     return new Promise((resolve, reject) => {
         $.ajax({
             url: "/go_parts",
@@ -153,9 +153,9 @@ function isMachineSpecKnown(mname) {
 }
 
 function resetVars() {
-    console.log("resetVars existingWindow = " + existingWindow);
+    //console.log("resetVars existingWindow = " + existingWindow);
     if (existingWindow !== undefined && existingWindow !== null) {
-        console.log("closing existing resetVars");
+        //console.log("closing existing resetVars");
         existingWindow.close();
         existingWindow = null;
     }

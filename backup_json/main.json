@@ -1,4 +1,4 @@
-{ 
+[{ 
     "_id" : "Lathe|NLX1500|99|BUSHING|112A3253-1", 
     "dept" : "Lathe", 
     "machine" : "NLX1500", 
@@ -13,7 +13,7 @@
     "op" : "25", 
     "pName" : "BUSHING", 
     "partId" : "112T1032-6"
-}
+},
 { 
     "_id" : "Lathe|ZL253-2|20|BUSHING|113T1347-9159", 
     "dept" : "Lathe", 
@@ -21,7 +21,7 @@
     "op" : "20", 
     "pName" : "BUSHING", 
     "partId" : "113T1347-9159"
-}
+},
 { 
     "_id" : "Lathe|ZL253-1|30|CAP|218T1113-16", 
     "dept" : "Lathe", 
@@ -253,4 +253,4 @@
     "pName" : "NUT", 
     "op" : "60", 
     "machine" : "NLX2500"
-}
+}]

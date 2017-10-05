@@ -171,13 +171,39 @@ module.exports = function (dir, app, db) {
 
         myPromise.then(
             r => {
-                console.log('/imagefiles/');
-                console.log(util.inspect(r));
+                //console.log('/imagefiles/');
+                //console.log(util.inspect(r));
                 res.json(r.map(obj => obj.files.filename));
             },
             () => res.json([])
         );
 
+    });
+
+    app.post('/create_container', (req, res) => {
+        console.log('/create_container');
+        console.log(JSON.stringify(req.body));
+        let document = {
+            "key4": req.body.key4,
+            "turret": parseInt(req.body.turret),
+            "spindle": parseInt(req.body.spindle),
+            "position": parseInt(req.body.position),
+            "offset": parseInt(req.body.offset),
+            "tab": req.body.tab,
+            "function": req.body.function,
+            "type": req.body.type,
+            "files": []
+        };
+        console.log(JSON.stringify(document));
+
+        db.collection("images").insertOne(document).then(
+            result => {
+                res.json({ "status": true, "result": result });
+            },
+            err => {
+                res.json({ "status": false, "result": err });
+            }
+        );
     });
 
 };

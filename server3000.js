@@ -18,14 +18,10 @@ MongoClient.connect(url, (err, database) => {
   topRouter(__dirname, app, db); // loads routers, and provides access there to these variables
   
   app.listen(port, () => {
-    console.log('mnode App listening on ' + port +'. Mongo "parts" is connected');
-  })
-  
-  
-    
+    console.log('Ott App listening on ' + port +'. Mongo "parts" is connected');
+  });
   
 });
-
 
 
 

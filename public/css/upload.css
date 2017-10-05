@@ -81,17 +81,6 @@ span.popup {
     margin-left: 10px;
 }
 
-#myProgress {
-    width: 300px;
-    background-color: #ddd;
-    margin: 10 auto;
-}
-  
-#myBar {
-    width: 0%;
-    height: 20px;
-    background-color: #4CAF50;
-}
 #title {
     font-size: 2em;
     margin-top: 0.67em;
@@ -113,6 +102,16 @@ header {
     margin-left: 6em;
     margin-bottom: 2em;
 }
+
+.savebutton{
+    margin: 0 5 0 5;
+    background-color: yellow;
+}
+.fCol, .tCol {
+    width: 500px;
+}
+
+
 
 
 
