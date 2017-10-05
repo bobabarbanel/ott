@@ -122,13 +122,11 @@ module.exports = function (dir, app, db) {
                     "position": position,
                     "offset": offset,
                     "turret": turret,
-                    "spindle": spindle
+                    "spindle": spindle,
+                    "type": type,
+                    "function": func
                 };
                 let updates = {
-                    $set: {
-                        "function": func,
-                        "type": type
-                    },
                     $push: { "files": fileRef(ftd, ffn) }
                 };
                 let options = { "upsert": true, "returnNewDocument": true };
