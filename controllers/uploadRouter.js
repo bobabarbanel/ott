@@ -51,6 +51,8 @@ module.exports = function (dir, app, db) {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
+
+
     app.post('/upload', (req, res) => {
         let retVal = [];
         let form = new formidable.IncomingForm();
@@ -151,16 +153,16 @@ module.exports = function (dir, app, db) {
     });
 
     app.post('/imagefiles/', (req, res) => {
-
+        let rq = req.body;
         let myPromise = db.collection("images").aggregate([
             {
                 $match: {
-                    "key4": req.body.key4,
-                    "turret": parseInt(req.body.turret),
-                    "position": parseInt(req.body.position),
-                    "spindle": parseInt(req.body.spindle),
-                    "offset": parseInt(req.body.offset),
-                    "tab": req.body.tab
+                    "key4": rq.key4,
+                    "turret": parseInt(rq.turret),
+                    "position": parseInt(rq.position),
+                    "spindle": parseInt(rq.spindle),
+                    "offset": parseInt(rq.offset),
+                    "tab": rq.tab
                 }
             },
             { $project: { "files.filename": 1, _id: 0 } },
@@ -178,21 +180,88 @@ module.exports = function (dir, app, db) {
 
     });
 
+    app.post('/updateFT', (req, res) => {
+        console.log('/updateFT' + JSON.stringify(req.body));
+        let rq = req.body;
+        let doc;
+
+        // db.images.insert({"function":"ddd","type":"eee","turret":"1","position":"3","spindle":"1","offset":"3","key4"
+        // :{"partId":"251A1626-2","dept":"LATHE","op":"30","machine":"NL2500"}, files: []})
+        if (rq.addFiles === "true") { //do an insert
+            console.log("insert");
+            doc = {
+                "key4": rq.key4,
+                "turret": parseInt(rq.turret),
+                "position": parseInt(rq.position),
+                "spindle": parseInt(rq.spindle),
+                "offset": parseInt(rq.offset),
+                "tab": rq.tab,
+                "function": rq.function,
+                "type": rq.type,
+                "files": [],
+            };
+            db.collection('images').insert(doc).then(
+                success => res.json({ 'status': true }),
+                failure => res.json({ 'status': false, 'error': failure })
+            );
+
+        } else { // do an update on an existing document, changing function and type strings
+            console.log("update");
+            doc = {
+                "key4": rq.key4,
+                "turret": parseInt(rq.turret),
+                "position": parseInt(rq.position),
+                "spindle": parseInt(rq.spindle),
+                "offset": parseInt(rq.offset),
+                "tab": rq.tab
+            };
+            let update = {
+                $set:
+                {
+                    "function": rq.function,
+                    "type": rq.type
+                }
+            };
+            console.log('/updateFT doc ' + JSON.stringify(doc));
+            console.log('/updateFT update ' + JSON.stringify(update));
+            db.collection('images').findOneAndUpdate(
+                doc,
+                update,
+                {
+                    "upsert": false, // if cannot find, do not create a new document
+                    "returnNewDocument": true // return new doc
+                }
+            ).then(
+                success => {
+                    console.log("findOneAndUpdate success" + success);
+                    res.json({ 'status': true, 'result': success });
+                },
+                failure => {
+                    console.log("findOneAndUpdate failure" + failure);
+                    res.json({ 'status': false, 'result': failure });
+                }
+                );
+        }
+    });
+
+
+
     app.post('/create_container', (req, res) => {
-        console.log('/create_container');
-        console.log(JSON.stringify(req.body));
+        //console.log('/create_container');
+        let rq = req.body;
+        //console.log(JSON.stringify(rq));
         let document = {
-            "key4": req.body.key4,
-            "turret": parseInt(req.body.turret),
-            "spindle": parseInt(req.body.spindle),
-            "position": parseInt(req.body.position),
-            "offset": parseInt(req.body.offset),
-            "tab": req.body.tab,
-            "function": req.body.function,
-            "type": req.body.type,
+            "key4": rq.key4,
+            "turret": parseInt(rq.turret),
+            "spindle": parseInt(rq.spindle),
+            "position": parseInt(rq.position),
+            "offset": parseInt(rq.offset),
+            "tab": rq.tab,
+            "function": rq.function,
+            "type": rq.type,
             "files": []
         };
-        console.log(JSON.stringify(document));
+        //console.log(JSON.stringify(document));
 
         db.collection("images").insertOne(document).then(
             result => {

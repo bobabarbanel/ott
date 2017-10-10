@@ -11,6 +11,12 @@ function debugLog(text) { if (debug) { console.log(text); } }
 $(function () {
     //$('.progress-bar').text('0%');
     //$('.progress-bar').width('0%');
+    $('#edit_func_type').on('click',
+        () => window.location = './ftedits.html'
+    );
+    function f_t_edits(state) {
+        $('#edit_func_type').prop('disabled', state); // enable/disable edits
+    }
     function getSheetTagsFiles(tab) {
         //debugLog("getSheetTagsFiles");
         let key = JSON.parse(getCookie());
@@ -50,7 +56,7 @@ $(function () {
                     key5.partId, key5.pName, key5.dept, key5.op, key5.machine
                 ].join(" : ")
             );
-
+            f_t_edits(true); // start disabled
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
                     getSheetTagsFiles(SECTION).then(toolData => {
@@ -115,11 +121,11 @@ $(function () {
                 saveContainer(rowID, SECTION).then(
                     success => {
                         $(that).hide();
-                        $('#'+idStr(rowID,'upload')).show();
-                        $('#'+rowID).attr('saved','1');
-                        $('#'+idStr(rowID,'function')).prop('disabled', true);
-                        $('#'+idStr(rowID,'type')).prop('disabled', true);
-
+                        $('#' + idStr(rowID, 'upload')).show();
+                        $('#' + rowID).attr('saved', '1');
+                        $('#' + idStr(rowID, 'function')).prop('disabled', true);
+                        $('#' + idStr(rowID, 'type')).prop('disabled', true);
+                        f_t_edits(false);
                     },
                     error => {
                         alert(error);
@@ -129,31 +135,32 @@ $(function () {
             }
         );
 
-        
+
         $(".tinput").on("input", function () {
             if ($(this).val() !== undefined && $(this).val() !== "") {
                 $(this).removeClass("noval");
-               
+
                 let rowID = $(this).parent().parent().attr('id');
-                let oIv = $('#'+idStr(rowID,'function')).val();
-                if(oIv !== undefined && oIv !== "") {
-                    let sB = $('#'+idStr(rowID,'buttons')).find('button');
-                    sB.prop('disabled',false);
-                    sB.css('background','yellow');
+                let oIv = $('#' + idStr(rowID, 'function')).val();
+                if (oIv !== undefined && oIv !== "") {
+                    let sB = $('#' + idStr(rowID, 'buttons')).find('button');
+                    sB.prop('disabled', false);
+                    sB.css('background', 'yellow');
                 }
-                
+
             }
         });
+
         $(".finput").on("input", function () {
             if ($(this).val() !== undefined && $(this).val() !== "") {
                 $(this).removeClass("noval");
-               
+
                 let rowID = $(this).parent().parent().attr('id');
-                let oIv = $('#'+idStr(rowID,'type')).val();
-                if(oIv !== undefined && oIv !== "") {
-                    let sB = $('#'+idStr(rowID,'buttons')).find('button');
-                    sB.prop('disabled',false);
-                    sB.css('background','yellow');
+                let oIv = $('#' + idStr(rowID, 'type')).val();
+                if (oIv !== undefined && oIv !== "") {
+                    let sB = $('#' + idStr(rowID, 'buttons')).find('button');
+                    sB.prop('disabled', false);
+                    sB.css('background', 'yellow');
                 }
             }
         });
@@ -268,7 +275,7 @@ $(function () {
                 let tData;
                 if (haves[link] !== undefined) {
                     tData = haves[link]; // from db
-                    tr.attr("saved","1");
+                    tr.attr("saved", "1");
                 } else {
                     tData = { // no data in db
                         "function": "N/A",
@@ -292,6 +299,7 @@ $(function () {
                     f_input.val(tData.function);
                     f_input.removeClass("noval");
                     f_input.prop('disabled', true);
+                    f_t_edits(false);
                 }
 
                 td.append(f_input);
@@ -304,11 +312,12 @@ $(function () {
                 if ((tData.type === "N/A")) {
                     t_input.val("");
                     t_input.addClass("noval");
-                    //empty++;
+
                 } else {
                     t_input.val(tData.type);
                     t_input.removeClass("noval");
                     t_input.prop('disabled', true);
+                    f_t_edits(false);
                 }
 
                 td.append(t_input);
@@ -349,17 +358,19 @@ $(function () {
             }
         }
 
+
+
         function adjustButtons(tr, uI, fI, tI, sB) {
-            
-            if(fI.val() === '' || tI.val() === '') {
+
+            if (fI.val() === '' || tI.val() === '') {
                 sB.show();
                 uI.hide();
-                if(tr.attr('saved') !== "1") {
-                    sB.prop('disabled',true);
-                    sB.css('background','#DDD');
+                if (tr.attr('saved') !== "1") {
+                    sB.prop('disabled', true);
+                    sB.css('background', '#DDD');
                 }
             } else {
-                if(tr.attr('saved') === "1") {
+                if (tr.attr('saved') === "1") {
                     sB.hide();
                     uI.show();
                 }
@@ -379,24 +390,24 @@ $(function () {
 
             return new Promise((resolve, reject) => {
                 $.ajax({
-                        url: "/create_container",
-                        type: 'post',
-                        data: {
-                            "key4": getKey4id(),
-                            "tab": tab,
-                            "function": funct,
-                            "type": type,
-                            "turret": turret,
-                            "position": position,
-                            "spindle": spindle,
-                            "offset": offset
-                        }
-        
-                    }).done(
-                        result => {
-                            console.log(JSON.stringify(result));
-                            resolve(result);
-                        })
+                    url: "/create_container",
+                    type: 'post',
+                    data: {
+                        "key4": getKey4id(),
+                        "tab": tab,
+                        "function": funct,
+                        "type": type,
+                        "turret": turret,
+                        "position": position,
+                        "spindle": spindle,
+                        "offset": offset
+                    }
+
+                }).done(
+                    result => {
+                        console.log(JSON.stringify(result));
+                        resolve(result);
+                    })
                     .fail((request, status, error) => reject(error))
             });
         };

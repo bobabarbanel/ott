@@ -12,7 +12,6 @@ content {
    /* margin: 0 auto;*/
 }
 #setup { /* a table */
-
     width: 60%;
     border-collapse: collapse;
 }
@@ -84,23 +83,18 @@ span.popup {
 #title {
     font-size: 2em;
     margin-top: 0.67em;
-    margin-bottom: 0.67em;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 1em;
+    align-content: left;
     font-weight: bold;
     color: yellow;
+    width: 40%;
 }
 #job {
     font-size: 1.17em;
     margin-top: 1em;
-    margin-bottom: 1em;
-    margin-left: 6em;
+    margin-right: 1em;
+    align-content: right;
     font-weight: normal;
-}
-header {
-    display: table;
-    margin-left: 6em;
-    margin-bottom: 2em;
 }
 
 .savebutton{
@@ -110,6 +104,42 @@ header {
 .fCol, .tCol {
     width: 500px;
 }
+#header {
+    align-content: center;
+    width: 60%;
+}
+#header, #header tr, #header td {
+    border: 0;
+}
+#eftrow {
+     height: 0.5em;
+     border-bottom: 0.5em;
+}
+#edit_func_type {
+     margin-right: 150px;
+}
+.changed {
+    background: lightsalmon;
+}
+.button {
+    font: bold 12px Arial;
+    text-decoration: none;
+    background-color: #EEEEEE;
+    color: #333333;
+    padding: 2px 6px 2px 6px;
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+    border-left: 1px solid #CCCCCC;
+  }
+  #ftSubmit {
+      background: transparent;
+      width: 100px;
+  }
+
+
+ 
+ 
 
 
 
