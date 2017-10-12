@@ -5,10 +5,8 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs-extra');
-const util = require('util');
 const formidable = require('formidable');
 
-const uploadDir = "uploadedImages"; // place to which images are uploaded
 const SECTION = "Tools";
 const debug = false;
 function debugLog(text, extra) {
@@ -54,22 +52,21 @@ module.exports = function (dir, app, db) {
 
 
     app.post('/upload', (req, res) => {
-        let retVal = [];
         let form = new formidable.IncomingForm();
         form.multiples = true;
-        let myFiles = [];;
+        let myFiles = [];
         form.parse(req, function (err, fields, files) {
 
             let key4 = JSON.parse(fields['key4']);
 
-            let turret = (typeof fields['turret'] === "string")
-                ? parseInt(fields['turret']) : fields['turret'];
-            let spindle = (typeof fields['spindle'] === "string")
-                ? parseInt(fields['spindle']) : fields['spindle'];
-            let position = (typeof fields['position'] === "string")
-                ? parseInt(fields['position']) : fields['position'];
-            let offset = (typeof fields['offset'] === "string")
-                ? parseInt(fields['offset']) : fields['offset'];
+            let turret = (typeof fields['turret'] === "string") ?
+                parseInt(fields['turret']) : fields['turret'];
+            let spindle = (typeof fields['spindle'] === "string") ?
+                parseInt(fields['spindle']) : fields['spindle'];
+            let position = (typeof fields['position'] === "string") ?
+                parseInt(fields['position']) : fields['position'];
+            let offset = (typeof fields['offset'] === "string") ?
+                parseInt(fields['offset']) : fields['offset'];
             let tab = fields['tab'];
             let func = fields['func'];
             let type = fields['type'];
@@ -77,17 +74,14 @@ module.exports = function (dir, app, db) {
             myFiles = files['uploads[]'];
 
             // if only a single file is selected, it does NOT come in array
-            if (myFiles.length === undefined) myFiles = [myFiles];
+            if (myFiles.length === undefined) { myFiles = [myFiles]; }
 
             let ftd = calcFullTargetDir(key4, SECTION);
 
             //console.log("ftdir " + ftd);
             // public/images/Tools/img/MLetters (first 2 letters of machine name)
             let fullPath = path.normalize(dir + "/public/" + ftd);
-            if (fs.existsSync(fullPath)) {
-                //console.log("******* dir exists: " + fullPath);
-            } else {
-                //console.log("******* dir NOT exists creating: " + fullPath);
+            if (!fs.existsSync(fullPath)) {
                 fs.mkdirSync(fullPath);
             }
             let tailnum = 1;
@@ -132,14 +126,13 @@ module.exports = function (dir, app, db) {
                     $push: { "files": fileRef(ftd, ffn) }
                 };
                 let options = { "upsert": true, "returnNewDocument": true };
-                //console.log("doing findOneAndUpdate\n\t" + mongoKey4 + " p " + position + " o " + offset +
-                //" f " + func + " t " + type);
+
                 db.collection("images").findOneAndUpdate(
                     query, updates, options,
                     function (err, doc) {
                         assert.equal(err, null);
                         if (doc !== null) {
-                            if (++uploadCount == myFiles.length) {
+                            if (++uploadCount === myFiles.length) {
                                 res.json({ "count": uploadCount });
                                 return;
                             }
@@ -201,7 +194,7 @@ module.exports = function (dir, app, db) {
                 "files": [],
             };
             db.collection('images').insert(doc).then(
-                success => res.json({ 'status': true }),
+                () => res.json({ 'status': true }),
                 failure => res.json({ 'status': false, 'error': failure })
             );
 

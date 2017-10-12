@@ -11,7 +11,7 @@ function debugLog(text) { if (debug) { console.log(text); } }
 
 $(function () {
     function disableButton(state) {
-        if (state == true) { // disable button
+        if (state === true) { // disable button
             $('#ftSubmit').prop('disabled', 'disabled').css('background', 'transparent');
 
         } else { // enable button
@@ -52,8 +52,10 @@ $(function () {
             let oldPromises = old.map(link => updateFT(existingValues[link], false));
             Promise.all(newPromises.concat(oldPromises)).then(
                 complete => {
-                    if(!complete[0].status) 
-                        alert("Unable to complete updates.")
+                    if(!complete[0].status) {
+                        alert("Unable to complete updates.");
+                    }
+                       
                      
                     // if (success.status)
                     //     alert("success " + JSON.stringify(success.result));
@@ -65,7 +67,7 @@ $(function () {
                     alert("error " + JSON.stringify(error));
                     window.location.reload(true);
                 }
-            )
+            );
 
 
         }
@@ -257,24 +259,24 @@ $(function () {
             let f_input = $('<input class="finput" name="function" type="text"/>');
             f_input.attr("id", idStr(link, "function"));
             f_input.val(existingValues[link].function);
-            f_input.on("input", function (ev) {
-                let now = $(this).val();
-                ev.preventDefault();
+            f_input.on("input", null, 'f_change', inputChanges); //function (ev) {
+                // let now = $(this).val();
+                // ev.preventDefault();
 
-                let ids = $(this).attr('id').split('_');
-                let inputId = ids.shift();
-                let link = ids.join('_');
-                if (existingValues[link][inputId] !== now) {
-                    disableButton('false');
-                    $(this).parent().addClass('changed');
-                    existingValues[link].f_change = true;
-                } else {
-                    $(this).parent().removeClass('changed');
-                    existingValues[link].f_change = false;
-                }
-                checkForChanges();
+                // let ids = $(this).attr('id').split('_');
+                // let inputId = ids.shift();
+                // let link = ids.join('_');
+                // if (existingValues[link][inputId] !== now) {
+                //     disableButton('false');
+                //     $(this).parent().addClass('changed');
+                //     existingValues[link].f_change = true;
+                // } else {
+                //     $(this).parent().removeClass('changed');
+                //     existingValues[link].f_change = false;
+                // }
+                // checkForChanges();
 
-            });
+            //});
             td.append(f_input);
             tr.append(td);
 
@@ -283,34 +285,54 @@ $(function () {
             let t_input = $('<input class="tinput" name="type" type="text"/>');
             t_input.attr("id", idStr(link, "type"));
             t_input.val(existingValues[link].type);
-            t_input.on("input", function (ev) {
-                let now = $(this).val();
-                ev.preventDefault();
+            t_input.on("input", null, 't_change', inputChanges);
+            // t_input.on("input", function (ev) {
+            //     let now = $(this).val();
+            //     ev.preventDefault();
 
-                let ids = $(this).attr('id').split('_');
-                let inputId = ids.shift();
-                let link = ids.join('_');
-                if (existingValues[link][inputId] !== now) {
-                    disableButton('false');
-                    $(this).parent().addClass('changed');
-                    existingValues[link].t_change = true;
-                } else {
-                    $(this).parent().removeClass('changed');
-                    existingValues[link].t_change = false;
-                }
-                checkForChanges();
-            });
+            //     let ids = $(this).attr('id').split('_');
+            //     let inputId = ids.shift();
+            //     let link = ids.join('_');
+            //     if (existingValues[link][inputId] !== now) {
+            //         disableButton('false');
+            //         $(this).parent().addClass('changed');
+            //         existingValues[link].t_change = true;
+            //     } else {
+            //         $(this).parent().removeClass('changed');
+            //         existingValues[link].t_change = false;
+            //     }
+            //     checkForChanges();
+            // });
             td.append(t_input);
             tr.append(td);
             table.append(tr);
         }
+    }
+    function inputChanges(ev) { // called from type and function input text elements
+        let now = $(this).val();
+        ev.preventDefault();
+
+        let ids = $(this).attr('id').split('_');
+        let inputId = ids.shift();
+        let link = ids.join('_');
+        if (existingValues[link][inputId] !== now) {
+            disableButton('false');
+            $(this).parent().addClass('changed');
+            existingValues[link][ev.data] = true;
+        } else {
+            $(this).parent().removeClass('changed');
+            existingValues[link][ev.data] = false;
+        }
+        checkForChanges();
     }
 
     function checkForChanges() {
         let change = false;
         Object.keys(existingValues).forEach(
             link => {
-                if (existingValues[link].f_change || existingValues.t_change) change = true;
+                if (existingValues[link].f_change || existingValues.t_change) {
+                    change = true;
+                }
             }
         );
         disableButton(!change);
@@ -326,7 +348,9 @@ $(function () {
             arr = idFields.slice(); // copies array at top level
         }
 
-        if (arr.length === 5) arr.shift();
+        if (arr.length === 5) {
+            arr.shift();
+        }
 
         arr[0] = arr[0].replace(/^Turret|^Spindle/, '');
         arr[2] = arr[2].replace(/^Turret|^Spindle/, '');

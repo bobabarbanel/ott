@@ -95,6 +95,8 @@
 "setThisTab",
 "getSpec",
 "getKey4id",
-"getKey4"
+"getKey4",
+"numsOf",
+"isString"
   ]
 }

@@ -48,8 +48,7 @@ $(function () {
             key4 = getKey4();
             debugLog("upload.js key4 being set " + JSON.stringify(key4));
             //debugLog("upload Cookie: " + getCookie());
-            var title = "Uploads " + getParsedCookie().partId;
-            debugLog("title " + cookieValue);
+            
             var key5 = getParsedCookie();
             $("#job").text(
                 [
@@ -115,11 +114,11 @@ $(function () {
 
 
         $('.savebutton').on("click",
-            function (event) {
+            function () {
                 let rowID = $(this).parent().parent().attr('id');
                 let that = this;
                 saveContainer(rowID, SECTION).then(
-                    success => {
+                    () => {
                         $(that).hide();
                         $('#' + idStr(rowID, 'upload')).show();
                         $('#' + rowID).attr('saved', '1');
@@ -129,7 +128,7 @@ $(function () {
                     },
                     error => {
                         alert(error);
-                        alert("Unable to create document in 'images' collection.")
+                        alert("Unable to create document in 'images' collection.");
                     }
                 );
             }
@@ -379,7 +378,6 @@ $(function () {
 
         // create image document, initially empty for files
         function saveContainer(rowID, tab) {
-            let tr = $('#' + rowID);
             let idFields = rowID.split('_');
             let turret = numsOf(idFields[0]);
             let position = idFields[1];
@@ -408,13 +406,13 @@ $(function () {
                         console.log(JSON.stringify(result));
                         resolve(result);
                     })
-                    .fail((request, status, error) => reject(error))
+                    .fail((request, status, error) => reject(error));
             });
-        };
+        }
 
 
 
-        function fileUpload(event) {
+        function fileUpload() {
             $("div#pop-up").hide();
             var idFields = $(this).attr("id").split("_");
 
@@ -461,72 +459,18 @@ $(function () {
                             //debugLog("/upload success "+JSON.stringify(result));
                             resolve(result);
                         })
-                        .fail((request, status, error) => reject(error))
+                        .fail((request, status, error) => reject(error));
                 }).then(
                     success => {
                         let id = '#' + idStr(idFields, "count");
                         $(id).text(parseInt($(id).text()) + success.count);
-                    },
-                    error => {
-                        //debugLog("/upload then failure "+error); 
                     }
                     );
             }
             return;
-        };
+        }
 
         $('.fileUpload').on('change', fileUpload);
-
-        // function saveActivity(idFields) {
-        //     // enables or disables the upload button depending on values 
-        //     // being present for
-        //     let button = $('#' + idStr(idFields, "upload"));
-
-        // }
-        // function buttonActivity(idFields) {
-        //     return;
-        //     // enables or disables the upload button depending on values 
-        //     // being present for
-        //     let u_input = $('#' + idStr(idFields, "upload"));
-        //     let f_input = $('#' + idStr(idFields, "function"));
-        //     let t_input = $('#' + idStr(idFields, "type"));
-        //     //debugLog(t, s);
-
-        //     setButton(t_input, f_input, u_input, false);
-        // }
-        // function setButton(t_input, f_input, u_input, quiet) {
-        //     return;
-        //     // quiet non-false means that td containing upload button will not flash a color
-        //     let f_val = (f_input.val() === undefined) ? "" : f_input.val();
-        //     let t_val = (t_input.val() === undefined) ? "" : t_input.val();
-
-        //     //debugLog("\tf\t" + f_val);
-        //     //debugLog("\tt\t" + t_val);
-
-        //     if (f_val === "" || t_val === "") { // disable
-        //         // disable
-        //         //debugLog("\tdisable");
-        //         u_input.parent().removeClass("enabled");
-        //         // u_input.parent().addClass("disabled");
-        //         u_input.prop("disabled", true);
-        //     }
-
-
-        //     else {
-        //         // enable
-        //         debugLog("\tenable");
-        //         u_input.prop("disabled", false);
-        //         u_input.parent().removeClass("disabled");
-        //         if (!quiet) {
-        //             u_input.parent().addClass("enabled");
-        //             // flash background in <td>
-        //             setTimeout(function () {
-        //                 u_input.parent().removeClass("enabled");
-        //             }, 1000);
-        //         }
-        //     }
-
-        // }
 
         function idStr(idFields, tag) {
             // returns input element id for a given turret, spindle, tnum, snum, and type(tag)
@@ -538,7 +482,9 @@ $(function () {
                 arr = idFields.slice();
             }
 
-            if (arr.length === 5) arr.shift();
+            if (arr.length === 5) {
+                arr.shift();
+            }
             if (arr.length !== 4) {
                 debugger;
             }
@@ -574,26 +520,5 @@ $(function () {
             });
         }
 
-        function getFileCount(tab, position, offset) {
-
-            return new Promise((resolve, reject) => {
-                $.ajax({
-                    url: "/countfiles",
-                    type: 'post',
-                    data: {
-                        "key4": getKey4id(),
-                        "tab": tab,
-                        "position": position,
-                        "offset": offset
-                    },
-                    dataType: 'json'
-                })
-                    .done(result => {
-                        //debugLog("getFileCount " + result.path);
-                        resolve(result.path);
-                    })
-                    .fail((request, status, error) => reject(error));
-            });
-        }
     }
 });

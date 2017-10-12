@@ -65,7 +65,7 @@ function paintPage(toolSpecs, toolData) {
     }
     toolData.forEach((item) => {
         var link = item.position + "-" + item.offset;
-        var text = link + ") " + item.type + ":  " + item.function
+        var text = link + ") " + item.type + ":  " + item.function;
         links.push(['#'+link,text]);
         var pic = $('<div class="pic">');
         var div = $("<div/>", { "id": link });

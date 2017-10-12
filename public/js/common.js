@@ -1,5 +1,5 @@
 "use strict";
-/*exported cookieValue,getSpec,getParsedCookie,readCookie,setThisTab,getKey4 */
+/*exported cookieValue,getSpec,getParsedCookie,readCookie,setThisTab,getKey4,getKey4id,isString,numsOf */
 // common.js
 var cookieValue;
 function getSpec(machine) {
@@ -53,7 +53,7 @@ function getKey4id() {
 // Returns if a value is a string
 function isString(value) {
     return typeof value === 'string' || value instanceof String;
-};
+}
 
 function numsOf(str) {
     return str.replace(/[^\d]/g, '');

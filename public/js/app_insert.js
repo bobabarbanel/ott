@@ -1,4 +1,5 @@
-
+"use strict";
+// app_insert.js
 $(function () {
     //console.log("app_insert.js");
 
@@ -106,9 +107,9 @@ function handleChooseOne(who) {
     $(insertSelector, "#new_key_input ").val(newval);
 
     if (isFullySelected()) {
-        doneChoosing()
+        doneChoosing();
     }
-};
+}
 
 function doneChoosing() {
     $("#insertNotice").removeClass().hide();
@@ -116,23 +117,21 @@ function doneChoosing() {
     // also show edit tools??
 }
 
-var existingWindow;
+//var existingWindow;
 
-function handleChoice() {
-    //console.log("handleChoice " + KEY5.partId);
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: "/go_parts",
-            type: 'post',
-            data: KEY5
-        })
-            .done(result => resolve(result))
+// function handleChoice() {
+//     //console.log("handleChoice " + KEY5.partId);
+//     return new Promise((resolve, reject) => {
+//         $.ajax({
+//             url: "/go_parts",
+//             type: 'post',
+//             data: KEY5
+//         })
+//             .done(result => resolve(result))
 
-            .fail((request, status, error) => reject(error))
-
-        //.always(() => console.log("handlechoice complete"));   
-    });
-}
+//             .fail((request, status, error) => reject(error));
+//     });
+// }
 
 function isMachineSpecKnown(mname) {
     return new Promise((resolve, reject) => {
@@ -149,30 +148,28 @@ function isMachineSpecKnown(mname) {
                 //alert("isMachineSpecKnown error: " + error);
                 reject(error);
             });
-    })
-}
-
-function resetVars() {
-    //console.log("resetVars existingWindow = " + existingWindow);
-    if (existingWindow !== undefined && existingWindow !== null) {
-        //console.log("closing existing resetVars");
-        existingWindow.close();
-        existingWindow = null;
-    }
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: "/reset",
-            type: 'get'
-        })
-            .done(result => resolve(result))
-
-            .fail((request, status, error) => reject(error))
-
-            .always(() => console.log("resetVars complete"));
     });
-
 }
 
+// function resetVars() {
+//     //console.log("resetVars existingWindow = " + existingWindow);
+//     if (existingWindow !== undefined && existingWindow !== null) {
+//         //console.log("closing existing resetVars");
+//         existingWindow.close();
+//         existingWindow = null;
+//     }
+//     return new Promise((resolve, reject) => {
+//         $.ajax({
+//             url: "/reset",
+//             type: 'get'
+//         })
+//             .done(result => resolve(result))
+
+//             .fail((request, status, error) => reject(error))
+
+//             .always(() => console.log("resetVars complete"));
+//     });
+// }
 
 var jsonData;
 const FIELDS = ["partId", "pName", "dept", "op", "machine"];
@@ -187,16 +184,16 @@ const FIELDSORTER = {
 const FWIDTH = "180px";
 const STATUS = {};
 const KEY5 = {};
-const LAST = {}; // for checking completion of inputs
+//const LAST = {}; // for checking completion of inputs
 
-function initControls() {
-    for (var key in Object.keys(FIELDS)) {
-        STATUS[key] = 0;
-    }
-    for (var key in Object.keys(KEY5)) {
-        KEY5[key] = undefined;
-    }
-}
+// function initControls() {
+//     for (let key1 in Object.keys(FIELDS)) {
+//         STATUS[key1] = 0;
+//     }
+//     for (let key2 in Object.keys(KEY5)) {
+//         KEY5[key2] = undefined;
+//     }
+// }
 
 
 function getData(message) {
@@ -234,7 +231,7 @@ function putKey5() {
 
 
 function isFullySelected() {
-    return FIELDS.every((f) => (STATUS[f] == 1));
+    return FIELDS.every((f) => (STATUS[f] === 1));
 }
 
 function findUnique(fName) {
@@ -243,8 +240,8 @@ function findUnique(fName) {
 }
 
 function keyMatch(row) {
-    if (Object.keys(KEY5).length == 0) return true;
-    return Object.keys(KEY5).every((key) => (row[key] == KEY5[key]));
+    if (Object.keys(KEY5).length === 0) { return true; }
+    return Object.keys(KEY5).every((key) => (row[key] === KEY5[key]));
 }
 
 function initField(fName) { // set up options for one field fName .chosen and initiate chosen
@@ -278,7 +275,7 @@ function initField(fName) { // set up options for one field fName .chosen and in
     });
 
 
-    if (howMany == 1) {
+    if (howMany === 1) {
         // always disable if there is but one value
         $(".chosen-" + fName, "#container").prop('disabled', true).trigger("chosen:updated");
         // have the containing td act as a button to select the one value
@@ -298,13 +295,3 @@ function initField(fName) { // set up options for one field fName .chosen and in
     }
 
 }
-
-
-
-
-function alphaCompare(a, b) { // used by sort for alpha fields
-    return a.localeCompare(b);
-}
-
-
-

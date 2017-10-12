@@ -1,3 +1,4 @@
+"use strict";
 // File: controllers/topRouter.js
 const assert = require('assert');
 const path = require('path');
@@ -28,7 +29,7 @@ module.exports = function (dir, app, db) {
 			.find({}, { '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 }).sort({ partId: 1 });
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
-			if (doc != null) {
+			if (doc !== null) {
 				//console.log(++count);
 				data.push(doc);
 			}
@@ -46,7 +47,7 @@ module.exports = function (dir, app, db) {
 			.find({}, { '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 }).sort({ partId: 1 });
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
-			if (doc != null) {
+			if (doc !== null) {
 				//console.log(++count);
 				data.push(doc);
 			}
@@ -87,7 +88,7 @@ module.exports = function (dir, app, db) {
 
 		myPromise.then(
 			r => res.json(r),
-			e => res.json([])
+			() => res.json([])
 		);
 		return;
 	});
@@ -115,7 +116,7 @@ module.exports = function (dir, app, db) {
 		//console.log("/images key4 " + key4);
 		var query = { "key4": key4, "tab": req.body.tab };
 		var project = { "_id": 0, "key4": 0, "tab": 0, "files": 0 };
-		if (includeFiles == 1) delete project.files;
+		if (includeFiles === 1) { delete project.files; }
 		var myPromise = db.collection('images')
 			.find(query, project)
 			.sort({ position: 1, offset: 1 })
@@ -126,7 +127,7 @@ module.exports = function (dir, app, db) {
 				//console.log(r);
 				res.json(r);
 			},
-			e => res.json([])
+			() => res.json([])
 		);
 		return;
 	});
@@ -154,7 +155,7 @@ module.exports = function (dir, app, db) {
 			{ '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 });
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
-			if (doc != null) {
+			if (doc !== null) {
 				data.push(doc);
 			}
 		});
@@ -164,7 +165,7 @@ module.exports = function (dir, app, db) {
 
 	app.post('/go_parts', (req, res) => {
 		//console.log("/go_parts post " + JSON.stringify(req.body));
-		var cookie_value = JSON.stringify(req.body)
+		var cookie_value = JSON.stringify(req.body);
 		res.cookie(COOKIE, cookie_value);
 		//console.log("cookie set");
 		res.send("chosen set to " + cookie_value);
@@ -189,7 +190,7 @@ module.exports = function (dir, app, db) {
 				//console.log("part name: " + r);
 				res.json(r);
 			},
-			e => res.json("none")
+			() => res.json("none")
 		);
 		return;
 	});

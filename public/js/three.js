@@ -47,10 +47,6 @@ $(function () {
 
 });
 
-
-
-
-
 function paintPage(toolSpecs, toolData) {
 
     var pictures = $('pictures');
@@ -59,7 +55,7 @@ function paintPage(toolSpecs, toolData) {
         var link = item.title.replace(" ", "");
         links.push(['#'+link,item.title]);
         var pic = $('<div class="pic" id="' + link + '"/>');
-        if (index == 0) { // first pic
+        if (index === 0) { // first pic
             pic.removeClass('pic').addClass('pic0');
         }
 
@@ -105,8 +101,6 @@ function paintPage(toolSpecs, toolData) {
     });
 }
 
-
-
 function getImages(tab) {
     var key = getParsedCookie();
 
@@ -128,35 +122,6 @@ function getImages(tab) {
         //.always(() => console.log("getImages complete"));
     });
 }
-/*
-function getImageComment(path) {
-    
-    var dirs = path.split(/\//);
-
-    path = {
-        dir: dirs.slice(0, dirs.length - 1).join("/"),
-        filename: dirs[dirs.length - 1]
-    };
-    //console.log("dirs: " + path.dir + "::" + path.filename);
-    return new Promise((resolve, reject) => {
-
-        $.ajax({
-            url: "/imageComment",
-            type: 'post',
-            data: path,
-            dataType: 'text'
-        })
-            .done((result) => resolve(result))
-
-            .fail((request, status, error) => reject(error))
-
-        //.always(() => console.log("getImages complete"));
-    });
-    
-}
-*/
-
-
 
 // add scroll offset to fragment target (if there is one)
 function delayedFragmentTargetOffset() {
@@ -182,8 +147,3 @@ function delayedFragmentTargetOffset() {
 
 
 }
-
-function isT1S1(spec) {
-    return (spec.Turret2 === undefined || spec.Turret1.Sprindle2 === undefined);
-}
-

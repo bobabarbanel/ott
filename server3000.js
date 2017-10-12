@@ -1,3 +1,4 @@
+"use strict";
 const MongoClient = require('mongodb').MongoClient;
 //const assert      = require('assert');
 //const path        = require('path');
@@ -12,7 +13,7 @@ const topRouter   = require("./controllers/topRouter");
 //var db;
 
 MongoClient.connect(url, (err, database) => {
-  if (err) return console.log("Mongo Error: " + err);
+  if (err) { return console.log("Mongo Error: " + err); }
   
   const db = database;
   topRouter(__dirname, app, db); // loads routers, and provides access there to these variables
