@@ -30,13 +30,11 @@ module.exports = function (dir, app, db) {
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
 			if (doc !== null) {
-				//console.log(++count);
 				data.push(doc);
 			}
 		});
 		// then show main search front end index.html file
 
-		// console.log("controllers/topRouter.js");
 		res.sendFile(dir + '/index.html');
 	});
 
@@ -48,7 +46,6 @@ module.exports = function (dir, app, db) {
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
 			if (doc !== null) {
-				//console.log(++count);
 				data.push(doc);
 			}
 		});
@@ -59,10 +56,8 @@ module.exports = function (dir, app, db) {
 	app.get('/machine/:mnum', (req, res) => {
 
 		var query = { "machines.mid": req.params.mnum };
-		//console.log('/machine/mnum ' + req.params.mnum);
 		db.collection('machineSpecs').findOne(query, { "_id": 0 }).then(
 			doc => {
-				//console.log('/machine: '+doc);
 				res.json(doc);
 			},
 			err => {
@@ -74,13 +69,8 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post('/images', (req, res) => {
-		//console.log("/images post " + JSON.stringify(req.body));
-
-		//console.log("/images parameters " + req.body.key + " : : " + req.body.tab);
-
 		var key4 = [req.body.key.dept, req.body.key.partId, req.body.key.op, req.body.key.machine].join("|");
 
-		//console.log("/images key4 " + key4);
 		var myPromise = db.collection('images').find({ "key4": key4, "tab": req.body.tab },
 			{ "_id": 0, "key4": 0, "tab": 0 })
 			.sort({ position: 1, offset: 1 })
@@ -122,7 +112,6 @@ module.exports = function (dir, app, db) {
 
 		myPromise.then(
 			r => {
-				console.log(r);
 				res.json(r);
 			},
 			() => res.json([])
@@ -132,7 +121,6 @@ module.exports = function (dir, app, db) {
 
 
 	app.get('/noget', (req, res) => {
-		//console.log("/noget-index.html");
 		res.sendFile(dir + '/index.html');
 	});
 
@@ -145,7 +133,6 @@ module.exports = function (dir, app, db) {
 
 	// do Mongo query
 	app.get('/parts', (req, res) => {
-		//console.log("/parts");
 
 		data = [];
 		// project out the ids
@@ -162,16 +149,12 @@ module.exports = function (dir, app, db) {
 
 
 	app.post('/go_parts', (req, res) => {
-		//console.log("/go_parts post " + JSON.stringify(req.body));
 		var cookie_value = JSON.stringify(req.body);
 		res.cookie(COOKIE, cookie_value);
-		//console.log("cookie set");
 		res.send("chosen set to " + cookie_value);
-		//console.log("res.send");
 	});
 
 	app.post('/pname', (req, res) => {
-		//console.log("/pname post " + JSON.stringify(req.body));
 		
 		var query = { 
 			"dept": req.body.dept,
@@ -185,7 +168,6 @@ module.exports = function (dir, app, db) {
 
 		myPromise.then(
 			r => {
-				//console.log("part name: " + r);
 				res.json(r);
 			},
 			() => res.json("none")
@@ -194,7 +176,6 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.get('/reset', (req, res) => {
-		//console.log("start app/reset");
 
 		data = null;
 		res.clearCookie(COOKIE);

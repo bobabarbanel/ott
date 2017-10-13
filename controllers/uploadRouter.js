@@ -78,7 +78,6 @@ module.exports = function (dir, app, db) {
 
             let ftd = calcFullTargetDir(key4, SECTION);
 
-            //console.log("ftdir " + ftd);
             // public/images/Tools/img/MLetters (first 2 letters of machine name)
             let fullPath = path.normalize(dir + "/public/" + ftd);
             if (!fs.existsSync(fullPath)) {
@@ -88,28 +87,21 @@ module.exports = function (dir, app, db) {
             let uploadCount = 0;
             for (let i = 0; i < myFiles.length; i++) {
                 let fileName = myFiles[i].name;
-                //console.log("file name " + fileName);
                 let tail = fileName.substring(fileName.lastIndexOf("."));
 
                 //  public/images/Tools/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
                 let base = calcFullTargetBaseFileName(key4, position, offset);
-                //console.log("base " + base);
                 let ffn = base + "_" + pad3(tailnum++) + tail; // _001 file
-                //console.log("ffname " + ffn);
 
                 let to = path.normalize(addWebSitePublic(dir, ftd, ffn));
-                //console.log("rename File to " + to);
                 // does the target file already exist with default name?
 
                 while (fs.existsSync(to)) { // while file 'to' exists
                     // add _002 etc as needed
                     ffn = base + "_" + pad3(tailnum++, 3) + tail; // file changed to 002, 003, ...
                     to = path.normalize(addWebSitePublic(dir, ftd, ffn));
-                    //console.log("rename again " + to);
                 }
 
-                //console.log("*** final new movefile to " + to);
-                //console.log("*** last exists check " + fs.existsSync(to));
                 fs.renameSync(myFiles[i].path, to);
                 let mongoKey4 = [key4.dept, key4.partId, key4.op, key4.machine].join("|");
                 let query = {
@@ -164,8 +156,6 @@ module.exports = function (dir, app, db) {
 
         myPromise.then(
             r => {
-                //console.log('/imagefiles/');
-                //console.log(util.inspect(r));
                 res.json(r.map(obj => obj.files.filename));
             },
             () => res.json([])
@@ -174,14 +164,9 @@ module.exports = function (dir, app, db) {
     });
 
     app.post('/updateFT', (req, res) => {
-        console.log('/updateFT' + JSON.stringify(req.body));
         let rq = req.body;
         let doc;
-
-        // db.images.insert({"function":"ddd","type":"eee","turret":"1","position":"3","spindle":"1","offset":"3","key4"
-        // :{"partId":"251A1626-2","dept":"LATHE","op":"30","machine":"NL2500"}, files: []})
         if (rq.addFiles === "true") { //do an insert
-            console.log("insert");
             doc = {
                 "key4": rq.key4,
                 "turret": parseInt(rq.turret),
@@ -199,7 +184,6 @@ module.exports = function (dir, app, db) {
             );
 
         } else { // do an update on an existing document, changing function and type strings
-            console.log("update");
             doc = {
                 "key4": rq.key4,
                 "turret": parseInt(rq.turret),
@@ -215,8 +199,7 @@ module.exports = function (dir, app, db) {
                     "type": rq.type
                 }
             };
-            console.log('/updateFT doc ' + JSON.stringify(doc));
-            console.log('/updateFT update ' + JSON.stringify(update));
+ 
             db.collection('images').findOneAndUpdate(
                 doc,
                 update,
@@ -226,11 +209,9 @@ module.exports = function (dir, app, db) {
                 }
             ).then(
                 success => {
-                    console.log("findOneAndUpdate success" + success);
                     res.json({ 'status': true, 'result': success });
                 },
                 failure => {
-                    console.log("findOneAndUpdate failure" + failure);
                     res.json({ 'status': false, 'result': failure });
                 }
                 );
@@ -240,9 +221,7 @@ module.exports = function (dir, app, db) {
 
 
     app.post('/create_container', (req, res) => {
-        //console.log('/create_container');
         let rq = req.body;
-        //console.log(JSON.stringify(rq));
         let document = {
             "key4": rq.key4,
             "turret": parseInt(rq.turret),
@@ -254,7 +233,6 @@ module.exports = function (dir, app, db) {
             "type": rq.type,
             "files": []
         };
-        //console.log(JSON.stringify(document));
 
         db.collection("images").insertOne(document).then(
             result => {

@@ -51,8 +51,9 @@ function paintPage(toolSpecs, toolData) {
         var link = item.position + "-" + item.offset;
         var text = link + ") " + item.type + ":  " + item.function;
         links.push(['#'+link,text]);
+        
         var pic = $('<div class="pic">');
-        var div = $("<div/>", { "id": link });
+        var div = $("<div/>");
 
         var paragraph = $('<p/>').text(text);
 
@@ -61,14 +62,15 @@ function paintPage(toolSpecs, toolData) {
         item.files.forEach((path) => {
             var img = $('<img/>', {
                 height: "100px",
-                alt: item.function,
+                alt: item.type + ": " + item.function,
                 link: link,
                 src: path.dir + '/' + path.filename,
                 comment: path.comment
             });
             pic.append(img);
         });
-        pictures.append(pic);
+        let anchor = $('<a class="anchor" id="' + link + '"/>');
+        pictures.append(anchor).append(pic);
     });
     $("pictures img").on("click", function () {
         $(".pic").css("background-color", "white");
@@ -76,7 +78,7 @@ function paintPage(toolSpecs, toolData) {
         var single = $("single");
         single.empty();
         single.append($('<h2/>')
-            .text("Tool " + $(this).attr("link") + ": " + $(this).attr("alt")));
+            .text("Tool " + $(this).attr("link") + ") " + $(this).attr("alt")));
         $("pictures img").css("border-color", "transparent");
         $(this).css("border-color", "blue");
         var img = $('<img/>', {
