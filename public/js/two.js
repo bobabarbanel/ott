@@ -58,7 +58,7 @@ function paintPage(toolSpecs, toolData) {
             let anchor = $('<a class="anchor" id="' + headLink + '"/>');
             pictures.append(anchor);
             pictures.append(
-                $('<h4/>').text(headText).css('background', 'lightgreen')
+                $('<div class="headtext"/>').text(headText)
             );
             currentTurret = item.turret;
             currentSpindle = item.spindle;

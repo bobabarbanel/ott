@@ -49,6 +49,15 @@ single h2 {
 .pic a p {
     font-weight: bold;
 }
+.headtext {
+    background: lightgreen;
+    display: block;
+    margin-top: 1.33em;
+    margin-bottom: 1.33em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+}
 
 #floatMenu {
     position: absolute;
@@ -68,8 +77,9 @@ single h2 {
 
 #floatMenu ul a {
     background: lightgreen;;
-    color:#222;
+    color: black;
     font-weight: bold;
+    font-size: 115%;
 }
 
 #floatMenu ul li a {
