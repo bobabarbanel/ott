@@ -61,19 +61,28 @@ single h2 {
 #floatMenu ul {
     margin-bottom:20px;
     list-style: none;
+    background:#ccc;
+    color:#222;
+    padding-left: 10px;
+}
+
+#floatMenu ul a {
+    background: lightgreen;;
+    color:#222;
+    font-weight: bold;
 }
 
 #floatMenu ul li a {
-    display:block;
-    border:1px solid #999;
-    background-color:#222;
-    border-left:6px solid #999;
-    text-decoration:none;
-    color:#ccc;
-    padding:5px 5px 5px 25px;
+    display: block;
+    border: 2px solid #999;
+    background-color: #222;
+    /*border-left:6px solid #999;*/
+    text-decoration: none;
+    color: #ccc;
+    padding: 5px 5px 5px 5px;
 }
-#floatMenu ul.menu1 li a:hover {
-    border-color:#09f;
+#floatMenu ul li a:hover, #floatMenu ul a:hover {
+    border-color:yellow;
 }
 a.anchor {
     display: block;

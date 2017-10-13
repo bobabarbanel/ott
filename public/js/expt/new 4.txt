@@ -1,8 +1,0 @@
-<% clients.forEach(fucntion(client){ %>
-
-                <tr>
-                    <td><a href="http://lar4.loc/clients/<%= client._id %>"><%= client.first_name %></a></td>
-                    <td>Title</td>
-                </tr>
-
-            <%  }) %>

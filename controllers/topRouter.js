@@ -73,7 +73,7 @@ module.exports = function (dir, app, db) {
 
 		var myPromise = db.collection('images').find({ "key4": key4, "tab": req.body.tab },
 			{ "_id": 0, "key4": 0, "tab": 0 })
-			.sort({ position: 1, offset: 1 })
+			.sort({ turret: 1, position: 1, spindle: 1, offset: 1 })
 			.toArray();
 
 		myPromise.then(
