@@ -5,7 +5,6 @@ var cookieValue = "not set";
 var floatName = "#floatMenu";
 var menuYloc = null;
 
-
 $(function () {
     menuYloc = parseInt($(floatName).css("top"));
     $(window).scroll(function () {
@@ -13,27 +12,22 @@ $(function () {
         $(floatName).animate({ top: offset }, { duration: 300, queue: false });
         $('content').attr('top',"60px");
     });
-    //console.log("2.html cookieValue = " + getCookie());
+;
     $.getScript("/js/common.js")
         .done(function (/*script, textStatus*/) {
-            //console.log("getScript " + textStatus);
 
             ////////////////////////////////////////////////////////////
             cookieValue = unescape(readCookie(COOKIE));
 
-
-            var title = "Part " + getParsedCookie().partId;
-
-            $("title").text(title);
+            $("title").text("Part " + getParsedCookie().partId);
 
             $("#cookie").text(getCookie());
             setThisTab(2);
-            //var toolSpecs = null;
+
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
 
                     getImages("Tools").then((toolData) => {
-                        //console.log("toolData: " + toolData);
                         paintPage(machineSpecs, toolData);
                     });
 
@@ -49,20 +43,10 @@ $(function () {
 
 });
 
-
-
-
-
 function paintPage(toolSpecs, toolData) {
     var links = [];
     var pictures = $('pictures');
-    //var num = 1;
-    if (isT1S1(toolSpecs)) {
-        pictures.append($("<p>" + "T1S1" + "</p>"));
-    }
-    else {
-        pictures.append($("<p>" + "NOT T1S1" + "</p>"));
-    }
+
     toolData.forEach((item) => {
         var link = item.position + "-" + item.offset;
         var text = link + ") " + item.type + ":  " + item.function;
@@ -71,11 +55,9 @@ function paintPage(toolSpecs, toolData) {
         var div = $("<div/>", { "id": link });
 
         var paragraph = $('<p/>').text(text);
-        //paragraph.attr("id", "num" + num);
+
         div.html(paragraph);
         pic.append(div);
-        //pic.append(paragraph);
-
         item.files.forEach((path) => {
             var img = $('<img/>', {
                 height: "100px",
@@ -84,7 +66,6 @@ function paintPage(toolSpecs, toolData) {
                 src: path.dir + '/' + path.filename,
                 comment: path.comment
             });
-            //console.log("dir " + path.dir + " com " + path.comment);
             pic.append(img);
         });
         pictures.append(pic);
@@ -114,8 +95,6 @@ function paintPage(toolSpecs, toolData) {
     });
 }
 
-
-
 function getImages(tab) {
     var key = getParsedCookie();
 
@@ -134,38 +113,8 @@ function getImages(tab) {
 
             .fail((request, status, error) => reject(error));
 
-        //.always(() => console.log("getImages complete"));
     });
 }
-/*
-function getImageComment(path) {
-    
-    var dirs = path.split(/\//);
-
-    path = {
-        dir: dirs.slice(0, dirs.length - 1).join("/"),
-        filename: dirs[dirs.length - 1]
-    };
-    //console.log("dirs: " + path.dir + "::" + path.filename);
-    return new Promise((resolve, reject) => {
-
-        $.ajax({
-            url: "/imageComment",
-            type: 'post',
-            data: path,
-            dataType: 'text'
-        })
-            .done((result) => resolve(result))
-
-            .fail((request, status, error) => reject(error))
-
-        //.always(() => console.log("getImages complete"));
-    });
-    
-}
-*/
-
-
 
 // add scroll offset to fragment target (if there is one)
 function delayedFragmentTargetOffset() {
@@ -177,9 +126,6 @@ function delayedFragmentTargetOffset() {
         var div = $(url.substring(hashCharPosition));
 
         var offset = div.offset();
-        //console.log("delayedFragmentTargetOffset" + " :: " + offset.top);
-        //var offset = $(':target').offset();
-
 
         var scrollto = offset.top - 50; // minus fixed header height
         $('html, body').animate({ scrollTop: scrollto }, 0);
@@ -191,8 +137,3 @@ function delayedFragmentTargetOffset() {
 
 
 }
-
-function isT1S1(spec) {
-    return (spec.Turret2 === undefined || spec.Turret1.Sprindle2 === undefined);
-}
-

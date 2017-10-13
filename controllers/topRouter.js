@@ -106,25 +106,23 @@ module.exports = function (dir, app, db) {
 
 	});
 	app.post('/sheetTags', (req, res) => {
-		//console.log("/sheetTags post " + JSON.stringify(req.body));
-
-		//console.log("/sheetTags parameters " + req.body.key + " : : " + req.body.tab + " : : " + req.body.files);
 
 		var key4 = [req.body.key.dept, req.body.key.partId,
 		req.body.key.op, req.body.key.machine].join("|");
 		var includeFiles = req.body.files;
-		//console.log("/images key4 " + key4);
+		
 		var query = { "key4": key4, "tab": req.body.tab };
 		var project = { "_id": 0, "key4": 0, "tab": 0, "files": 0 };
-		if (includeFiles === 1) { delete project.files; }
+		if (includeFiles !== 1) { delete project.files; }
+
 		var myPromise = db.collection('images')
 			.find(query, project)
-			.sort({ position: 1, offset: 1 })
+			.sort({ turret: 1, position: 1, spindle: 1, offset: 1 })
 			.toArray();
 
 		myPromise.then(
 			r => {
-				//console.log(r);
+				console.log(r);
 				res.json(r);
 			},
 			() => res.json([])
@@ -194,10 +192,6 @@ module.exports = function (dir, app, db) {
 		);
 		return;
 	});
-	/*function vals(q) {
-	  return [q.partId, q.dept, q.pName, q.op, q.machine].join(",");
-    }*/
-
 
 	app.get('/reset', (req, res) => {
 		//console.log("start app/reset");
