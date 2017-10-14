@@ -36,6 +36,10 @@ single h2 {
     top: 50px; 
 }
 
+single:hover {
+    z-index: 5;
+}
+
 .pic {
     border: 20px;
 	/*margin-right: 300px;*/
@@ -67,6 +71,7 @@ single h2 {
     right: 50px;
     margin-left: 40px;
     width: 200px;
+    z-index: 0;
 }
 
 #floatMenu ul {
