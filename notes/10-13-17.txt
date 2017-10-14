@@ -16,3 +16,5 @@ or smaller font and scroll, or click z-index back and forth
 8) large image right click - open in paint? magnifier ?
 
 9) quick jump to image anchor from tab 1
+
+10) parts directory ??
