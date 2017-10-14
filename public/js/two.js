@@ -49,8 +49,6 @@ function paintPage(toolSpecs, toolData) {
         let text = item.position + '-' + item.offset + ") "
             + item.function + ":  " + item.type;
 
-
-
         if (currentTurret !== item.turret || currentSpindle !== item.spindle) {
             let headText = "Turret" + item.turret + " " + "Spindle" + item.spindle;
             let headLink = [item.turret, item.spindle].join('-');
@@ -70,8 +68,6 @@ function paintPage(toolSpecs, toolData) {
         let anchor = $('<a class="anchor" id="' + link + '"/>');
         pictures.append(anchor);
         let pic = $('<div class="pic">');
-
-
         let div = $("<div/>");
         let paragraph = $('<p/>').text(text);
 
@@ -83,6 +79,9 @@ function paintPage(toolSpecs, toolData) {
                     height: "100px",
                     alt: item.function + ": " + item.type,
                     link: link,
+                    tag: item.position + '-' + item.offset,
+                    turret: currentTurret,
+                    spindle: currentSpindle,
                     src: path.dir + '/' + path.filename,
                     comment: path.comment
                 });
@@ -97,8 +96,12 @@ function paintPage(toolSpecs, toolData) {
         $(this).parent().css("background-color", "yellow");
         var single = $("single");
         single.empty();
+        single.append($('<h4/>')
+            .text("Turret" + $(this).attr("turret")
+            + " Spindle" + $(this).attr("spindle")));
         single.append($('<h2/>')
-            .text("Tool " + $(this).attr("link") + ") " + $(this).attr("alt")));
+            .text("Tool " + $(this).attr("tag") + ") "
+            + $(this).attr("alt")));
         $("pictures img").css("border-color", "transparent");
         $(this).css("border-color", "blue");
         var img = $('<img/>', {

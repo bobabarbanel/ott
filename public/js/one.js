@@ -4,17 +4,13 @@ const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
 
 $(function () {
-    //console.log("running one");
     $.getScript("/js/common.js")
         .done(function (/*script, textStatus*/) {
-            //console.log("getScript " + textStatus);
 
             ////////////////////////////////////////////////////////////
             cookieValue = unescape(readCookie(COOKIE));
 
-            //console.log("one Cookie: " + getCookie());
             var title = "Setup " + getParsedCookie().partId;
-            //console.log("title " + title);
             $("title").text(title);
 
             $("#cookie").text(getCookie()); setThisTab(1);
@@ -32,6 +28,12 @@ $(function () {
         });
 
 });
+function genLinkObj(tDoc) {
+    return [tDoc.turret, tDoc.position, tDoc.spindle, tDoc.offset].join('_');
+}
+function genLinkList(aList) {
+    return aList.join('_');
+}
 
 function paintPage(machineSpecs, toolData) {
     let table = $('<table id="setup"/>');
@@ -42,7 +44,7 @@ function paintPage(machineSpecs, toolData) {
 
     let haves = {}; // lookup for position-offset pairs
     toolData.forEach(tDoc => {
-        haves[tDoc.position + "-" + tDoc.offset] = tDoc;
+        haves[genLinkObj(tDoc)] = tDoc;
     });
 
     ["Turret1", "Turret2"].forEach((turret) => {
@@ -71,7 +73,7 @@ function doRows(specs, turret, spindle, table, haves) {
     let lowS  = specs[turret][spindle][0];
     //let highS = specs[turret][spindle][1];
     for (var t = lowT, s = lowS; t <= highT; t++ , s++) {
-        var link = t + "-" + s;
+        var link = genLinkList([numsOf(turret),t,numsOf(spindle),s]);
         let trClass = (haves[link] !== undefined) ? "slightgrey" : "nogrey";
 
         let tr = $('<tr class="' + trClass + '"/>');
@@ -79,7 +81,6 @@ function doRows(specs, turret, spindle, table, haves) {
         if(haves[link] !== undefined) {
             // white circle symbol in first column
             var a = '<a target="_blank" href="/tabs/2.html#' + link + '">' + "&#9675;" + '</a>'; 
-            //var r = '<div><input type="radio" value="/tabs/2.html#' + link + '"></div>';
             td.html(a);
         }
         
