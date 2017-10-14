@@ -45,3 +45,11 @@ tr.nogrey {
 td.left a:link {
     text-decoration: none;
 }
+
+#header {
+    align-content: center;
+    width: 60%;
+}
+#header, #header tr, #header td {
+    border: 0;
+}

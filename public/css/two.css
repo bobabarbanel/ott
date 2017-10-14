@@ -70,8 +70,10 @@ single:hover {
     top: 40px;
     right: 50px;
     margin-left: 40px;
-    width: 200px;
+    width: 250px;
     z-index: 0;
+    max-height: 700px;
+    overflow-y: scroll;
 }
 
 #floatMenu ul {
@@ -80,13 +82,14 @@ single:hover {
     background:#ccc;
     color:#222;
     padding-left: 10px;
+    font-size: 115%;
 }
 
 #floatMenu ul a {
     background: lightgreen;;
     color: black;
     font-weight: bold;
-    font-size: 115%;
+    font-size: 80%;
 }
 
 #floatMenu ul li a {

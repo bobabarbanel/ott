@@ -9,11 +9,17 @@ $(function () {
 
             ////////////////////////////////////////////////////////////
             cookieValue = unescape(readCookie(COOKIE));
-
-            var title = "Setup " + getParsedCookie().partId;
+            var key5 = getParsedCookie();
+            var title = "Setup " + key5.partId;
             $("title").text(title);
-
-            $("#cookie").text(getCookie()); setThisTab(1);
+            
+            setThisTab(1);
+            
+            $("#job").text(
+                [
+                    key5.partId, key5.pName, key5.dept, key5.op, key5.machine
+                ].join(" : ")
+            );
 
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
@@ -94,8 +100,8 @@ function doRows(specs, turret, spindle, table, haves) {
         td.text(s);
         tr.append(td);
         var tData;
-        if (haves[t + "-" + s] !== undefined) {
-            tData = haves[t + "-" + s];
+        if (haves[link] !== undefined) {
+            tData = haves[link];
         } else {
             tData = { "function": "N/A", "type": "N/A" };
         }
