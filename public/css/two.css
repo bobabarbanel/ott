@@ -19,12 +19,12 @@ single {
 single img {
     position: fixed;
 	top: 120px;
-    height: 600px;
+    height: 500px;
    
 }
 single p {
     position: fixed;
-	top: 710px;
+	top: 610px;
 }
 single h4 {
     position: fixed;
@@ -53,7 +53,7 @@ single:hover {
 #floatMenu {
     position: absolute;
     top: 40px;
-    right: 50px;
+    right: 20px;
     margin-left: 40px;
     width: 250px;
     z-index: 0;
@@ -102,21 +102,6 @@ a.anchor {
 	color: #222;
     border-bottom: 1px solid black;
 }
-/*
-.pic {
-    border: 20px;
-	background-color: white;
-	color: #222;
-    border-bottom: 1px solid black;
-}
-.pic img {
-    margin: 10px;
-    border: 4px solid transparent;
-}
-.pic a p {
-    font-weight: bold;
-}
-*/
 
 .img-wrap {
     position: relative;
@@ -144,4 +129,14 @@ a.anchor {
 }
 .img-wrap:hover .close {
     opacity: 1;
+}
+#floatButton {
+    float: right;
+    margin-right: 40px;
+    margin-top: 6px;
+    background: blue;
+    color: white;
+}
+.hidden {
+    display: none;
 }

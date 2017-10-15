@@ -36,8 +36,12 @@ $(function () {
         .fail(function (/*jqxhr, settings, exception*/) {
             console.log("getScript " + "Triggered ajaxError handler.");
         });
+        $("#floatButton").on('click', hideShowFloat);  
 
 });
+function hideShowFloat() {
+    $("#floatMenu").toggleClass('hidden');
+};
 
 function paintPage(toolSpecs, toolData) {
     let links = []; // for float menu
@@ -75,12 +79,7 @@ function paintPage(toolSpecs, toolData) {
         pic.append(div);
         item.files.forEach(
             (path) => {
-                /*
-                <div class="img-wrap">
-    <span class="close">&times;</span>
-    <img src="http://lorempixel.com/200/200" data-id="123">
-</div>
-                */
+ 
                 let div = $('<div class="img-wrap"><span class="close">&times;</span></div>');
                 let img = $('<img/>', {
                     height: "100px",
@@ -130,7 +129,7 @@ function paintPage(toolSpecs, toolData) {
         });
         single.append(img);
         single.append($("<p>" + $(this).attr("comment") + "</p>"));
-
+        $('#floatMenu').removeClass().toggleClass('hidden');
     });
     // build static menu
     //let ul = $(floatName + "> ul");
