@@ -80,6 +80,7 @@ function doRows(specs, turret, spindle, table, haves) {
     //let highS = specs[turret][spindle][1];
     for (var t = lowT, s = lowS; t <= highT; t++ , s++) {
         var link = genLinkList([numsOf(turret),t,numsOf(spindle),s]);
+        console.log("link: " + link);
         let trClass = (haves[link] !== undefined) ? "slightgrey" : "nogrey";
 
         let tr = $('<tr class="' + trClass + '"/>');

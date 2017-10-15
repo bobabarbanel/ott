@@ -75,6 +75,13 @@ function paintPage(toolSpecs, toolData) {
         pic.append(div);
         item.files.forEach(
             (path) => {
+                /*
+                <div class="img-wrap">
+    <span class="close">&times;</span>
+    <img src="http://lorempixel.com/200/200" data-id="123">
+</div>
+                */
+                let div = $('<div class="img-wrap"><span class="close">&times;</span></div>');
                 let img = $('<img/>', {
                     height: "100px",
                     alt: item.function + ": " + item.type,
@@ -83,17 +90,30 @@ function paintPage(toolSpecs, toolData) {
                     turret: currentTurret,
                     spindle: currentSpindle,
                     src: path.dir + '/' + path.filename,
-                    comment: path.comment
+                    comment: path.comment,
+                    dir: path.dir,
+                    filename: path.filename
                 });
-                pic.append(img);
+                div.append(img);
+                pic.append(div);
             });
-
         pictures.append(pic);
     });
 
+    $('.img-wrap .close').on('click', function() {
+        let img = $(this).closest('.img-wrap').find('img');
+        let link = img.attr('link');
+        let filename = img.attr('filename');
+        let directory = img.attr('dir');
+        // if currently displayed single - kill that
+        // remove from db
+        // rename (move) file to public/image/trash/MAchineCHARDir
+        alert('remove picture: ' + [link,directory,filename].join(' : '));
+        return false;
+    });
     $("pictures img").on("click", function () {
         $(".pic").css("background-color", "white");
-        $(this).parent().css("background-color", "yellow");
+        $(this).parent().parent().css("background-color", "yellow");
         var single = $("single");
         single.empty();
         single.append($('<h4/>')
