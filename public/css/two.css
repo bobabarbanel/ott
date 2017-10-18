@@ -16,11 +16,10 @@ single {
     position: fixed;
     left: 600px;
 }
-single img {
-    position: fixed;
-	top: 120px;
+#image-gallery img {
+    /*position: fixed;
+	top: 120px;*/
     height: 500px;
-   
 }
 single p {
     position: fixed;
@@ -35,10 +34,11 @@ single h2 {
     position: fixed;
     top: 50px; 
 }
-
+/*
 single:hover {
     z-index: 5;
 }
+*/
 
 .headtext {
     background: lightgreen;

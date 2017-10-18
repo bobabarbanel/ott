@@ -432,11 +432,11 @@ function initField(fName) { // set up options for one field fName .chosen and in
 
     //return howMany;
 }
-/*
+
 function alphaCompare(a, b) { // useed by sort for alpha fields
     return a.localeCompare(b);
 }
-*/
+
 function updateField(fName) { // set up options for one field fName .chosen and initiate chosen
     //console.log("updateField "+ fName);
     const selector = "#" + fName + "_select";

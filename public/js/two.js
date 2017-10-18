@@ -36,7 +36,7 @@ $(function () {
         .fail(function (/*jqxhr, settings, exception*/) {
             console.log("getScript " + "Triggered ajaxError handler.");
         });
-        $("#floatButton").on('click', hideShowFloat);  
+    $("#floatButton").on('click', hideShowFloat);
 
 });
 function hideShowFloat() {
@@ -79,7 +79,7 @@ function paintPage(toolSpecs, toolData) {
         pic.append(div);
         item.files.forEach(
             (path) => {
- 
+
                 let div = $('<div class="img-wrap"><span class="close">&times;</span></div>');
                 let img = $('<img/>', {
                     height: "100px",
@@ -99,7 +99,7 @@ function paintPage(toolSpecs, toolData) {
         pictures.append(pic);
     });
 
-    $('.img-wrap .close').on('click', function() {
+    $('.img-wrap .close').on('click', function () {
         let img = $(this).closest('.img-wrap').find('img');
         let link = img.attr('link');
         let filename = img.attr('filename');
@@ -107,14 +107,14 @@ function paintPage(toolSpecs, toolData) {
         // if currently displayed single - kill that
         // remove from db
         // rename (move) file to public/image/trash/MAchineCHARDir
-        alert('remove picture: ' + [link,directory,filename].join(' : '));
+        alert('remove picture: ' + [link, directory, filename].join(' : '));
         return false;
     });
     $("pictures img").on("click", function () {
         $(".pic").css("background-color", "white");
         $(this).parent().parent().css("background-color", "yellow");
-        var single = $("single");
-        single.empty();
+        let single = $("single").empty();
+
         single.append($('<h4/>')
             .text("Turret" + $(this).attr("turret")
             + " Spindle" + $(this).attr("spindle")));
@@ -123,11 +123,18 @@ function paintPage(toolSpecs, toolData) {
             + $(this).attr("alt")));
         $("pictures img").css("border-color", "transparent");
         $(this).css("border-color", "blue");
-        var img = $('<img/>', {
-            src: $(this).attr("src"),
-            alt: "large image"
-        });
-        single.append(img);
+
+        var img = $('<img class="pannable-image"/>');
+        img.attr('src', $(this).attr("src"));
+        img.attr('data-high-res-src', $(this).attr("src"));
+        img.attr('alt', $(this).attr('filename'));
+
+        let in_single = $('<div id="image-gallery" class="in_single cf"/>');
+        in_single.append(img);
+        
+
+        single.append(in_single);
+        $('.pannable-image').ImageViewer();
         single.append($("<p>" + $(this).attr("comment") + "</p>"));
         $('#floatMenu').removeClass().toggleClass('hidden');
     });
