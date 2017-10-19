@@ -26,61 +26,65 @@ $(function () {
         // validate values !! no nulls
         let old = [];
         let nowNew = [];
-        Object.keys(existingValues).filter(
+        var evMod = jQuery.extend(true, {}, existingValues); // a deep copy
+        Object.keys(evMod).forEach(
             link => {
-                let ret = (existingValues[link].f_change || existingValues[link].t_change);
+                let ret = (evMod[link].f_change || 
+                           evMod[link].t_change);
                 if (ret) {
-                    if (existingValues[link].function === '') {
+                    if (evMod[link].function === '') {
                         nowNew.push(link);
-                        existingValues[link].function = $('#' + idStr(link, 'function')).val();
-                        existingValues[link].type = $('#' + idStr(link, 'type')).val();
+                        // now, modify the existing values
+                        evMod[link].function = $('#' + idStr(link, 'function')).val();
+                        evMod[link].type = $('#' + idStr(link, 'type')).val();
                     }
                     else {
-                        existingValues[link].function = $('#' + idStr(link, 'function')).val();
-                        existingValues[link].type = $('#' + idStr(link, 'type')).val();
+                        // now, modify the existing values
+                        evMod[link].function = $('#' + idStr(link, 'function')).val();
+                        evMod[link].type = $('#' + idStr(link, 'type')).val();
                         old.push(link);
                     }
                 }
-                return true;
+                // evMod[link] now has all the editing/changed values for link
+                //return true;
             }
         );
-
-        if (old.some(link => hasEmptyString(link)) || nowNew.some(link => hasEmptyString(link))) {
-            alert("Must not Use an Empty Function or Type Name.");
+        let old_some_empty = old.some(link => hasEmptyString(evMod, link));
+        let new_some_empty = nowNew.some(link => hasEmptyString(evMod, link));
+        if ( old_some_empty || new_some_empty){
+            alert("Must have both a non-empty Function and Type Name.");
         } else {
-            let newPromises = nowNew.map(link => updateFT(existingValues[link], true));
-            let oldPromises = old.map(link => updateFT(existingValues[link], false));
+            let newPromises = nowNew.map(link => updateFT(evMod[link], true));
+            let oldPromises = old.map(link => updateFT(evMod[link], false));
+            //alert("new " + newPromises.length);
+            //alert("old " + oldPromises.length);
             Promise.all(newPromises.concat(oldPromises)).then(
                 complete => {
                     if(!complete[0].status) {
                         alert("Unable to complete updates.");
                     }
-                       
-                     
-                    // if (success.status)
-                    //     alert("success " + JSON.stringify(success.result));
-                    // else
-                    //     alert("error " + JSON.stringify(success.result));
-                    window.location.reload(true);
+                    //alert("complete status " + complete[0].status);
+                    window.location = window.location.href+'?eraseCache=true';
+                    //window.location.reload(true);
                 },
                 error => {
-                    alert("error " + JSON.stringify(error));
-                    window.location.reload(true);
+                    //alert("error " + JSON.stringify(error));
+                    //window.location.reload(true);
+                    window.location = window.location.href+'?eraseCache=true';
                 }
             );
-
-
         }
     });
 
-    function hasEmptyString(link) {
-        return existingValues[link].function === '' || existingValues[link].type === '';
+    function hasEmptyString(evMod, link) { // check evMod for empty values
+        return evMod[link].function === '' || evMod[link].type === '';
     }
 
     function updateFT(fields, addFiles) {
         fields.key4 = getKey4id();
         fields.addFiles = addFiles;
         fields.tab = SECTION;
+        alert("updateFT " + fields.key4 + " " + fields.function);
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "/updateFT",
