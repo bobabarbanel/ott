@@ -84,7 +84,7 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post('/addkey', (req, res) => {
-
+		req.body.lastUpdated = new Date(); // timestamp for jobs
 		db.collection('main').insertOne(req.body).then(
 			result => {
 				res.send(result);

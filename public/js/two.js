@@ -79,7 +79,7 @@ function paintPage(toolSpecs, toolData) {
         pic.append(div);
         item.files.forEach(
             (path) => {
-
+console.log(path.dir + '/' + path.filename);
                 let div = $('<div class="img-wrap"><span class="close">&times;</span></div>');
                 let img = $('<img/>', {
                     height: "100px",
