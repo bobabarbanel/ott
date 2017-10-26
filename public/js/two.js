@@ -79,7 +79,7 @@ function paintPage(toolSpecs, toolData) {
         pic.append(div);
         item.files.forEach(
             (path) => {
-console.log(path.dir + '/' + path.filename);
+
                 let div = $('<div class="img-wrap"><span class="close">&times;</span></div>');
                 let img = $('<img/>', {
                     height: "100px",
@@ -98,7 +98,7 @@ console.log(path.dir + '/' + path.filename);
             });
         pictures.append(pic);
     });
-
+    // testing update
     $('.img-wrap .close').on('click', function () {
         let img = $(this).closest('.img-wrap').find('img');
         let link = img.attr('link');
@@ -106,7 +106,8 @@ console.log(path.dir + '/' + path.filename);
         let directory = img.attr('dir');
         // if currently displayed single - kill that
         // remove from db
-        // rename (move) file to public/image/trash/MAchineCHARDir
+        // rename (move) file to public/images/Archive/Tools[_small|large]
+        // 
         alert('remove picture: ' + [link, directory, filename].join(' : '));
         return false;
     });
