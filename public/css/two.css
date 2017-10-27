@@ -34,11 +34,10 @@ single h2 {
     position: fixed;
     top: 50px; 
 }
-/*
+
 single:hover {
     z-index: 5;
 }
-*/
 
 .headtext {
     background: lightgreen;

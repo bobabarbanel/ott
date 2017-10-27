@@ -69,9 +69,13 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post('/images', (req, res) => {
-		var key4 = [req.body.key.dept, req.body.key.partId, req.body.key.op, req.body.key.machine].join("|");
+		var key4 = [req.body.key.dept, req.body.key.partId,
+		req.body.key.op, req.body.key.machine].join("|");
 
-		var myPromise = db.collection('images').find({ "key4": key4, "tab": req.body.tab },
+		var myPromise = db.collection('images').find({
+			"key4": key4,
+			"tab": req.body.tab
+		},
 			{ "_id": 0, "key4": 0, "tab": 0 })
 			.sort({ turret: 1, position: 1, spindle: 1, offset: 1 })
 			.toArray();
@@ -100,7 +104,7 @@ module.exports = function (dir, app, db) {
 		var key4 = [req.body.key.dept, req.body.key.partId,
 		req.body.key.op, req.body.key.machine].join("|");
 		var includeFiles = req.body.files;
-		
+
 		var query = { "key4": key4, "tab": req.body.tab };
 		var project = { "_id": 0, "key4": 0, "tab": 0, "files": 0 };
 		if (includeFiles !== 1) { delete project.files; }
@@ -155,13 +159,13 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post('/pname', (req, res) => {
-		
-		var query = { 
+
+		var query = {
 			"dept": req.body.dept,
 			"machine": req.body.machine,
 			"op": req.body.op,
 			"partId": req.body.partId
-		 };
+		};
 		var project = { "pName": 1 };
 		var myPromise = db.collection('main')
 			.findOne(query, project);

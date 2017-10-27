@@ -51,7 +51,7 @@ function paintPage(toolSpecs, toolData) {
     toolData.forEach((item) => {
         let link = [item.turret, item.position, item.spindle, item.offset].join('_');
         let text = item.position + '-' + item.offset + ") "
-            + item.function + ":  " + item.type;
+            + item.function; + ":  " + item.type; 
 
         if (currentTurret !== item.turret || currentSpindle !== item.spindle) {
             let headText = "Turret" + item.turret + " " + "Spindle" + item.spindle;
@@ -68,7 +68,7 @@ function paintPage(toolSpecs, toolData) {
             links.push(['#' + headLink, headText]);
         }
 
-        links.push(['#' + link, text]);
+        links.push(['#' + link, item.function]); // -- Jeff request to drop type
         let anchor = $('<a class="anchor" id="' + link + '"/>');
         pictures.append(anchor);
         let pic = $('<div class="pic">');
@@ -78,9 +78,11 @@ function paintPage(toolSpecs, toolData) {
         div.html(paragraph);
         pic.append(div);
         item.files.forEach(
-            (path) => {
-
-                let div = $('<div class="img-wrap"><span class="close">&times;</span></div>');
+            path => {
+                let small = path.dir.replace('/Tools/','/Tools_small/');
+                let large = path.dir.replace('/Tools/','/Tools_large/');
+                let div = $('<div class="img-wrap"><span class="close">'
+                    + '&times;</span></div>');
                 let img = $('<img/>', {
                     height: "100px",
                     alt: item.function + ": " + item.type,
@@ -88,9 +90,11 @@ function paintPage(toolSpecs, toolData) {
                     tag: item.position + '-' + item.offset,
                     turret: currentTurret,
                     spindle: currentSpindle,
-                    src: path.dir + '/' + path.filename,
+                    src: small + '/' + path.filename,
                     comment: path.comment,
                     dir: path.dir,
+                    dir_small: small,
+                    dir_large: large,
                     filename: path.filename
                 });
                 div.append(img);
@@ -103,18 +107,19 @@ function paintPage(toolSpecs, toolData) {
         let img = $(this).closest('.img-wrap').find('img');
         let link = img.attr('link');
         let filename = img.attr('filename');
-        let directory = img.attr('dir');
+        let dirs = [img.attr('dir'), img.attr('dir_small'), img.attr('dir_large')];
         // if currently displayed single - kill that
         // remove from db
         // rename (move) file to public/images/Archive/Tools[_small|large]
         // 
-        alert('remove picture: ' + [link, directory, filename].join(' : '));
+        alert('remove picture: ' + [link, dirs[0], dirs[1], dirs[2], filename].join('\n'));
         return false;
     });
     $("pictures img").on("click", function () {
         $(".pic").css("background-color", "white");
         $(this).parent().parent().css("background-color", "yellow");
         let single = $("single").empty();
+        let fileName = $(this).attr('filename');
 
         single.append($('<h4/>')
             .text("Turret" + $(this).attr("turret")
@@ -126,18 +131,17 @@ function paintPage(toolSpecs, toolData) {
         $(this).css("border-color", "blue");
 
         var img = $('<img class="pannable-image"/>');
-        img.attr('src', $(this).attr("src"));
-        img.attr('data-high-res-src', $(this).attr("src"));
+        img.attr('src', $(this).attr("dir_large") + '/' + fileName);
+        img.attr('data-high-res-src', $(this).attr("dir") + '/' + fileName);
         img.attr('alt', $(this).attr('filename'));
 
         let in_single = $('<div id="image-gallery" class="in_single cf"/>');
         in_single.append(img);
-        
 
         single.append(in_single);
         $('.pannable-image').ImageViewer();
         single.append($("<p>" + $(this).attr("comment") + "</p>"));
-        $('#floatMenu').removeClass().toggleClass('hidden');
+        //$('#floatMenu').removeClass().toggleClass('hidden');
     });
     // build static menu
     //let ul = $(floatName + "> ul");
