@@ -108,15 +108,39 @@ function paintPage(toolSpecs, toolData) {
     $('.img-wrap .close').on('click', function () {
         let img = $(this).closest('.img-wrap').find('img');
         let link = img.attr('link');
-        let filename = img.attr('filename');
+        let fileName = img.attr('filename');
         let dirs = [img.attr('dir'), img.attr('dir_small'), img.attr('dir_large')];
         // if currently displayed single - kill that
         // remove from db
         // rename (move) file to public/images/Archive/Tools[_small|large]
         // 
-        alert('remove picture: ' + [link, dirs[0], dirs[1], dirs[2], filename].join('\n'));
+        //alert('remove picture: ' + [link, dirs[0], dirs[1], dirs[2], filename].join('\n'));
+        $.confirm({
+            boxWidth: '500px',
+            useBootstrap: false,
+            type: 'dark',
+            draggable: true,
+            animation: 'left',
+            title: "Image Deletion",
+            content: '<img src="' + img.attr('dir_small') + '/' + fileName +'"/>'
+             + '&nbsp;&nbsp;Do you want to delete this image?',
+            buttons: {
+                Yes: {
+                    text: "Yes - Delete it!",
+                    btnClass: 'btn-blue',
+                    action: function () { deleteImages(dirs, filename); }
+                },
+                No: {
+                    btnClass: 'btn-red'
+                },
+            }
+        });
+        
         return false;
     });
+    function deleteImages(dirs, fileName) {
+
+    }
     $("pictures img").on("click", function () {
         $(".pic").css("background-color", "white");
         $(this).parent().parent().css("background-color", "yellow");

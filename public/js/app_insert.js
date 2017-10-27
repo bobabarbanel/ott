@@ -1,8 +1,6 @@
 "use strict";
 // app_insert.js
 $(function () {
-    //console.log("app_insert.js");
-
     $("#submit").hide();
     doGetData();
 
@@ -12,14 +10,9 @@ $(function () {
 
     $("#submit").on("click", function () {
         $("#insertNotice").hide();
-
-
         isMachineSpecKnown(KEY5.machine).then(
             result => {
-
-                //alert("isMachineSpecKnown result = " + result);
                 if (!result) {
-
                     $.confirm({
                         boxWidth: '700px',
                         useBootstrap: false,
@@ -57,18 +50,16 @@ function performPut() {
     putKey5().then(
         value => {
             if (value.error) {
-                //alert("Error: Duplicate Identifier.");
                 $("#submit").hide();
                 $("#insertNotice").css("background-color", "red");
                 $("#insertNotice").text("Error: Duplicate Identifier.").show();
             } else {
                 $("#insertNotice").css("background-color", "green");
                 $("#insertNotice").text("1 New Identifier Added.").show();
-                //alert("1 New Identifier Added.");
                 setTimeout(function () { location.reload(); }, 2000);
             }
         },
-        () => alert("error")
+        error => alert("/insert app_insert.js performPut error " + error)
     );
 }
 function doGetData() {
@@ -213,9 +204,7 @@ function getData(message) {
 
 function putKey5() {
     return new Promise((resolve, reject) => {
-
         KEY5._id = idOrderedKeys.map(key => KEY5[key]).join("|");
-
 
         $.ajax({
             url: "/addkey",
@@ -223,9 +212,7 @@ function putKey5() {
             data: KEY5
         })
             .success(result => resolve(result))
-
             .error((request, status, error) => reject(error));
-
     });
 }
 
@@ -293,5 +280,4 @@ function initField(fName) { // set up options for one field fName .chosen and in
                 }
             });
     }
-
 }
