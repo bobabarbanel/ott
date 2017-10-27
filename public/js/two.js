@@ -51,7 +51,9 @@ function paintPage(toolSpecs, toolData) {
     toolData.forEach((item) => {
         let link = [item.turret, item.position, item.spindle, item.offset].join('_');
         let text = item.position + '-' + item.offset + ") "
-            + item.function; + ":  " + item.type; 
+            + item.function + ":  " + item.type; 
+            let linkText = item.position + '-' + item.offset + ") "
+            + item.function;
 
         if (currentTurret !== item.turret || currentSpindle !== item.spindle) {
             let headText = "Turret" + item.turret + " " + "Spindle" + item.spindle;
@@ -68,7 +70,7 @@ function paintPage(toolSpecs, toolData) {
             links.push(['#' + headLink, headText]);
         }
 
-        links.push(['#' + link, item.function]); // -- Jeff request to drop type
+        links.push(['#' + link, linkText]); // -- Jeff request to drop type
         let anchor = $('<a class="anchor" id="' + link + '"/>');
         pictures.append(anchor);
         let pic = $('<div class="pic">');
