@@ -6,8 +6,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
-
-
 const COOKIE = 'chosenCookie';
 module.exports = function (dir, app, db) {
 	/*const upload = */require('./uploadRouter')(dir, app, db);
@@ -185,4 +183,6 @@ module.exports = function (dir, app, db) {
 		res.clearCookie(COOKIE);
 		res.send("variables reset");
 	});
+
+	
 };

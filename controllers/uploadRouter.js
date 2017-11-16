@@ -49,7 +49,60 @@ module.exports = function (dir, app, db) {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
+    app.post('/archiveImages', (req, res) => {
+        let dirs = req.body.dirs;
+        let fileName = req.body.fileName;
 
+        //console.log(dirs[0]);
+        //console.log(fileName);
+        dirs.forEach(
+            aDir => {
+                let archiveDir = aDir.replace("Tools", "Archive/Tools");
+
+                let fullPath = path.normalize(dir + "/public" + archiveDir);
+                if (!fs.existsSync(fullPath)) {
+                    //console.log("creating " + aDir + " : " + fullPath);
+                    fs.mkdirSync(fullPath);
+                }
+                fs.renameSync(
+                    path.normalize(dir + "/public" + aDir + '/' + fileName),
+                    fullPath + '/' + fileName
+                );
+            }
+        );
+
+        res.json("success");
+        return;
+    });
+    function isString (value) {
+        return typeof value === 'string' || value instanceof String;
+        };
+
+    app.post('/deleteDbImages', (req, res) => {
+        //console.log('/deleteDbImages');
+        //console.log(req.body);
+        let query = req.body.query;
+        ["turret","position","spindle","offset"].forEach(
+            term => query[term] = parseInt(query[term])
+        );
+
+        let deleteItem = {
+            "$pull": {
+                "files": req.body.filedata
+            }
+        };
+        //console.log("deleteItem\n" + JSON.stringify(deleteItem))
+        db.collection("images").update(query, deleteItem).then(
+            doc => {
+                //console.log("deleteDbImages delete ok " + JSON.stringify(doc));
+                res.json(doc);
+            },
+            err => {
+                console.log("deleteDbImages error " + JSON.stringify(err));
+                res.json(err);
+            }
+        );
+    });
 
     app.post('/upload', (req, res) => {
         let form = new formidable.IncomingForm();
@@ -194,12 +247,12 @@ module.exports = function (dir, app, db) {
             };
             let update = {
                 $set:
-                {
-                    "function": rq.function,
-                    "type": rq.type
-                }
+                    {
+                        "function": rq.function,
+                        "type": rq.type
+                    }
             };
- 
+
             db.collection('images').findOneAndUpdate(
                 doc,
                 update,

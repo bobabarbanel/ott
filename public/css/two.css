@@ -12,7 +12,7 @@ pictures {
 	width: 60%;
 }
 single {
-	/*margin-left: 30px;*/
+	margin-left: 30px;
     position: fixed;
     left: 600px;
 }

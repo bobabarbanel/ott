@@ -58,7 +58,8 @@
   "sub"           : true,    // Tolerate all forms of subscript notation besides dot notation e.g. `dict['key']` instead of `dict.key`.
   "supernew"      : false,    // Tolerate `new function () { ... };` and `new Object;`.
   "validthis"     : true,    // Tolerate strict violations when the code is running in strict mode and you use this in a non-constructor function.
-
+  
+    
   // == Environments ====================================================
   //
   // These options pre-define global variables that are exposed by
@@ -97,6 +98,7 @@
 "getKey4id",
 "getKey4",
 "numsOf",
-"isString"
+"isString",
+"$"
   ]
 }

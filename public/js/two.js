@@ -41,80 +41,81 @@ $(function () {
 });
 function hideShowFloat() {
     $("#floatMenu").toggleClass('hidden');
-};
+}
 
 function paintPage(toolSpecs, toolData) {
     let links = []; // for float menu
     let pictures = $('pictures');
     let currentTurret = 0;
     let currentSpindle = 0;
-    toolData.forEach((item) => {
-        let link = [item.turret, item.position, item.spindle, item.offset].join('_');
-        let text = item.position + '-' + item.offset + ") "
-            + item.function + ":  " + item.type; 
-            let linkText = item.position + '-' + item.offset + ") "
-            + item.function;
+    toolData.forEach(
+        item => {
+            let link = [item.turret, item.position, item.spindle, item.offset].join('_');
+            let text = item.position + '-' + item.offset + ") " +
+                item.function + ":  " + item.type;
+            let linkText = item.position + '-' + item.offset + ") " +
+                item.function;
 
-        if (currentTurret !== item.turret || currentSpindle !== item.spindle) {
-            let headText = "Turret" + item.turret + " " + "Spindle" + item.spindle;
-            let headLink = [item.turret, item.spindle].join('-');
+            if (currentTurret !== item.turret || currentSpindle !== item.spindle) {
+                let headText = "Turret" + item.turret + " " + "Spindle" + item.spindle;
+                let headLink = [item.turret, item.spindle].join('-');
 
-            let anchor = $('<a class="anchor" id="' + headLink + '"/>');
+                let anchor = $('<a class="anchor" id="' + headLink + '"/>');
+                pictures.append(anchor);
+                pictures.append(
+                    $('<div class="headtext"/>').text(headText)
+                );
+
+                links.push(['#' + headLink, headText]);
+            }
+
+            links.push(['#' + link, linkText]); // -- Jeff request to drop type
+            let anchor = $('<a class="anchor" id="' + link + '"/>');
             pictures.append(anchor);
-            pictures.append(
-                $('<div class="headtext"/>').text(headText)
-            );
-            currentTurret = item.turret;
-            currentSpindle = item.spindle;
+            let pic = $('<div class="pic" id="pic' + link + '">');
+            let div = $("<div/>");
+            let paragraph = $('<p/>').text(text);
 
-            links.push(['#' + headLink, headText]);
-        }
+            div.html(paragraph);
+            pic.append(div);
+            //console.log(item.files.length);
+            item.files.forEach(
+                path => {
+                    let small = path.dir.replace('/Tools/', '/Tools_small/');
+                    let large = path.dir.replace('/Tools/', '/Tools_large/');
+                    let div = $('<div class="img-wrap"><span class="close">' +
+                        '&times;</span></div>');
 
-        links.push(['#' + link, linkText]); // -- Jeff request to drop type
-        let anchor = $('<a class="anchor" id="' + link + '"/>');
-        pictures.append(anchor);
-        let pic = $('<div class="pic">');
-        let div = $("<div/>");
-        let paragraph = $('<p/>').text(text);
+                    let img = $('<img/>', {
+                        height: "100px",
+                        alt: item.function + ": " + item.type,
+                        link: link,
+                        tag: item.position + '-' + item.offset,
+                        src: small + '/' + path.filename,
+                        comment: path.comment,
+                        dir: path.dir,
+                        dir_small: small,
+                        dir_large: large,
+                        filename: path.filename,
+                        showingSingle: false
+                    });
 
-        div.html(paragraph);
-        pic.append(div);
-        item.files.forEach(
-            path => {
-                let small = path.dir.replace('/Tools/','/Tools_small/');
-                let large = path.dir.replace('/Tools/','/Tools_large/');
-                let div = $('<div class="img-wrap"><span class="close">'
-                    + '&times;</span></div>');
-                let img = $('<img/>', {
-                    height: "100px",
-                    alt: item.function + ": " + item.type,
-                    link: link,
-                    tag: item.position + '-' + item.offset,
-                    turret: currentTurret,
-                    spindle: currentSpindle,
-                    src: small + '/' + path.filename,
-                    comment: path.comment,
-                    dir: path.dir,
-                    dir_small: small,
-                    dir_large: large,
-                    filename: path.filename
+                    div.append(img);
+                    pic.append(div);
+
                 });
-                div.append(img);
-                pic.append(div);
-            });
-        pictures.append(pic);
-    });
+            pictures.append(pic);
+        });
     // testing update
     $('.img-wrap .close').on('click', function () {
-        let img = $(this).closest('.img-wrap').find('img');
+        let imgWrap = $(this).closest('.img-wrap');
+        let img = imgWrap.find('img');
         let link = img.attr('link');
         let fileName = img.attr('filename');
         let dirs = [img.attr('dir'), img.attr('dir_small'), img.attr('dir_large')];
         // if currently displayed single - kill that
-        // remove from db
-        // rename (move) file to public/images/Archive/Tools[_small|large]
-        // 
-        //alert('remove picture: ' + [link, dirs[0], dirs[1], dirs[2], filename].join('\n'));
+
+        //alert('remove picture: ' + [link, dirs[0], dirs[1], dirs[2], fileName].join('\n'));
         $.confirm({
             boxWidth: '500px',
             useBootstrap: false,
@@ -122,41 +123,45 @@ function paintPage(toolSpecs, toolData) {
             draggable: true,
             animation: 'left',
             title: "Image Deletion",
-            content: '<img src="' + img.attr('dir_small') + '/' + fileName +'"/>'
-             + '&nbsp;&nbsp;Do you want to delete this image?',
+            content: '<img src="' + dirs[1] + '/' + fileName + '"/>' +
+                '&nbsp;&nbsp;Do you want to delete this image?',
             buttons: {
                 Yes: {
                     text: "Yes - Delete it!",
                     btnClass: 'btn-blue',
-                    action: function () { deleteImages(dirs, filename); }
+                    action: function () {
+                        // remove from 2.html (small and large)
+                        deleteImages(imgWrap, img, dirs, fileName);
+                    }
                 },
                 No: {
                     btnClass: 'btn-red'
                 },
             }
         });
-        
+
         return false;
     });
-    function deleteImages(dirs, fileName) {
 
-    }
+
     $("pictures img").on("click", function () {
         $(".pic").css("background-color", "white");
         $(this).parent().parent().css("background-color", "yellow");
         let single = $("single").empty();
-        let fileName = $(this).attr('filename');
+        $("pictures img[showingsingle='true']").attr('showingsingle', false).css("border-color", "transparent");
 
         single.append($('<h4/>')
-            .text("Turret" + $(this).attr("turret")
-            + " Spindle" + $(this).attr("spindle")));
+            .text("Turret" + $(this).attr("turret") +
+            " Spindle" + $(this).attr("spindle")));
         single.append($('<h2/>')
-            .text("Tool " + $(this).attr("tag") + ") "
-            + $(this).attr("alt")));
-        $("pictures img").css("border-color", "transparent");
+            .text("Tool " + $(this).attr("tag") + ") " +
+            $(this).attr("alt")));
+        //$("pictures img").css("border-color", "transparent");
         $(this).css("border-color", "blue");
+        $(this).attr("showingSingle", true);
 
         var img = $('<img class="pannable-image"/>');
+        let fileName = $(this).attr('filename');
         img.attr('src', $(this).attr("dir_large") + '/' + fileName);
         img.attr('data-high-res-src', $(this).attr("dir") + '/' + fileName);
         img.attr('alt', $(this).attr('filename'));
@@ -167,7 +172,6 @@ function paintPage(toolSpecs, toolData) {
         single.append(in_single);
         $('.pannable-image').ImageViewer();
         single.append($("<p>" + $(this).attr("comment") + "</p>"));
-        //$('#floatMenu').removeClass().toggleClass('hidden');
     });
     // build static menu
     //let ul = $(floatName + "> ul");
@@ -190,6 +194,90 @@ function paintPage(toolSpecs, toolData) {
             }
         });
     float.append($('</ul>'));
+}
+
+function deleteImages(wrapper, img, dirs, fileName) {
+    // remove from db
+    var turret, position, spindle, offset;
+    [turret, position, spindle, offset] =
+        img.attr('link').split('_');
+
+    //         $elemMatch: {
+    //             dir: "/images/Tools/NL",
+    //             filename: "114T0231-5_30_NL2500_1_1_007.jpg"
+    //         }
+    let query = {
+        "key4": getKey4id(),
+        "turret": turret, // need int for actual query, have to convert in router code
+        "spindle": spindle,
+        "position": position,
+        "offset": offset,
+        "tab": "Tools"
+    };
+    let filedata = {
+        "dir": dirs[0],
+        "filename": fileName
+    };
+    dbImagesDelete(query, filedata).then(
+        success => {
+            // adjust UI (remove image), remove single if showing this image
+            if (img.attr("showingSingle")) $("single").empty();
+            wrapper.remove();
+            // rename (move) file to /images/Archive/MachineDir/Tools[_small|_large]
+            archiveImages(dirs, fileName).then(
+                success => { }, // silent
+                failure => alert("Unable to Archive images.")
+            );
+        },
+        failure => alert("Unable to perform database delete from images collection.\n"
+            + JSON.stringify(failure))
+    )
+
+
+}
+function archiveImages(dirs, fileName) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "/archiveImages",
+            type: 'post',
+            data: {
+                "dirs": dirs,
+                "fileName": fileName
+            },
+            dataType: 'json'
+        })
+            .done((result) => resolve(result))
+            .fail((request, status, error) => reject(error));
+    });
+}
+
+function dbImagesDelete(query, filedata) {
+    //console.log(JSON.stringify(query));
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "/deleteDbImages",
+            type: 'post',
+            data: {
+                "query": query,
+                "filedata": filedata
+            },
+            dataType: 'json'
+        })
+            .success((result) => {
+                debugger;
+                //console.log("dbImagesDelete done " + JSON.stringify(result));
+                if (result.nModified === 1) {
+                    resolve(result);
+                }
+                else reject(result);
+
+            })
+            .fail((request, status, error) => {
+                debugger;
+                console.log("dbImagesDelete fail " + JSON.stringify(error));
+                reject(error);
+            })
+    });
 }
 
 function getImages(tab) {
