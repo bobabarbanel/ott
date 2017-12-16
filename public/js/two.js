@@ -6,6 +6,7 @@ var floatName = "#floatMenu";
 var menuYloc = null;
 
 $(function () {
+
     menuYloc = parseInt($(floatName).css("top"));
     $(window).scroll(function () {
         var offset = menuYloc + $(document).scrollTop() + "px";
@@ -18,11 +19,16 @@ $(function () {
 
             ////////////////////////////////////////////////////////////
             cookieValue = unescape(readCookie(COOKIE));
-
+            let key5 = getParsedCookie();
             $("title").text("Part " + getParsedCookie().partId);
 
             $("#cookie").text(getCookie());
             setThisTab(2);
+            $("#job").text(
+                [
+                    key5.partId, key5.pName, key5.dept, key5.op, key5.machine
+                ].join(" : ")
+            );
 
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
@@ -85,7 +91,7 @@ function paintPage(toolSpecs, toolData) {
                     let large = path.dir.replace('/Tools/', '/Tools_large/');
                     let div = $('<div class="img-wrap"><span class="close">' +
                         '&times;</span></div>');
-
+// add handlers for video
                     let img = $('<img/>', {
                         height: "100px",
                         alt: item.function + ": " + item.type,
@@ -202,10 +208,6 @@ function deleteImages(wrapper, img, dirs, fileName) {
     [turret, position, spindle, offset] =
         img.attr('link').split('_');
 
-    //         $elemMatch: {
-    //             dir: "/images/Tools/NL",
-    //             filename: "114T0231-5_30_NL2500_1_1_007.jpg"
-    //         }
     let query = {
         "key4": getKey4id(),
         "turret": turret, // need int for actual query, have to convert in router code
@@ -299,7 +301,6 @@ function getImages(tab) {
 
 // add scroll offset to fragment target (if there is one)
 function delayedFragmentTargetOffset() {
-
     var url = $(":target").context.URL;
 
     var hashCharPosition = url.lastIndexOf("#");

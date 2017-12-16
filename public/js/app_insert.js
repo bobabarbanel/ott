@@ -108,21 +108,7 @@ function doneChoosing() {
     // also show edit tools??
 }
 
-//var existingWindow;
 
-// function handleChoice() {
-//     //console.log("handleChoice " + KEY5.partId);
-//     return new Promise((resolve, reject) => {
-//         $.ajax({
-//             url: "/go_parts",
-//             type: 'post',
-//             data: KEY5
-//         })
-//             .done(result => resolve(result))
-
-//             .fail((request, status, error) => reject(error));
-//     });
-// }
 
 function isMachineSpecKnown(mname) {
     return new Promise((resolve, reject) => {
@@ -142,25 +128,7 @@ function isMachineSpecKnown(mname) {
     });
 }
 
-// function resetVars() {
-//     //console.log("resetVars existingWindow = " + existingWindow);
-//     if (existingWindow !== undefined && existingWindow !== null) {
-//         //console.log("closing existing resetVars");
-//         existingWindow.close();
-//         existingWindow = null;
-//     }
-//     return new Promise((resolve, reject) => {
-//         $.ajax({
-//             url: "/reset",
-//             type: 'get'
-//         })
-//             .done(result => resolve(result))
 
-//             .fail((request, status, error) => reject(error))
-
-//             .always(() => console.log("resetVars complete"));
-//     });
-// }
 
 var jsonData;
 const FIELDS = ["partId", "pName", "dept", "op", "machine"];
@@ -175,16 +143,6 @@ const FIELDSORTER = {
 const FWIDTH = "180px";
 const STATUS = {};
 const KEY5 = {};
-//const LAST = {}; // for checking completion of inputs
-
-// function initControls() {
-//     for (let key1 in Object.keys(FIELDS)) {
-//         STATUS[key1] = 0;
-//     }
-//     for (let key2 in Object.keys(KEY5)) {
-//         KEY5[key2] = undefined;
-//     }
-// }
 
 
 function getData(message) {

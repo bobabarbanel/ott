@@ -4,32 +4,21 @@ $(function () {
 
     setUpTable();
 
-    getData().then(
-        (data) => {
-            jsonData = data; // now global
-            // Choosers
-            FIELDS.forEach(initField); // QUERY empty to start
-            // Table
-            refreshFilterTable();
-            $("#run").hide();
-            $("#upload_action").hide();
-        },
-        (error) => console.log("getData error " + error));
+    refreshFromDB();
+
+
 
     $("#reset").on("click", function () {
         resetVars().then(
             () => {
                 //console.log("resetVars " + signal)
             },
-
             error => console.log("resetVars Error: " + error)
         );
-
         location.reload();
     });
 
     $("#run").on("click", function () {
-
         if (existingWindow !== undefined && existingWindow !== null) {
             existingWindow.close();
             existingWindow = null;
@@ -55,6 +44,78 @@ $(function () {
             },
             error => console.log("uploadChoice Error: " + error));
     });
+
+    $("#delete_action").on("click", function () {
+        let key4 = [QUERY.dept, QUERY.partId, QUERY.op, QUERY.machine].join("|");
+        countImages(key4).then(
+            r => {
+                //debugger;
+                let fileCount = r.fileCount;
+                $.confirm({
+                    closeIcon: true, 
+                    icon: 'fa fa-exclamation fa-3x',
+                    boxWidth: '700px',
+                    useBootstrap: false,
+                    /*type: 'red',*/
+                    animation: 'right',
+                    title: showVals(fileCount),
+                    content: '<span class="qmsg"><b>'
+                        + 'Please choose a button.</b></span>',
+                    buttons: {
+                        "YES, Delete This Job!": {
+                            btnClass: 'btn-red',
+                            action: () => {
+                                let key5 = [QUERY.dept, QUERY.machine,
+                                QUERY.op, QUERY.pName, QUERY.partId].join("|");
+                                jobArchive(key4, key5);
+                                location.reload();
+                            }
+                        },
+                        "No, Do Not Delete": {
+                            btnClass: 'btn-blue cancelButtonClass'
+                        }
+                    }
+                    
+                    
+                });
+            },
+            err => console.log("err " + err)
+        );
+    });
+
+    const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
+
+    function showVals(fileCount) { // used in confirmation for job Archive
+        // include number of images for this job
+        let spaces4 = "&nbsp;&nbsp;&nbsp;&nbsp;";
+        let str = '<table class="qtable" frame="box">';
+        str += '<tr><th/><td/></td></tr>';
+        Object.keys(QUERY).forEach(
+            (key, idx) => {
+                if (idx === 0)
+                    str += '<tr><th class="qname">' + idToText[key] + ":</th>"
+                        + '<td colspan="2" class="qvalue">' + spaces4 + QUERY[key]
+                        + '</td><td/></tr>';
+                else if (idx === 1)
+                    str += '<tr><th class="qname">' + idToText[key] + ":</th>"
+                        + '<td class="qvalue">' + spaces4 + QUERY[key]
+                        + '</td><td rowspan="4"><img class="shiftd" '
+                        + 'src="/images/trashfull_sm.jpg"/></td></tr>';
+                else
+                    str += '<tr><th class="qname">' + idToText[key] + ":</th>"
+                        + '<td class="qvalue">' + spaces4 + QUERY[key]
+                        + "</td><td/></tr>";
+            }
+        )
+
+        str += '</table><br/>This job currently has ';
+        if (fileCount == 0) {
+            str += "no images.";
+        }
+        else
+            str += fileCount + " image" + ((fileCount == 1) ? '' : 's') + '.';
+        return str;
+    }
 
     // handle changes in choosers - that is, selection of a particular item
     $(".chooser", "#container").on("change", function () {
@@ -90,7 +151,56 @@ $(function () {
     });
 
 });
-var existingWindow;
+
+function refreshFromDB() {
+    getData().then(
+        data => {
+            jsonData = data; // now global
+            // Choosers
+            FIELDS.forEach(initField); // QUERY empty to start
+            // Table
+            refreshFilterTable();
+            $("#run").hide();
+            $("#upload_action").hide();
+            $("#delete_action").hide();
+        },
+        error => console.log("getData error " + error)
+    );
+}
+let existingWindow;
+let TABNAME = "Tools";
+
+function jobArchive(key4, key5) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "/jobArchive",
+            type: 'post',
+            data: {
+                "key4": key4,
+                "key5": key5,
+                "tab": TABNAME,
+                "idOrderedKeys": idOrderedKeys
+            }
+        })
+            .success(result => resolve(result))
+            .fail((request, status, error) => reject(error));
+    });
+}
+
+function countImages(key4) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "/countImages",
+            type: 'post',
+            data: {
+                "key4": key4,
+                "tab": TABNAME
+            }
+        })
+            .success(result => resolve(result[0]))
+            .fail((request, status, error) => reject(error));
+    });
+}
 
 function handleChoice() {
     //console.log("handleChoice " + QUERY.partId);
@@ -152,11 +262,11 @@ function openInNewTab(url) {
 var jsonData;
 const FIELDS = ["partId", "pName", "dept", "op", "machine"];
 const FIELDSORTER = {
-    "partId": "alphaCompare",
-    "pName": "alphaCompare",
-    "dept": "alphaCompare",
+    "partId": alphaCompare,
+    "pName": alphaCompare,
+    "dept": alphaCompare,
     "op": (a, b) => a - b,
-    "machine": "alphaCompare"
+    "machine": alphaCompare
 };
 
 const FWIDTH = "180px";
@@ -177,15 +287,16 @@ function updateTable(rows) {
 function refreshFilterTable() { // set new (reduced) jsonData in table, uses QUERY
     updateTable(jsonData.filter((row) => rowMatchesQuery(row)));
 }
-/*
-function QUERYtoString() {
-    var ret = 'QUERY {';
-    var nameVals = FIELDS.map((f) => f + ": " + QUERY[f]);
-    ret += nameVals.join(", ");
 
-    return ret + '}';
-}
-*/
+let idToText = {
+    "partId": "Part Number",
+    "pName": "Part Name",
+    "dept": "Department",
+    "op": "Operation",
+    "machine": "Machine"
+};
+
+
 
 function setUpTable() {
     $("#dataTable").tabulator({
@@ -270,16 +381,7 @@ function getData(/*message*/) {
     });
 }
 
-/*
-function filterData(filter) {
-    return new Promise((resolve, reject) => {
 
-        resolve(jsonData.filter((row) =>
-            Object.keys(QUERY).every((field) => (row[field] === QUERY[field]))));
-
-    });
-}
-*/
 function formatTableCells() { // marks column in table when field is determined
     FIELDS.forEach((f) => {
         if (STATUS[f] === 1) {
@@ -327,6 +429,7 @@ function pageComplete() {
     $("#dataTable").hide();
     $("#run").show();
     $("#upload_action").show();
+    $("#delete_action").show();
 }
 
 

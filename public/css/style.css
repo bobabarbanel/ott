@@ -46,16 +46,7 @@ a.chosen-single:not(.chosen-default) span{
 #container label {
 	margin-left: 10px;
 }
-#buttons {
-	display: inline-block;
-}
-.action {
-	margin-left: 40px;
-}
-#run {
-	background: blue;
-	color: white;
-}
+
 #dataTable {
 	width: 900px;
 	margin: 70px auto;
@@ -101,6 +92,72 @@ a.chosen-single:not(.chosen-default) span{
 	width: 260px;
 	color: red;
 }
+#buttons {
+	display: inline-block;
+}
+.action {
+	margin-left: 40px;
+}
+#run {
+	background: blue;
+	color: white;
+}
+#buttons {
+	width: 80%;
+}
+#buttons button {
+	margin-left: 4em;
+}
+#delete_action {
+	float: right;
+	background: rgb(146, 123, 8);
+	color: white;
+	font-weight: bold;
+}
+
+.qtable {
+	margin-left: 10px;
+	width: 100%;
+	margin: 0 auto;
+}
+.fa-exclamation {
+	color: rgb(146, 123, 8);
+    text-shadow: 2px 2px 2px #ccc;
+    font-size: 4.5em;
+}
+
+.qname {
+	padding: 10px;
+}
+.qname, .qvalue {
+	width: 200px;
+}
+
+
+.qtable .qname {
+	text-align: right;
+}
+
+.shiftd {
+	/*margin-top: 20px;*/
+	height: 150px;
+}
+.jconfirm-content {
+	float: right;
+	margin-right: 100px;
+}
+.cancelButtonClass {
+	margin-left: 50px !important;
+}
+.qmsg {
+	font-size: 1.5em;
+	color: rgb(146, 123, 8);
+	text-decoration: underline;
+}
+
+
+
+
 
 
 	

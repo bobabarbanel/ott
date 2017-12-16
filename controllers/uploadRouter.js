@@ -74,15 +74,15 @@ module.exports = function (dir, app, db) {
         res.json("success");
         return;
     });
-    function isString (value) {
+    function isString(value) {
         return typeof value === 'string' || value instanceof String;
-        };
+    };
 
     app.post('/deleteDbImages', (req, res) => {
         //console.log('/deleteDbImages');
         //console.log(req.body);
         let query = req.body.query;
-        ["turret","position","spindle","offset"].forEach(
+        ["turret", "position", "spindle", "offset"].forEach(
             term => query[term] = parseInt(query[term])
         );
 
@@ -102,6 +102,76 @@ module.exports = function (dir, app, db) {
                 res.json(err);
             }
         );
+    });
+
+    app.post('/countImages', (req, res) => {
+
+        let myPromise = db.collection("images").aggregate([
+            {
+                $match: {
+                    "key4": req.body.key4,
+                    "tab": req.body.tab
+                }
+            },
+            { $project: { "files.filename": 1, _id: 0 } },
+            { $unwind: { path: "$files" } },
+            { $count: "fileCount" }
+        ]).toArray();
+
+        myPromise.then(
+            r => {// result looks like { "fileCount" : 67 }
+                res.json(r);
+            },
+            err => res.json(err)
+        );
+    });
+
+    app.post('/jobArchive', (req, res) => {
+        let key4 = req.body.key4; // key4 of parts.images
+        let tab = req.body.tab; // part of primary key on parts.images
+        let key5 = req.body.key5; // _id of parts.main
+        let idOrderedKeys = req.body.idOrderedKeys;
+        console.log("jobArchive: " + key4 + " " + tab + " " + key5);
+        db.collection("main").remove(
+            { "_id": key5 }
+        ).then(
+            success => {
+                console.log("main removed " + success);
+                let keyFields = key5.split('|');
+                let archiveMainEntry = {
+                    "_id": key5
+                };
+                idOrderedKeys.forEach(
+                    (k,i) => {
+                        archiveMainEntry[k] = keyFields[i];
+                    }
+                );
+                db.collection("archive_main").create(archiveMainEntry).then(
+                    success => {
+                        console.log("archive_main created " + success);
+                        db.collection("images").remove(
+                            {
+                                "key4": key4,
+                                "tab": tab
+                            }
+                        ).then(
+                            // archive images (Tools,Tools_large, Tools_small) TBD
+                            );
+                    },
+                    error => {
+                        console.log("archive_main NOT created " + error);
+                        res.json({ "main": true, "archive_main": false, "images": false})
+                    }
+                );
+               
+               
+            },
+            error => {
+                console.log("main NOT removed " + error);
+                res.json({ "main": false, "archive_main": false, "images": false })
+            }
+        );
+        
     });
 
     app.post('/upload', (req, res) => {
