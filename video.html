@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        video {
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+    <div id=thumbs>Loading video in background...</div>
+    <script>
+        var i = 0;
+var video = document.createElement("video");
+var thumbs = document.getElementById("thumbs");
+function generateThumbnail() {
+  var c = document.createElement("canvas");
+  var ctx = c.getContext("2d");
+  c.width = 160;
+  c.height = 90;
+  ctx.drawImage(video, 0, 0, 160, 90);
+  thumbs.appendChild(c);
+}
+
+video.addEventListener('loadeddata', function() {
+	thumbs.innerHTML = "";
+    video.currentTime = i;
+}, false);
+
+video.addEventListener('seeked', function() {
+    generateThumbnail(i);
+}, false);
+
+video.preload = "auto";
+video.src =  //"https://media.w3.org/2010/05/sintel/trailer.mp4";
+ "./IMG_0610.MOV";
+
+</script>
+</body>
+</html>

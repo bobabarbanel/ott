@@ -6,6 +6,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs-extra');
 const formidable = require('formidable');
+var Jimp = require("jimp");
 
 const SECTION = "Tools";
 const debug = false;
@@ -29,7 +30,8 @@ module.exports = function (dir, app, db) {
     function calcFullTargetDir(key4, section) {
         // Directory path determined using first+second letter of Machine name,
         // and fixed targetHeadString. Has leading "public/".
-        debugLog("calcFullTargetDir key4 " + JSON.stringify(key4));
+        // debugLog("calcFullTargetDir key4 " + JSON.stringify(key4));
+        /******************************/
         let machine = key4.machine.substring(0, 2);
         // e.g., /images/Tools/LC
         return [targetHeadString, section, machine].join("/");
@@ -53,15 +55,12 @@ module.exports = function (dir, app, db) {
         let dirs = req.body.dirs;
         let fileName = req.body.fileName;
 
-        //console.log(dirs[0]);
-        //console.log(fileName);
         dirs.forEach(
             aDir => {
                 let archiveDir = aDir.replace("Tools", "Archive/Tools");
 
                 let fullPath = path.normalize(dir + "/public" + archiveDir);
                 if (!fs.existsSync(fullPath)) {
-                    //console.log("creating " + aDir + " : " + fullPath);
                     fs.mkdirSync(fullPath);
                 }
                 fs.renameSync(
@@ -79,9 +78,8 @@ module.exports = function (dir, app, db) {
     };
 
     app.post('/deleteDbImages', (req, res) => {
-        //console.log('/deleteDbImages');
-        //console.log(req.body);
         let query = req.body.query;
+        // convert the string attrs to integers
         ["turret", "position", "spindle", "offset"].forEach(
             term => query[term] = parseInt(query[term])
         );
@@ -91,10 +89,8 @@ module.exports = function (dir, app, db) {
                 "files": req.body.filedata
             }
         };
-        //console.log("deleteItem\n" + JSON.stringify(deleteItem))
         db.collection("images").update(query, deleteItem).then(
             doc => {
-                //console.log("deleteDbImages delete ok " + JSON.stringify(doc));
                 res.json(doc);
             },
             err => {
@@ -131,24 +127,24 @@ module.exports = function (dir, app, db) {
         let tab = req.body.tab; // part of primary key on parts.images
         let key5 = req.body.key5; // _id of parts.main
         let idOrderedKeys = req.body.idOrderedKeys;
-        console.log("jobArchive: " + key4 + " " + tab + " " + key5);
+        // console.log("jobArchive: " + key4 + " " + tab + " " + key5);
         db.collection("main").remove(
             { "_id": key5 }
         ).then(
             success => {
-                console.log("main removed " + success);
+                // console.log("main removed " + success);
                 let keyFields = key5.split('|');
                 let archiveMainEntry = {
                     "_id": key5
                 };
                 idOrderedKeys.forEach(
-                    (k,i) => {
+                    (k, i) => {
                         archiveMainEntry[k] = keyFields[i];
                     }
                 );
                 db.collection("archive_main").create(archiveMainEntry).then(
                     success => {
-                        console.log("archive_main created " + success);
+                        // console.log("archive_main created " + success);
                         db.collection("images").remove(
                             {
                                 "key4": key4,
@@ -160,18 +156,18 @@ module.exports = function (dir, app, db) {
                     },
                     error => {
                         console.log("archive_main NOT created " + error);
-                        res.json({ "main": true, "archive_main": false, "images": false})
+                        res.json({ "main": true, "archive_main": false, "images": false })
                     }
                 );
-               
-               
+
+
             },
             error => {
                 console.log("main NOT removed " + error);
                 res.json({ "main": false, "archive_main": false, "images": false })
             }
-        );
-        
+            );
+
     });
 
     app.post('/upload', (req, res) => {
@@ -198,62 +194,96 @@ module.exports = function (dir, app, db) {
 
             // if only a single file is selected, it does NOT come in array
             if (myFiles.length === undefined) { myFiles = [myFiles]; }
+            let ftdMedium, ftdSmall, ftdLarge;
 
-            let ftd = calcFullTargetDir(key4, SECTION);
+            ftdLarge = calcFullTargetDir(key4, SECTION + '_large'); 
+            ftdMedium = calcFullTargetDir(key4, SECTION);
+            ftdSmall = calcFullTargetDir(key4, SECTION + '_small');
 
-            // public/images/Tools/img/MLetters (first 2 letters of machine name)
-            let fullPath = path.normalize(dir + "/public/" + ftd);
+            // public/images/Tools_large/img/MLetters (first 2 letters of machine name)
+            let fullPath = path.normalize(dir + "/public/" + ftdLarge);
             if (!fs.existsSync(fullPath)) {
                 fs.mkdirSync(fullPath);
             }
             let tailnum = 1;
             let uploadCount = 0;
+
             for (let i = 0; i < myFiles.length; i++) {
                 let fileName = myFiles[i].name;
                 let tail = fileName.substring(fileName.lastIndexOf("."));
 
-                //  public/images/Tools/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
+                //  public/images/Tools_large/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
                 let base = calcFullTargetBaseFileName(key4, position, offset);
-                let ffn = base + "_" + pad3(tailnum++) + tail; // _001 file
+                let ffn = base + "_" + pad3(tailnum) + tail; // _001 file
 
-                let to = path.normalize(addWebSitePublic(dir, ftd, ffn));
+                let toLarge = path.normalize(addWebSitePublic(dir, ftdLarge, ffn));
                 // does the target file already exist with default name?
 
-                while (fs.existsSync(to)) { // while file 'to' exists
+                while (fs.existsSync(toLarge)) { // while file 'to' exists
                     // add _002 etc as needed
-                    ffn = base + "_" + pad3(tailnum++, 3) + tail; // file changed to 002, 003, ...
-                    to = path.normalize(addWebSitePublic(dir, ftd, ffn));
+                    ffn = base + "_" + pad3(++tailnum, 3) + tail; // file changed to 002, 003, ...
+                    toLarge = path.normalize(addWebSitePublic(dir, ftdLarge, ffn));
                 }
 
-                fs.renameSync(myFiles[i].path, to);
-                let mongoKey4 = [key4.dept, key4.partId, key4.op, key4.machine].join("|");
-                let query = {
-                    "key4": mongoKey4,
-                    "tab": tab,
-                    "position": position,
-                    "offset": offset,
-                    "turret": turret,
-                    "spindle": spindle,
-                    "type": type,
-                    "function": func
-                };
-                let updates = {
-                    $push: { "files": fileRef(ftd, ffn) }
-                };
-                let options = { "upsert": true, "returnNewDocument": true };
+                // now 'toLarge' is our _large target full path
 
-                db.collection("images").findOneAndUpdate(
-                    query, updates, options,
-                    function (err, doc) {
-                        assert.equal(err, null);
-                        if (doc !== null) {
-                            if (++uploadCount === myFiles.length) {
-                                res.json({ "count": uploadCount });
-                                return;
+                // save original image in _large directory
+                fs.renameSync(myFiles[i].path, toLarge);
+                               
+                Jimp.read(toLarge).then(function (image) {
+                    let img = image.clone();
+
+                    // create _small version of image in Tools_small
+                    let toSmall = path.normalize(
+                        addWebSitePublic(dir, ftdSmall, ffn));
+                    img.resize(Jimp.AUTO, 100)      // resize height 100
+                        .quality(99)                  // set JPEG quality
+                        .write(toSmall);            // save
+
+                    let toMedium = path.normalize(
+                        addWebSitePublic(dir, ftdMedium, ffn));
+                    // create medium sized image in /Tools
+                    image.resize(300, Jimp.AUTO)      // resize width 300
+                        .quality(99)                  // set JPEG quality
+                        .write(toMedium);            // save
+
+                    // update Mongo entry for this job
+                    let mongoKey4 = [key4.dept, key4.partId, key4.op, key4.machine].join("|");
+                    let query = {
+                        "key4": mongoKey4,
+                        "tab": tab,
+                        "position": position,
+                        "offset": offset,
+                        "turret": turret,
+                        "spindle": spindle,
+                        "type": type,
+                        "function": func
+                    };
+                    let updates = {
+                        $push: { "files": fileRef(ftdMedium, ffn) }
+                    };
+                    let options = { "upsert": true, "returnNewDocument": true };
+
+                    db.collection("images").findOneAndUpdate(
+                        query, updates, options,
+                        function (err, doc) {
+                            assert.equal(err, null);
+                            if (doc !== null) {
+                                if (++uploadCount === myFiles.length) {
+                                    res.json({ "count": uploadCount });
+                                    return;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+                    console.error("files complete");
+                    // success res
+                }).catch(function (err) {
+                    console.error(err);
+                    // error res
+                });
+
+
             }
 
         });

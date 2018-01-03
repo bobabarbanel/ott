@@ -46,7 +46,7 @@ $(function () {
 
 });
 function hideShowFloat() {
-    $("#floatMenu").toggleClass('hidden');
+    $(floatName).toggleClass('hidden');
 }
 
 function paintPage(toolSpecs, toolData) {
@@ -73,6 +73,9 @@ function paintPage(toolSpecs, toolData) {
                 );
 
                 links.push(['#' + headLink, headText]);
+                // set current values so can detect need for next UL on change
+                currentTurret = item.turret;
+                currentSpindle = item.spindle
             }
 
             links.push(['#' + link, linkText]); // -- Jeff request to drop type
@@ -179,7 +182,7 @@ function paintPage(toolSpecs, toolData) {
         $('.pannable-image').ImageViewer();
         single.append($("<p>" + $(this).attr("comment") + "</p>"));
     });
-    // build static menu
+    // build floating menu
     //let ul = $(floatName + "> ul");
     let float = $(floatName);
     let dash = /-/;

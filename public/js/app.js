@@ -1,12 +1,8 @@
 "use strict";
 $(function () {
-    //console.log("\napp.js");
 
     setUpTable();
-
     refreshFromDB();
-
-
 
     $("#reset").on("click", function () {
         resetVars().then(

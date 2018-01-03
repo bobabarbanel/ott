@@ -9,8 +9,6 @@ var debug = false;
 function debugLog(text) { if (debug) { console.log(text); } }
 
 $(function () {
-    //$('.progress-bar').text('0%');
-    //$('.progress-bar').width('0%');
     $('#edit_func_type').on('click',
         () => window.location = './ftedits.html'
     );
@@ -90,7 +88,7 @@ $(function () {
 
         table.append(tr);
 
-        let haves = {}; // lookup for position-offset pairs
+        let haves = {}; // lookup for turret-position-spindle-offset
         toolData.forEach(tDoc => {
             haves[
                 [
@@ -445,6 +443,9 @@ $(function () {
                     // add the files to formData object for the data payload
                     formData.append('uploads[]', files[i], files[i].name);
                 }
+                $("#progress").show();
+                let countField = '#' + idStr(idFields, "count");
+                $(countField).addClass("stripes");
                 new Promise((resolve, reject) => {
                     $.ajax({
                         url: "/upload",
@@ -452,18 +453,27 @@ $(function () {
                         data: formData,
                         processData: false,
                         contentType: false
-
                     })
                         .done(
                         result => {
                             //debugLog("/upload success "+JSON.stringify(result));
                             resolve(result);
                         })
-                        .fail((request, status, error) => reject(error));
+                        .fail((request, status, error) => {
+                            reject(error);
+                            
+                        })
                 }).then(
                     success => {
-                        let id = '#' + idStr(idFields, "count");
-                        $(id).text(parseInt($(id).text()) + success.count);
+                        $("#progress").hide();
+                        //let id = '#' + idStr(idFields, "count");
+                        $(countField).removeClass("stripes");
+                        $(countField).text(parseInt($(countField).text()) + success.count);
+                    },
+                    error => {
+                        $(countField).removeClass("stripes");
+                            $("#progress").hide();
+                        alert("Error: " + error);
                     }
                     );
             }

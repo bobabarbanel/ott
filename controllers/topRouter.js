@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 
 const COOKIE = 'chosenCookie';
 module.exports = function (dir, app, db) {
-	/*const upload = */require('./uploadRouter')(dir, app, db);
+	require('./uploadRouter')(dir, app, db);
 	var data;
 
 
@@ -24,7 +24,14 @@ module.exports = function (dir, app, db) {
 		//var count = 0;
 		data = [];
 		var cursor = db.collection('main')
-			.find({}, { '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 }).sort({ partId: 1 });
+			.find({}, {
+				'_id': 0,
+				dept: 1,
+				op: 1,
+				partId: 1,
+				machine: 1,
+				pName: 1
+			}).sort({ partId: 1 });
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
 			if (doc !== null) {
@@ -184,5 +191,5 @@ module.exports = function (dir, app, db) {
 		res.send("variables reset");
 	});
 
-	
+
 };
