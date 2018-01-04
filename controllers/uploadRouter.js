@@ -77,13 +77,17 @@ module.exports = function (dir, app, db) {
         return typeof value === 'string' || value instanceof String;
     };
 
+    
+    
     app.post('/deleteDbImages', (req, res) => {
         let query = req.body.query;
         // convert the string attrs to integers
         ["turret", "position", "spindle", "offset"].forEach(
             term => query[term] = parseInt(query[term])
         );
-
+        // remove timestamp is present
+        if(req.body.filedata.when !== undefined)
+            delete req.body.filedata.when;
         let deleteItem = {
             "$pull": {
                 "files": req.body.filedata
@@ -91,13 +95,75 @@ module.exports = function (dir, app, db) {
         };
         db.collection("images").update(query, deleteItem).then(
             doc => {
-                res.json(doc);
+                return (doc);
             },
             err => {
-                console.log("deleteDbImages error " + JSON.stringify(err));
+                console.log("deleteDbImages files out error " + JSON.stringify(err));
                 res.json(err);
             }
+        ).then(
+            doc => {
+                // add timestamp
+                req.body.filedata.when = new Date();
+                let addItem = {
+                    "$push": {
+                        "archived": req.body.filedata
+                    }
+                };
+                db.collection("images").update(query, addItem).then(
+                    doc => {
+                        res.json(doc);
+                    },
+                    err => {
+                        console.log("deleteDbImages archived in error " + JSON.stringify(err));
+                        res.json(err);
+                    }
+                );
+            });
+    });
+
+    app.post('/restoreDbImages', (req, res) => {
+        let query = req.body.query;
+        
+        // convert the string attrs to integers
+        ["turret", "position", "spindle", "offset"].forEach(
+            term => query[term] = parseInt(query[term])
         );
+        // remove timestamp is present
+        if(req.body.filedata.when !== undefined)
+            delete req.body.filedata.when;
+        let deleteItem = {
+            "$pull": {
+                "archived": req.body.filedata
+            }
+        };
+        db.collection("images").update(query, deleteItem).then(
+            doc => {
+                return (doc);
+            },
+            err => {
+                console.log("restoreDbImages archived out error " + JSON.stringify(err));
+                res.json(err);
+            }
+        ).then(
+            doc => {
+                // add timestamp
+                req.body.filedata.when = new Date();
+                let addItem = {
+                    "$push": {
+                        "files": req.body.filedata
+                    }
+                };
+                db.collection("images").update(query, addItem).then(
+                    doc => {
+                        res.json(doc);
+                    },
+                    err => {
+                        console.log("deleteDbImages files in error " + JSON.stringify(err));
+                        res.json(err);
+                    }
+                );
+            });
     });
 
     app.post('/countImages', (req, res) => {
@@ -196,7 +262,7 @@ module.exports = function (dir, app, db) {
             if (myFiles.length === undefined) { myFiles = [myFiles]; }
             let ftdMedium, ftdSmall, ftdLarge;
 
-            ftdLarge = calcFullTargetDir(key4, SECTION + '_large'); 
+            ftdLarge = calcFullTargetDir(key4, SECTION + '_large');
             ftdMedium = calcFullTargetDir(key4, SECTION);
             ftdSmall = calcFullTargetDir(key4, SECTION + '_small');
 
@@ -229,7 +295,7 @@ module.exports = function (dir, app, db) {
 
                 // save original image in _large directory
                 fs.renameSync(myFiles[i].path, toLarge);
-                               
+
                 Jimp.read(toLarge).then(function (image) {
                     let img = image.clone();
 

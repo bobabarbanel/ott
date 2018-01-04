@@ -144,3 +144,17 @@ a.anchor {
     margin-top: 1em;
     font-weight: normal;
 }
+
+.redUndo {
+    color: red;
+    text-shadow: 1px 1px 4px grey;
+    margin-left: 0.8em;
+    font-size: 14px;
+}
+.redUndo:hover {
+    background: lightyellow;
+    cursor: pointer;
+}
+.horiz {
+    display: inline-block;
+}
