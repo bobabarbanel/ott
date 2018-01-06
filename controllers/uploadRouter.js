@@ -42,9 +42,9 @@ module.exports = function (dir, app, db) {
     function calcFullTargetBaseFileName(key4, position, offset) {
         return [key4.partId, key4.op, key4.machine, position, offset].join("_");
     }
-    function pad3(num) {
+    function pad4(num) { // pads for number tail of length 4
         let s = "000000000000" + num;
-        return s.substr(s.length - 3);
+        return s.substr(s.length - 4);
     }
 
     app.use(express.static(path.join(dir, '/public')));
@@ -280,14 +280,14 @@ module.exports = function (dir, app, db) {
 
                 //  public/images/Tools_large/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
                 let base = calcFullTargetBaseFileName(key4, position, offset);
-                let ffn = base + "_" + pad3(tailnum) + tail; // _001 file
+                let ffn = base + "_" + pad4(tailnum) + tail; // _001 file
 
                 let toLarge = path.normalize(addWebSitePublic(dir, ftdLarge, ffn));
                 // does the target file already exist with default name?
 
                 while (fs.existsSync(toLarge)) { // while file 'to' exists
                     // add _002 etc as needed
-                    ffn = base + "_" + pad3(++tailnum, 3) + tail; // file changed to 002, 003, ...
+                    ffn = base + "_" + pad4(++tailnum, 3) + tail; // file changed to 002, 003, ...
                     toLarge = path.normalize(addWebSitePublic(dir, ftdLarge, ffn));
                 }
 

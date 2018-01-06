@@ -14,30 +14,31 @@
 <body>
     <div id=thumbs>Loading video in background...</div>
     <script>
-        var i = 0;
+        
 var video = document.createElement("video");
 var thumbs = document.getElementById("thumbs");
 function generateThumbnail() {
   var c = document.createElement("canvas");
   var ctx = c.getContext("2d");
-  c.width = 160;
-  c.height = 90;
-  ctx.drawImage(video, 0, 0, 160, 90);
+  c.width = 90;
+  c.height = 160;
+  ctx.drawImage(video, 0, 0, 90, 160);
   thumbs.appendChild(c);
 }
 
 video.addEventListener('loadeddata', function() {
 	thumbs.innerHTML = "";
-    video.currentTime = i;
+    video.currentTime = 0;
 }, false);
 
 video.addEventListener('seeked', function() {
-    generateThumbnail(i);
+    console.log(video.videoHeight + "X" + video.videoWidth); // returns the intrinsic width of the video)
+    generateThumbnail(0);
 }, false);
 
 video.preload = "auto";
 video.src =  //"https://media.w3.org/2010/05/sintel/trailer.mp4";
- "./IMG_0610.MOV";
+ "./IMG_3510.m4v";
 
 </script>
 </body>

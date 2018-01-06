@@ -20,7 +20,7 @@ $(function () {
                     key5.partId, key5.pName, key5.dept, key5.op, key5.machine
                 ].join(" : ")
             );
-
+            $("#floatButton").hide();
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
                     getSheetTags("Tools").then((toolData) => {
@@ -32,6 +32,8 @@ $(function () {
         .fail(function (/*jqxhr, settings, exception*/) {
             console.log("getScript " + "Triggered ajaxError handler.");
         });
+
+        
 
 });
 function genLinkObj(tDoc) {
