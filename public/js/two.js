@@ -177,8 +177,8 @@ function imgClick() { // when small image clicked to show larger image
 
     var img = $('<img class="pannable-image"/>');
     let fileName = $(this).attr('filename');
-    img.attr('src', $(this).attr("dir_large") + '/' + fileName);
-    img.attr('data-high-res-src', $(this).attr("dir") + '/' + fileName);
+    img.attr('src', $(this).attr("dir") + '/' + fileName);
+    img.attr('data-high-res-src', $(this).attr("dir_large") + '/' + fileName);
     img.attr('alt', $(this).attr('filename'));
 
     let in_single = $('<div id="image-gallery" class="in_single cf"/>');
