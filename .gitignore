@@ -3,3 +3,4 @@ backup_json/**
 toDelete/**
 expt/**
 notes/**
+node_modules/**
