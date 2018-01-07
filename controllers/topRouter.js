@@ -4,19 +4,11 @@ const assert = require('assert');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 
 const COOKIE = 'chosenCookie';
 module.exports = function (dir, app, db) {
 	require('./uploadRouter')(dir, app, db);
 	var data;
-
-
-	app.use(express.static(path.join(dir, '/public')));
-	app.use(bodyParser.json());
-	app.use(bodyParser.urlencoded({ extended: true }));
-	app.use(cookieParser());
-
 
 	// main page 
 	app.get('/', (req, res) => {
@@ -40,7 +32,7 @@ module.exports = function (dir, app, db) {
 		});
 		// then show main search front end index.html file
 
-		res.sendFile(dir + '/index.html');
+		res.render('index.html', {});
 	});
 
 	app.get('/insert', (req, res) => {

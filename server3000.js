@@ -2,10 +2,12 @@
 
 const MongoClient = require('mongodb').MongoClient;
 //const assert      = require('assert');
-//const path        = require('path');
+const path        = require('path');
 
 const express = require('express');
-//const bodyParser  = require('body-parser');
+const bodyParser  = require('body-parser');
+const cookieParser = require('cookie-parser');
+
 
 const app = express();
 var myArgs = process.argv.slice(2);
@@ -28,9 +30,23 @@ const topRouter = require("./controllers/topRouter");
 MongoClient.connect(url,
   (err, database) => {
     if (err) { return console.log("Mongo Error: " + err); }
+    let dir = __dirname;
+    app.engine('html', require('ejs').renderFile);
+    app.set('view engine', 'ejs');
+
+    app.use(express.static(path.join(dir, '/public')));
+    app.use('/img', express.static(path.join(dir, 'public/img')));
+    app.use('/js', express.static(path.join(dir, 'public/js')));
+    app.use('/css', express.static(path.join(dir, 'public/css')));
+    app.set('views', path.join(dir, 'public/tabs'));
+
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(cookieParser());
+    
 
     // loads routers, and provides access there to these variables
-    topRouter(__dirname, app, database); 
+    topRouter(dir, app, database);
 
     app.listen(port, () => {
       console.log('Ott App listening on ' + port + '. Mongo "parts" is connected');

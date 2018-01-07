@@ -2,8 +2,7 @@
 // uploadRouter.js
 const assert = require('assert');
 const path = require('path');
-const express = require('express');
-const bodyParser = require('body-parser');
+
 const fs = require('fs-extra');
 const formidable = require('formidable');
 var Jimp = require("jimp");
@@ -46,10 +45,6 @@ module.exports = function (dir, app, db) {
         let s = "000000000000" + num;
         return s.substr(s.length - 4);
     }
-
-    app.use(express.static(path.join(dir, '/public')));
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
 
     app.post('/archiveImages', (req, res) => {
         let dirs = req.body.dirs;
