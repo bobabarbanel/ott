@@ -193,8 +193,8 @@ function singleToEmpty() {
 }
 
 function imgClick() { // when small image clicked to show larger image
-    $(".pic").css("background", "white");
-    $(this).closest('.pic').css("background", "yellow");
+    $(".pic").removeClass('highlight');
+    $(this).closest('.pic').addClass('highlight');
     let single = $("single");
 
     singleToEmpty();
@@ -502,20 +502,20 @@ function getImages(tab) {
 }
 
 // add scroll offset to fragment target (if there is one)
-function delayedFragmentTargetOffset() {
-    var url = $(":target").context.URL;
+// function delayedFragmentTargetOffset() {
+//     var url = $(":target").context.URL;
 
-    var hashCharPosition = url.lastIndexOf("#");
-    if (hashCharPosition !== -1) {
-        var div = $(url.substring(hashCharPosition));
+//     var hashCharPosition = url.lastIndexOf("#");
+//     if (hashCharPosition !== -1) {
+//         var div = $(url.substring(hashCharPosition));
 
-        var offset = div.offset();
+//         var offset = div.offset();
 
-        var scrollto = offset.top - 50; // minus fixed header height
-        $('html, body').animate({ scrollTop: scrollto }, 0);
-        div.css("background-color", "yellow");
-        setTimeout(function () {
-            div.css("background-color", "");
-        }, 3000);
-    }
-}
+//         var scrollto = offset.top - 50; // minus fixed header height
+//         $('html, body').animate({ scrollTop: scrollto }, 0);
+//         div.css("background-color", "yellow");
+//         setTimeout(function () {
+//             div.css("background-color", "");
+//         }, 3000);
+//     }
+// }

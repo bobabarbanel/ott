@@ -75,6 +75,7 @@ single:hover {
 
 #floatMenu ul a {
     background: lightgreen;
+
     color: black;
     font-weight: bold;
     font-size: 50%;
@@ -103,9 +104,12 @@ a.anchor {
 
 .pic {
     border: 20px;
-    background-color: white;
+    background: white;
     color: #222;
     border-bottom: 1px solid black;
+}
+.highlight {
+    background: rgb(240, 240, 131);
 }
 
 .img-wrap {
