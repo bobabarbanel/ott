@@ -63,3 +63,7 @@ single {
 #large {
 	width: 60%;
 }
+.w3-bar {
+	position: fixed;
+	z-index: 501px;
+}

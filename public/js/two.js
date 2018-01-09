@@ -9,12 +9,12 @@ const deletedImages = {}; // tracks list of deleted images for each link
 
 $(function () {
 
-    menuYloc = parseInt($(floatName).css("top"));
-    $(window).scroll(function () {
-        var offset = menuYloc + $(document).scrollTop() + "px";
-        $(floatName).animate({ top: offset }, { duration: 300, queue: false });
-        $('content').attr('top', "60px");
-    });
+    // menuYloc = parseInt($(floatName).css("top"));
+    // $(window).scroll(function () {
+    //     var offset = menuYloc + $(document).scrollTop() + "px";
+    //     $(floatName).animate({ top: offset }, { duration: 300, queue: false });
+    //     $('content').attr('top', "60px");
+    // });
 
     $.getScript("/js/common.js")
         .done(function (/*script, textStatus*/) {

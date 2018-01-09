@@ -54,13 +54,13 @@ single:hover {
 }
 
 #floatMenu {
-    position: absolute;
+    position: fixed;
     top: 40px;
     right: 20px;
     margin-left: 40px;
     width: 250px;
     z-index: 0;
-    max-height: 700px;
+    max-height: 550px;
     overflow-y: scroll;
 }
 
@@ -75,7 +75,6 @@ single:hover {
 
 #floatMenu ul a {
     background: lightgreen;
-    ;
     color: black;
     font-weight: bold;
     font-size: 50%;
@@ -176,13 +175,13 @@ a.anchor {
 
 #undoMenu {
     display: none;
-    position: absolute;
-    top: 100px;
-    left: 600px;
+    position: fixed;
+    top: 80px;
+    left: 530px;
     margin-left: 40px;
     margin-right: 40px;
     width: 250px;
-    z-index: 500;
+    /* z-index: 500; */
     border: 2px solid blue;
     background: white;
 }
@@ -197,7 +196,7 @@ a.anchor {
 #undoMenu ul {
     padding-left: 10px;
     overflow-y: scroll;
-    max-height: 650px;
+    max-height: 550px;
 }
 
 #undoMenu ul li {
