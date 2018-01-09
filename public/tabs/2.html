@@ -6,9 +6,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>General</title>
-
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
   <!--link rel="stylesheet" href="/css/jquery-ui-1.12.1.custom/jquery-ui.min.css"-->
-
+  <!-- <script src="https://use.fontawesome.com/cddef1effa.js"></script> -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
     crossorigin="anonymous"></script>
   <!--script src="/css/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script-->
@@ -18,9 +19,11 @@
 
   <script src="/js/imageviewer.js"></script>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" 
-  integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-    crossorigin="anonymous">
+  <!--link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" 
+    rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+    crossorigin="anonymous"-->
+  <script src="https://use.fontawesome.com/cddef1effa.js"></script>
+  <!-- <script defer src="https://use.fontawesome.com/releases/v5.0.2/js/all.js"></script> -->
   <link rel="stylesheet" href="/css/two.css">
 </head>
 
@@ -40,6 +43,27 @@
 
     <div id="floatMenu">
       <ul/>
+    </div>
+    <div id="undoMenu">
+      <p>Restore Image</p>
+      <form action="javascript:void()">
+        <ul></ul>
+        <div id="undoButtons">
+          <input type="submit" value="Submit">
+          <input type="submit" value="Cancel">
+        </div>
+      </form>
+    </div>
+
+    <div id="tadiv">
+      <textarea id="ta" rows="20" cols="80"></textarea>
+      <div id: "taButtons">
+        <button id="taButtonUpdate">Update Comment</button>
+        <button id="taButtonCancel">Cancel</button>
+      </div>
+    </div>
+    <div id="Fullscreen">
+      <img src="" alt="" />
     </div>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script>

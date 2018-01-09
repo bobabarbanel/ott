@@ -124,9 +124,11 @@ module.exports = function (dir, app, db) {
         ["turret", "position", "spindle", "offset"].forEach(
             term => query[term] = parseInt(query[term])
         );
-        // remove timestamp is present
+                // remove timestamp if present
         if(req.body.filedata.when !== undefined)
             delete req.body.filedata.when;
+        // let comment = req.body.filedata.comment;
+        // delete req.body.filedata.comment;
         let deleteItem = {
             "$pull": {
                 "archived": req.body.filedata
@@ -144,6 +146,7 @@ module.exports = function (dir, app, db) {
             doc => {
                 // add timestamp
                 req.body.filedata.when = new Date();
+                // req.data.filedata.comment = comment;
                 let addItem = {
                     "$push": {
                         "files": req.body.filedata
@@ -183,53 +186,53 @@ module.exports = function (dir, app, db) {
         );
     });
 
-    app.post('/jobArchive', (req, res) => {
-        let key4 = req.body.key4; // key4 of parts.images
-        let tab = req.body.tab; // part of primary key on parts.images
-        let key5 = req.body.key5; // _id of parts.main
-        let idOrderedKeys = req.body.idOrderedKeys;
-        // console.log("jobArchive: " + key4 + " " + tab + " " + key5);
-        db.collection("main").remove(
-            { "_id": key5 }
-        ).then(
-            success => {
-                // console.log("main removed " + success);
-                let keyFields = key5.split('|');
-                let archiveMainEntry = {
-                    "_id": key5
-                };
-                idOrderedKeys.forEach(
-                    (k, i) => {
-                        archiveMainEntry[k] = keyFields[i];
-                    }
-                );
-                db.collection("archive_main").create(archiveMainEntry).then(
-                    success => {
-                        // console.log("archive_main created " + success);
-                        db.collection("images").remove(
-                            {
-                                "key4": key4,
-                                "tab": tab
-                            }
-                        ).then(
-                            // archive images (Tools,Tools_large, Tools_small) TBD
-                            );
-                    },
-                    error => {
-                        console.log("archive_main NOT created " + error);
-                        res.json({ "main": true, "archive_main": false, "images": false })
-                    }
-                );
+    // app.post('/jobArchive', (req, res) => {
+    //     let key4 = req.body.key4; // key4 of parts.images
+    //     let tab = req.body.tab; // part of primary key on parts.images
+    //     let key5 = req.body.key5; // _id of parts.main
+    //     let idOrderedKeys = req.body.idOrderedKeys;
+    //     // console.log("jobArchive: " + key4 + " " + tab + " " + key5);
+    //     db.collection("main").remove(
+    //         { "_id": key5 }
+    //     ).then(
+    //         success => {
+    //             // console.log("main removed " + success);
+    //             let keyFields = key5.split('|');
+    //             let archiveMainEntry = {
+    //                 "_id": key5
+    //             };
+    //             idOrderedKeys.forEach(
+    //                 (k, i) => {
+    //                     archiveMainEntry[k] = keyFields[i];
+    //                 }
+    //             );
+    //             db.collection("archive_main").create(archiveMainEntry).then(
+    //                 success => {
+    //                     // console.log("archive_main created " + success);
+    //                     db.collection("images").remove(
+    //                         {
+    //                             "key4": key4,
+    //                             "tab": tab
+    //                         }
+    //                     ).then(
+    //                         // archive images (Tools,Tools_large, Tools_small) TBD
+    //                         );
+    //                 },
+    //                 error => {
+    //                     console.log("archive_main NOT created " + error);
+    //                     res.json({ "main": true, "archive_main": false, "images": false })
+    //                 }
+    //             );
 
 
-            },
-            error => {
-                console.log("main NOT removed " + error);
-                res.json({ "main": false, "archive_main": false, "images": false })
-            }
-            );
+    //         },
+    //         error => {
+    //             console.log("main NOT removed " + error);
+    //             res.json({ "main": false, "archive_main": false, "images": false })
+    //         }
+    //         );
 
-    });
+    // });
 
     app.post('/upload', (req, res) => {
         let form = new formidable.IncomingForm();
@@ -337,7 +340,6 @@ module.exports = function (dir, app, db) {
                             }
                         }
                     );
-                    console.error("files complete");
                     // success res
                 }).catch(function (err) {
                     console.error(err);

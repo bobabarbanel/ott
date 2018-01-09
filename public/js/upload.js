@@ -456,12 +456,10 @@ $(function () {
                     })
                         .done(
                         result => {
-                            //debugLog("/upload success "+JSON.stringify(result));
                             resolve(result);
                         })
                         .fail((request, status, error) => {
                             reject(error);
-                            
                         })
                 }).then(
                     success => {

@@ -2,15 +2,11 @@
 // two.js
 const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
-var floatName = "#floatMenu";
+const floatName = "#floatMenu";
 var menuYloc = null;
+const deletedImages = {}; // tracks list of deleted images for each link
 // temporary
-function showFn() {
-    console.log($(this).attr('filename'));
-}
-function hideFn() {
 
-}
 $(function () {
 
     menuYloc = parseInt($(floatName).css("top"));
@@ -50,7 +46,34 @@ $(function () {
         });
     $("#floatButton").on('click', hideShowFloat);
 
+    $('#Fullscreen').css('height', $(document).outerHeight() + 'px');
+    $('#Fullscreen').click(function () {
+        $(this).fadeOut(); //this will hide the fullscreen div if you click away from the image. 
+        $('#expand').show();
+    });
+
+    $('#taButtonCancel').on("click", () => {
+        $('#tadiv').css('display', 'none');
+        $("#ta").text('');
+    });
+
+    let form = $('#undoMenu').find('form');
+    form.find('[value="Submit"]').on("click", undoSubmit);
+    form.find('[value="Cancel"]').on("click",
+        () => {
+            $('#undoMenu').hide();
+            return false;
+        });
 });
+
+function fullscreenSingle() {
+    let img = $('img.iv-large-image');
+    let src = img.attr('src'); //get the source attribute of the clicked image
+
+    $('#Fullscreen img').attr('src', src); //assign it to the tag for your fullscreen div
+    $('#Fullscreen').fadeIn();
+}
+
 function hideShowFloat() {
     $(floatName).toggleClass('hidden');
 }
@@ -73,6 +96,7 @@ function paintPage(toolSpecs, toolData) {
     toolData.forEach(
         item => {
             let link = [item.turret, item.position, item.spindle, item.offset].join('_');
+            deletedImages[link] = []; // empty to start
             let text = item.position + '-' + item.offset + ") " +
                 item.function + ":  " + item.type;
             let linkText = item.position + '-' + item.offset + ") " +
@@ -99,10 +123,15 @@ function paintPage(toolSpecs, toolData) {
             pictures.append(anchor);
             let pic = $('<div class="pic" id="pic' + link + '">');
             let div = $('<div/>');
-            div.html($('<p/>').text(text));
+            let p = $('<p/>');
+            p.html(text +
+                '<i class="fa fa-undo redUndo"></i>');
+            p.find('i').on('click', null, {
+                "link": link
+            }, undoChoices).hide();
+            div.append(p);
             let pItems = $('<pItems/>');
-
-            item.files.sort(byDigits).forEach(
+            item.files.forEach(
                 (path, index) => {
                     let small = path.dir.replace('/Tools/', '/Tools_small/');
                     let large = path.dir.replace('/Tools/', '/Tools_large/');
@@ -121,9 +150,10 @@ function paintPage(toolSpecs, toolData) {
                         dir_large: large,
                         filename: path.filename,
                         showingSingle: false,
-                        order: index
+                        order: index,
+                        spindle: item.spindle,
+                        turret: item.turret
                     });
-                    img.hover(showFn, hideFn);
                     idiv.append(img);
                     pItems.append(idiv);
                 }
@@ -157,23 +187,34 @@ function paintPage(toolSpecs, toolData) {
         });
     float.append($('</ul>'));
 }
+function singleToEmpty() {
+    $('#expand').off().empty();
+    $('single').empty();
+}
 
 function imgClick() { // when small image clicked to show larger image
     $(".pic").css("background", "white");
     $(this).closest('.pic').css("background", "yellow");
-    let single = $("single").empty();
+    let single = $("single");
+
+    singleToEmpty();
     $("pictures img[showingsingle='true']")
         .attr('showingsingle', false)
         .css("border-color", "transparent");
 
     single.append($('<h4/>')
-        .text("Turret" + $(this).attr("turret") +
-        " Spindle" + $(this).attr("spindle")));
+        .html("Turret&nbsp;" + $(this).attr("turret") +
+        "&nbsp;&nbsp;Spindle&nbsp;" + $(this).attr("spindle")));
     single.append($('<h2/>')
         .text("Tool " + $(this).attr("tag") + ") " +
         $(this).attr("alt")));
+    single.append('<p id="expand"/>');
     $(this).css("border-color", "blue");
     $(this).attr("showingSingle", true);
+
+    $("#expand").html('<i class="fa fa-arrows-alt fa-2x"/>')
+        .on("click", fullscreenSingle)
+        .css('cursor', 'url(' + '"/images/expand.png"' + '), pointer');
 
     var img = $('<img class="pannable-image"/>');
     let fileName = $(this).attr('filename');
@@ -186,7 +227,25 @@ function imgClick() { // when small image clicked to show larger image
 
     single.append(in_single);
     $('.pannable-image').ImageViewer();
-    single.append($("<p>" + $(this).attr("comment") + "</p>"));
+    let commentP = $('<p class="comment">' + $(this).attr("comment") + "</p>")
+        .on("click",
+        null,
+        { img: $(this) },
+        editComment);
+    single.append(commentP);
+}
+
+function editComment(ev) {
+    // careful!! edits can change Db, but what is impact on deletedImages {} etc??
+
+    $('#ta').val(ev.data.img.attr("comment"));
+    //$('taButtonUpdate').attr('img', ev.data.img);
+    $('#taButtonUpdate').off()
+        .on("click", null,
+        { img: ev.data.img },
+        updateComment);
+    $("#tadiv").css("display", "flex");
+    return false;
 }
 
 function closeDelete() { // when X is clicked in small image, invokes deletion
@@ -197,7 +256,6 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
     let comment = img.attr('comment');
     let dirs = [img.attr('dir'), img.attr('dir_small'), img.attr('dir_large')];
 
-    //alert('remove picture: ' + [link, dirs[0], dirs[1], dirs[2], fileName].join('\n'));
     $.confirm({
         boxWidth: '500px',
         useBootstrap: false,
@@ -213,6 +271,7 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
                 btnClass: 'btn-blue',
                 action: function () {
                     // remove from 2.html (small and large)
+                    //deletedImages[link].push(imgWrap);
                     deleteImages(imgWrap, img, dirs, fileName, comment);
                 }
             },
@@ -248,85 +307,108 @@ function deleteImages(wrapper, img, dirs, fileName, comment) {
     };
     dbImagesDelete(query, filedata).then(
         success => {
-            // adjust UI (remove image), remove single if showing this image
-            if (img.attr("showingSingle") === "true") $("single").empty();
-            let undo = '<i class="icon-undo icon-1 redUndo"></i>';
+
+            // remove single if showing this image
+            if (img.attr("showingSingle") === "true") {
+                wrapper.closest('.pic').css('background', '');
+                wrapper.find('img').css('border-color', '');
+                singleToEmpty();
+            }
+
             let pic = $('#pic' + link);
-            pic.find("div > p > i").off().remove();
-            pic.find("div > p").append('<i class="fa fa-undo redUndo"></i>');
-            pic.find("div > p > i")
-                .on("click", null, {
-                    "query": query,
-                    "filedata": filedata,
-                    "pic": pic,
-                    "order": parseInt(order),
-                    "link": link,
-                    "alt": img.attr('alt'),
-                    "comment": img.attr('comment')
-                }, doUndo);
-            wrapper.remove();
+            deletedImages[link][order] = wrapper;
+
+            pic.find("div > p > i").html(
+                "&nbsp;" +
+                deletedImages[link].filter(x => x !== null).length)
+                .show();
+
+            // adjust UI (hide imagewrap)
+            wrapper.hide();
 
 
-            // rename (move) file to /images/Archive/MachineDir/Tools[_small|_large]
-            // archiveImages(dirs, fileName).then(
-            //     success => { }, // silent
-            //     failure => alert("Unable to Archive images.")
-            // );
         },
         failure => alert("Unable to perform database delete from images collection.\n"
             + JSON.stringify(failure))
     )
 }
 
-function doUndo(ev) {
-    let data = ev.data;
-    let pic = data.pic;
+function updateComment(ev) {
+    //alert("change text");
+    let currentVal = $('#ta').val();
+    ev.data.img.attr("comment", ); // change image's comment attribute
+    $('single .comment').text(currentVal);
+    $('#tadiv').css('display', 'none');
 
-    dbImagesRestore(data.query, data.filedata); // puts "archived" back in "files"
-    // Insert new img-wrap for restored image into the images list in proper order
-    let imgWraps = $(pic).find('pItems').children();
-    let imgWrapsPlus = [];
-    let once = true;
-    let small = data.filedata.dir.replace('/Tools/', '/Tools_small/');
-    let large = data.filedata.dir.replace('/Tools/', '/Tools_large/');
-    let idiv = $('<div class="img-wrap"><span class="close">' +
-        '&times;</span></div>');
+    return false;
+}
 
-    let img = $('<img/>', {
-        height: "100px",
-        alt: data.alt,
-        link: data.link,
-        tag: data.query.position + '-' + data.query.offset,
-        src: small + '/' + data.filedata.filename,
-        comment: data.comment,
-        dir: data.filedata.dir,
-        dir_small: small,
-        dir_large: large,
-        filename: data.filedata.filename,
-        showingSingle: false,
-        order: data.order
-    });
-    img.hover(showFn, hideFn);
-    idiv.find('.close').on('click', closeDelete);
-    img.on("click", imgClick);
-    idiv.append(img);
-    let currentLength = imgWraps.length;
-    // loop thru img-waps, insert new one for restored image
-    imgWraps.detach().each((index, element) => {
-        let pos = parseInt($(element).find('img').attr('order'));
-        // only do this one time
-        if (once && (pos > data.order)) {
-            once = false;
-            imgWrapsPlus.push(idiv);
+function undoChoices(ev) {
+    let link = ev.data.link;
+    let undo = $('#undoMenu');
+    let checkboxes = undo.find('form > ul').empty();
+    let choices = deletedImages[link];
+    let remaining = 0;
+    choices.forEach(
+        (aWrapper, index) => {
+            if (aWrapper !== null) {
+                remaining++;
+                let theImg = aWrapper.find('img');
+                let showImg = '<img src="' +
+                    theImg.attr('dir_small') + '/' +
+                    theImg.attr('filename') + '">';
+                checkboxes.append($(
+                    '<li><input type="checkbox" name="undoItems" value="' +
+                    link + ":" + theImg.attr('order') + '"> ' +
+                    showImg + '</li>'));
+            }
         }
-        imgWrapsPlus.push(element);
-    });
-    if (once) { // was not inserted before, so insert at end of list
-        imgWrapsPlus.push(idiv);
+    )
+    if (remaining > 0) {
+        undo.show();
     }
+}
 
-    $(pic).find('pItems').append(imgWrapsPlus);
-    pic.find("div > p > i").off().remove();
+function undoSubmit(ev) {
+    $('#undoMenu form input[name=undoItems]:checked').each(
+        (index, ele) => {
+            let item = $(ele).val();
+            let link, order;
+            [link, order] = item.split(":");
+            let imgWrap = deletedImages[link][parseInt(order)];
+            let img = imgWrap.find('img');
+            let filedata = {
+                "dir": img.attr('dir'),
+                "filename": img.attr('filename'),
+                "comment": img.attr('comment')
+            };
+            let turret, spindle, position, offset;
+            [turret, spindle, position, offset] =
+                link.split(/_/).map(x => parseInt(x));
+            let query = {
+                "key4": getKey4id(),
+                "turret": turret, // need int for actual query, have to convert in router code
+                "spindle": spindle,
+                "position": position,
+                "offset": offset,
+                "tab": "Tools"
+            };
+            dbImagesRestore(query, filedata); // puts "archived" back in "files"
+
+            // restore imgWrap
+            imgWrap.show();
+            deletedImages[link][parseInt(order)] = null;
+            let remaining = deletedImages[link].filter(x => x !== null).length;
+            let icon = $("#pic" + link).find("div > p > i");
+            if (remaining === 0) {
+                icon.hide();
+            } else {
+                icon.html("&nbsp;" + remaining);
+            }
+        }
+    );
+    $('#undoMenu').hide();
+    return false;
 }
 function archiveImages(dirs, fileName) {
     return new Promise((resolve, reject) => {
@@ -387,7 +469,7 @@ function dbImagesRestore(query, filedata) {
         })
             .success((result) => {
 
-                //console.log("dbImagesDelete done " + JSON.stringify(result));
+                console.log("dbImagesDelete done " + JSON.stringify(result));
                 if (result.nModified === 1) {
                     resolve(result);
                 }
