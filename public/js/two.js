@@ -47,6 +47,7 @@ $(function () {
     $('#Fullscreen').css('height', $(document).outerHeight() + 'px');
     $('#Fullscreen img').click(function () {
         $(this).fadeOut(); //this will hide the fullscreen div if you click away from the image. 
+        $(this).parent().fadeOut();
         $('#expand').show();
     });
 
@@ -76,6 +77,7 @@ function fullscreenSingle() {
 
     $('#Fullscreen img').attr('src', src); //assign it to the tag for your fullscreen div
     $('#Fullscreen').fadeIn();
+    $('#Fullscreen img').fadeIn();
 }
 
 function hideShowFloat() {
@@ -357,15 +359,13 @@ const dList = ".redUndo, .img-wrap .close, pictures img, .w3-bar a, #floatMenu a
 function disableActionsNow() {
     $("#Fullscreen").show();
     $("#Fullscreen img").hide();
-    
     $(dList).css("pointer-events", "none");
 }
+
 function enableActionsNow() {
-    
     $(dList).css("pointer-events", "auto");
     $("#Fullscreen img").show();
     $("#Fullscreen").hide();
-
 }
 
 function undoChoices(ev) {
@@ -402,9 +402,6 @@ function undoChoices(ev) {
 
         
         disableActionsNow();
-        $("#Fullscreen img").hide();
-        $("#Fullscreen").show();
-
         undo.show();
     }
 }
