@@ -1,4 +1,5 @@
 "use strict";
+const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
 $(function () {
 
     setUpTable();
@@ -55,8 +56,7 @@ $(function () {
                     /*type: 'red',*/
                     animation: 'right',
                     title: showVals(fileCount),
-                    content: '<span class="qmsg"><b>'
-                        + 'Please choose a button.</b></span>',
+                    content: '<span class="qmsg"><b>Please choose a button.</b></span>',
                     buttons: {
                         "YES, Delete This Job!": {
                             btnClass: 'btn-red',
@@ -79,7 +79,7 @@ $(function () {
         );
     });
 
-    const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
+    
 
     function showVals(fileCount) { // used in confirmation for job Archive
         // include number of images for this job
@@ -88,28 +88,33 @@ $(function () {
         str += '<tr><th/><td/></td></tr>';
         Object.keys(QUERY).forEach(
             (key, idx) => {
-                if (idx === 0)
-                    str += '<tr><th class="qname">' + idToText[key] + ":</th>"
-                        + '<td colspan="2" class="qvalue">' + spaces4 + QUERY[key]
-                        + '</td><td/></tr>';
-                else if (idx === 1)
-                    str += '<tr><th class="qname">' + idToText[key] + ":</th>"
-                        + '<td class="qvalue">' + spaces4 + QUERY[key]
-                        + '</td><td rowspan="4"><img class="shiftd" '
-                        + 'src="/images/trashfull_sm.jpg"/></td></tr>';
-                else
-                    str += '<tr><th class="qname">' + idToText[key] + ":</th>"
-                        + '<td class="qvalue">' + spaces4 + QUERY[key]
-                        + "</td><td/></tr>";
+                if (idx === 0) {
+                    str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
+                        '<td colspan="2" class="qvalue">' + spaces4 + QUERY[key] +
+                        '</td><td/></tr>';
+                }
+                else if (idx === 1) {
+                    str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
+                        '<td class="qvalue">' + spaces4 + QUERY[key] +
+                        '</td><td rowspan="4"><img class="shiftd" ' +
+                        'src="/images/trashfull_sm.jpg"/></td></tr>';
+                }
+                else {
+                    str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
+                        '<td class="qvalue">' + spaces4 + QUERY[key] +
+                        "</td><td/></tr>";
+                }
             }
-        )
+        );
 
         str += '</table><br/>This job currently has ';
-        if (fileCount == 0) {
+        if (fileCount === 0) {
             str += "no images.";
         }
-        else
-            str += fileCount + " image" + ((fileCount == 1) ? '' : 's') + '.';
+        else {
+            str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
+        }
+            str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
         return str;
     }
 

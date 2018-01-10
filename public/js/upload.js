@@ -460,7 +460,7 @@ $(function () {
                         })
                         .fail((request, status, error) => {
                             reject(error);
-                        })
+                        });
                 }).then(
                     success => {
                         $("#progress").hide();

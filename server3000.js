@@ -26,6 +26,7 @@ switch (myArgs[0]) {
 
 const port = process.env.port || 3000;
 const topRouter = require("./controllers/topRouter");
+const fs = require('fs-extra');
 
 MongoClient.connect(url,
   (err, database) => {
@@ -47,6 +48,11 @@ MongoClient.connect(url,
 
     // loads routers, and provides access there to these variables
     topRouter(dir, app, database);
+
+    /////////////DEBUG
+    const today = new Date();
+    fs.writeFileSync('undoLog.txt', '---------' + today.toString() + "\n");
+    /////////////DEBUG
 
     app.listen(port, () => {
       console.log('Ott App listening on ' + port + '. Mongo "parts" is connected');

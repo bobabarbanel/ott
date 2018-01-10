@@ -1,5 +1,5 @@
 "use strict";
-// upload.js
+// ftedits.js
 const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
 var key4;
@@ -67,7 +67,7 @@ $(function () {
                     window.location = window.location.href+'?eraseCache=true';
                     //window.location.reload(true);
                 },
-                error => {
+                () => { // error
                     //alert("error " + JSON.stringify(error));
                     //window.location.reload(true);
                     window.location = window.location.href+'?eraseCache=true';

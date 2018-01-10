@@ -55,13 +55,13 @@ single:hover {
 
 #floatMenu {
     position: fixed;
-    top: 40px;
+    top: 85px; /* down a bit to accomodate long type/function names */
     right: 20px;
     margin-left: 40px;
     width: 250px;
     z-index: 0;
     max-height: 550px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 #floatMenu ul {
@@ -185,9 +185,11 @@ a.anchor {
     margin-left: 40px;
     margin-right: 40px;
     width: 250px;
-    /* z-index: 500; */
-    border: 2px solid blue;
+    z-index: 500;
+    
+    border: 10px solid blue;
     background: white;
+    border-radius: 12px;
 }
 
 #undoMenu p {
@@ -199,7 +201,7 @@ a.anchor {
 
 #undoMenu ul {
     padding-left: 10px;
-    overflow-y: scroll;
+    overflow-y: auto;
     max-height: 550px;
 }
 
@@ -217,17 +219,29 @@ a.anchor {
     flex-direction: row;
     margin: 0px 20px 10px 20px;
     background: white;
+    
 }
 
 #undoButtons>input[value="Submit"] {
     margin-right: 40px;
     background: blue;
     color: white;
+    cursor: pointer;
+    border-radius: 8px;
 }
 
 #undoButtons>input[value="Cancel"] {
     background: red;
     color: white;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+#checkAll {
+    background: lightblue;
+    color: black;
+    cursor: pointer;
+    border-radius: 12px;
 }
 
 p.comment:hover {
@@ -245,7 +259,7 @@ p.comment:hover {
     height: 100%;
     display: none;
     position: fixed;
-    z-index: 1100;
+    z-index: 499;
     top: 0;
     right: 0;
     bottom: 0;
@@ -262,15 +276,18 @@ p.comment:hover {
 
 #tadiv {
     display: none;
+    /* display: flex; when running */
     background: grey;
-    position: absolute;
+    position: fixed; /* so does not scroll with page */
     top: 120px;
     left: 300px;
     flex-direction: column;
     z-index: 1000;
-    /* display: flex; */
     align-items: center;
     justify-content: center;
+    border: 10px solid blue;
+    background: white;
+    border-radius: 12px;
 }
 
 #ta {
@@ -309,6 +326,6 @@ p.comment:hover {
 
 single .comment {
     width: 650px;
-    overflow-y: scroll;
+    overflow-y: auto;
     max-height: 70px;
 }

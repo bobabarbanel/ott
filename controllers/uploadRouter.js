@@ -72,22 +72,28 @@ module.exports = function (dir, app, db) {
         return typeof value === 'string' || value instanceof String;
     };
 
-    
-    
+
+
     app.post('/deleteDbImages', (req, res) => {
+        // RMA - do this in bulk??
         let query = req.body.query;
         // convert the string attrs to integers
         ["turret", "position", "spindle", "offset"].forEach(
             term => query[term] = parseInt(query[term])
         );
         // remove timestamp is present
-        if(req.body.filedata.when !== undefined)
+        if (req.body.filedata.when !== undefined)
             delete req.body.filedata.when;
         let deleteItem = {
             "$pull": {
                 "files": req.body.filedata
             }
         };
+
+        //////////////////DEBUG
+        fs.appendFileSync('undoLog.txt', 'Delete ' + req.body.filedata.filename + "\n");
+        //////////////////DEBUG
+
         db.collection("images").update(query, deleteItem).then(
             doc => {
                 return (doc);
@@ -117,15 +123,24 @@ module.exports = function (dir, app, db) {
             });
     });
 
+    ///////////////////DEBUG
+    app.post('/reportLog', (req, res) => {
+        fs.appendFileSync('undoLog.txt', '\n\nReport ' +
+            JSON.stringify(req.body.f) + "\n" +
+            JSON.stringify(req.body.q) + "\n" +
+            JSON.stringify(req.body.r) + "\n\n");
+    });
+    //////////////////DEBUG
+
     app.post('/restoreDbImages', (req, res) => {
         let query = req.body.query;
-        
+
         // convert the string attrs to integers
         ["turret", "position", "spindle", "offset"].forEach(
             term => query[term] = parseInt(query[term])
         );
-                // remove timestamp if present
-        if(req.body.filedata.when !== undefined)
+        // remove timestamp if present
+        if (req.body.filedata.when !== undefined)
             delete req.body.filedata.when;
         // let comment = req.body.filedata.comment;
         // delete req.body.filedata.comment;
@@ -134,12 +149,17 @@ module.exports = function (dir, app, db) {
                 "archived": req.body.filedata
             }
         };
+        ////////////////DEBUG
+        fs.appendFileSync('undoLog.txt', 'Restore ' +
+            req.body.filedata.filename + "\n");
+        ////////////////DEBUG
         db.collection("images").update(query, deleteItem).then(
             doc => {
                 return (doc);
             },
             err => {
-                console.log("restoreDbImages archived out error " + JSON.stringify(err));
+                console.log("restoreDbImages archived out error " +
+                    JSON.stringify(err));
                 res.json(err);
             }
         ).then(
@@ -157,7 +177,8 @@ module.exports = function (dir, app, db) {
                         res.json(doc);
                     },
                     err => {
-                        console.log("deleteDbImages files in error " + JSON.stringify(err));
+                        console.log("deleteDbImages files in error " +
+                            JSON.stringify(err));
                         res.json(err);
                     }
                 );
