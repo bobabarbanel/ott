@@ -46,7 +46,7 @@ $(function () {
             key4 = getKey4();
             debugLog("upload.js key4 being set " + JSON.stringify(key4));
             //debugLog("upload Cookie: " + getCookie());
-            
+
             var key5 = getParsedCookie();
             $("#job").text(
                 [
@@ -239,7 +239,7 @@ $(function () {
                 tr.append($('<td class="hidehover"/>'));
             }
             // add progress bar in this header row for last column
-            let td = $('<td class="hidehover"/>');//;.html('<div id="myProgress"><div id="myBar"></div></div>');
+            let td = $('<td class="hidehover"/>');
 
             tr.append(td);
             table.append(tr);
@@ -444,6 +444,8 @@ $(function () {
                     formData.append('uploads[]', files[i], files[i].name);
                 }
                 $("#progress").show();
+                disableActionsNow();
+                $(".bcolumn").css("visibility","hidden");
                 let countField = '#' + idStr(idFields, "count");
                 $(countField).addClass("stripes");
                 new Promise((resolve, reject) => {
@@ -463,14 +465,19 @@ $(function () {
                         });
                 }).then(
                     success => {
+                        
                         $("#progress").hide();
+                        $(".bcolumn").css("visibility","visible");
+                        enableActionsNow();
                         //let id = '#' + idStr(idFields, "count");
                         $(countField).removeClass("stripes");
                         $(countField).text(parseInt($(countField).text()) + success.count);
                     },
                     error => {
                         $(countField).removeClass("stripes");
-                            $("#progress").hide();
+                        $("#progress").hide();
+                        $(".bcolumn").css("visibility","visible");
+                        enableActionsNow();
                         alert("Error: " + error);
                     }
                     );
@@ -499,6 +506,15 @@ $(function () {
             arr[0] = arr[0].replace(/^Turret|^Spindle/, '');
             arr[2] = arr[2].replace(/^Turret|^Spindle/, '');
             return tag + '_' + arr.join("_");
+        }
+
+        const dList = ".fileUpload, .savebutton";
+
+        function disableActionsNow() {
+            $(dList).css("pointer-events", "none");
+        }
+        function enableActionsNow() {
+            $(dList).css("pointer-events", "auto");
         }
 
 

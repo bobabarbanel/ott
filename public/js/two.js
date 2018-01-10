@@ -4,10 +4,7 @@ const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
 const floatName = "#floatMenu";
 const SPACE = "&nbsp;";
-//var menuYloc = null;
 const deletedImages = {}; // tracks list of deleted images for each link
-// temporary
-//var disableActions = false;
 $(function () {
 
     // menuYloc = parseInt($(floatName).css("top"));
@@ -74,9 +71,6 @@ $(function () {
 });
 
 function fullscreenSingle() {
-    // if (disableActions) {
-    //     return false;
-    // }
     let img = $('img.iv-large-image');
     let src = img.attr('src'); //get the source attribute of the clicked image
 
@@ -203,9 +197,6 @@ function singleToEmpty() {
 }
 
 function imgClick() { // when small image clicked to show larger image
-    // if (disableActions) {
-    //     return false;
-    // }
     $(".pic").removeClass('highlight');
     $(this).closest('.pic').addClass('highlight');
     let single = $("single");
@@ -251,10 +242,6 @@ function imgClick() { // when small image clicked to show larger image
 }
 
 function editComment(ev) {
-    // if (disableActions) {
-    //     return false;
-    // }
-    // careful!! edits can change Db, but what is impact on deletedImages {} etc??
 
     $('#ta').val(ev.data.img.attr("comment"));
     //$('taButtonUpdate').attr('img', ev.data.img);
@@ -262,16 +249,13 @@ function editComment(ev) {
         .on("click", null,
         { img: ev.data.img },
         updateComment);
-    //disableActions = true;
     disableActionsNow();
     $("#tadiv").css("display", "flex");
     return false;
 }
 
 function closeDelete() { // when X is clicked in small image, invokes deletion
-    // if (disableActions) {
-    //     return false;
-    // }
+
     let imgWrap = $(this).closest('.img-wrap');
     let img = imgWrap.find('img');
     //let link = img.attr('link');
@@ -367,31 +351,17 @@ function updateComment(/*ev*/) { //RMA INWORK
 
     return false;
 }
-// const disableList = [
-//     '.redUndo', // <i>
-//     '.img-wrap .close', // <span>
-//     'pictures img', // <img>
-//     '.w3-bar a', // <a>
-//     '#floatMenu a' // <a>
-// ];
+
 const dList = ".redUndo, .img-wrap .close, pictures img, .w3-bar a, #floatMenu a";
 
 function disableActionsNow() {
     $("#Fullscreen").show();
     $("#Fullscreen img").hide();
-    // disableList.forEach(
-    //     selector => {
-    //         $(selector).css("pointer-events", "none");
-    //     }
-    // ); 
+    
     $(dList).css("pointer-events", "none");
 }
 function enableActionsNow() {
-    // disableList.forEach(
-    //     selector => {
-    //         $(selector).css("pointer-events", "auto");
-    //     }
-    // );
+    
     $(dList).css("pointer-events", "auto");
     $("#Fullscreen img").show();
     $("#Fullscreen").hide();
@@ -399,9 +369,7 @@ function enableActionsNow() {
 }
 
 function undoChoices(ev) {
-    // if (disableActions) {
-    //     return false;
-    // }
+    
     let link = ev.data.link;
     let undo = $('#undoMenu');
     let checkboxes = undo.find('form > ul').empty();
@@ -432,8 +400,7 @@ function undoChoices(ev) {
             undo.find('p').text("Restore Image");
         }
 
-        //undo.find('input').first().focus();
-        //disableActions = true;
+        
         disableActionsNow();
         $("#Fullscreen img").hide();
         $("#Fullscreen").show();

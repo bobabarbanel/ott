@@ -1,23 +1,22 @@
-body{
-    background:cadetblue;
+body {
+    background: rgb(159, 190, 231);
 }
 
 content {
-
-	position: absolute;
-	left: 20px;
+    position: absolute;
+    left: 20px;
     top: 20px;
-
-    /*width: 80%;*/
-   /* margin: 0 auto;*/
 }
-#setup { /* a table */
+
+#setup {
+    /* a table */
     width: 60%;
     border-collapse: collapse;
 }
+
 table, th, td {
-   border: 1px solid black;
-   text-align: center;
+    border: 1px solid black;
+    text-align: center;
 }
 
 .digit {
@@ -25,16 +24,20 @@ table, th, td {
     padding-left: 10px;
     padding-right: 10px;
 }
+
 tr.sep {
     height: 0.5em;
     background-color: palevioletred;
 }
+
 tr.colnames {
-    background-color: lightgreen;
+    background-color: rgb(74, 81, 182);
 }
+
 tr.greyrow {
     background-color: grey;
 }
+
 tr.greyrow th {
     color: white;
     width: 200px;
@@ -44,34 +47,43 @@ tr.greyrow th {
 tr.spaced {
     background-color: white;
 }
+
 input.noval {
     background-color: lightyellow;
 }
+
 input {
     margin-top: .5em;
     margin-bottom: .5em;
 }
+
 .ibutton {
     margin: .5em;
 }
-td.enabled { /* will be flashed to show change */
+
+td.enabled {
+    /* will be flashed to show change */
     background-color: yellow;
 }
-td.disabled { /* will be flashed to show change */
+
+td.disabled {
+    /* will be flashed to show change */
     background-color: pink;
 }
+
 .colT, .colS {
     width: 200px;
 }
-/* HOVER STYLES */
+
 div#pop-up {
-  display: none;
-  position: absolute;
-  width: 280px;
-  padding: 0 5px 0 5px;
-  background: #eeeeee;
-  border: 1px solid #1a1a1a;
+    display: none;
+    position: absolute;
+    width: 280px;
+    padding: 0 5px 0 5px;
+    background: #eeeeee;
+    border: 1px solid #1a1a1a;
 }
+
 span.popup {
     font-size: 80%;
     color: blue;
@@ -79,56 +91,74 @@ span.popup {
     /*line-height:100%;*/
     margin-left: 10px;
 }
+
 .stripes {
-    background: blue;
+    background: repeating-linear-gradient( 45deg,
+     #ae60bc, #ae60bc 5px, #5d3364 5px, #5d3364 10px);
 }
+
 #progress {
     position: absolute;
     top: 0;
     left: 0.5em;
     display: none;
 }
+
 #title {
     font-size: 2em;
     margin-top: 0.67em;
     margin-left: 1em;
     align-content: left;
     font-weight: bold;
-    color: yellow;
     width: 40%;
 }
+
+tr.colnames th {
+    color: white;
+}
+
 #job {
     font-size: 1.17em;
     margin-top: 1em;
     margin-right: 1em;
     align-content: right;
-    font-weight: normal;
+    font-weight: bold;
 }
 
-.savebutton{
+.savebutton {
     margin: 0 5 0 5;
     background-color: yellow;
 }
+
 .fCol, .tCol {
     width: 500px;
 }
+
 #header {
     align-content: center;
     width: 60%;
 }
+
 #header, #header tr, #header td {
     border: 0;
 }
+
 #eftrow {
-     height: 0.5em;
-     border-bottom: 0.5em;
+    height: 0.5em;
+    border-bottom: 0.5em;
 }
+
 #edit_func_type {
-     margin-right: 150px;
+    margin-right: 150px;
+    background: blue;
+    color: white;
+    width: 400px;
 }
+
 .changed {
     background: lightsalmon;
 }
+
 .button {
     font: bold 12px Arial;
     text-decoration: none;
@@ -139,20 +169,9 @@ span.popup {
     border-right: 1px solid #333333;
     border-bottom: 1px solid #333333;
     border-left: 1px solid #CCCCCC;
-  }
-  #ftSubmit {
-      background: transparent;
-      width: 100px;
-  }
+}
 
-
- 
- 
-
-
-
-
-
-
-
-
+#ftSubmit {
+    background: transparent;
+    width: 100px;
+}
