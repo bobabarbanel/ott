@@ -49,7 +49,7 @@ $(function () {
 
     $('#taButtonCancel').on("click", () => {
         enableActionsNow();
-        ignoreEnter();
+        //ignoreEnter();
         $('#tadiv').css('display', 'none');
         $("#ta").text('');
         return false;
@@ -70,14 +70,15 @@ $(function () {
 
 function catchEnter(dialog) {
     switch(dialog) {
-        case "comment": // Enter when editing comment will Submit (Update)
-        $('body').on('keypress', function(args) {
-            if (args.keyCode == 13) {
-                $('#taButtonUpdate').click();
-                return false;
-            }
-        });
-        break;
+        // Don't Catch Enter for editing comment... then can have no newlines.
+        // case "comment": // Enter when editing comment will Submit (Update)
+        // $('body').on('keypress', function(args) {
+        //     if (args.keyCode == 13) {
+        //         $('#taButtonUpdate').click();
+        //         return false;
+        //     }
+        // });
+        // break;
 
         case "undo": // Enter for Undo Update triggers click on Submit button
         $('body').on('keypress', function(args) {
@@ -277,7 +278,7 @@ function editComment(ev) {
         { img: ev.data.img },
         updateComment);
     disableActionsNow();
-    catchEnter("comment");
+    //catchEnter("comment");
     $("#tadiv").css("display", "flex");
     return false;
 }
@@ -376,7 +377,7 @@ function updateComment(/*ev*/) { //RMA INWORK
     // modify the db
     $('single .comment').text(currentVal);
     enableActionsNow();
-    ignoreEnter();
+    //ignoreEnter();
     $('#tadiv').css('display', 'none');
 
     return false;
