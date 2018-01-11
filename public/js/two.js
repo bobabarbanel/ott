@@ -7,13 +7,6 @@ const SPACE = "&nbsp;";
 const deletedImages = {}; // tracks list of deleted images for each link
 $(function () {
 
-    // menuYloc = parseInt($(floatName).css("top"));
-    // $(window).scroll(function () {
-    //     var offset = menuYloc + $(document).scrollTop() + "px";
-    //     $(floatName).animate({ top: offset }, { duration: 300, queue: false });
-    //     $('content').attr('top', "60px");
-    // });
-
     $.getScript("/js/common.js")
         .done(function (/*script, textStatus*/) {
 
@@ -44,6 +37,9 @@ $(function () {
         });
     $("#floatButton").on('click', hideShowFloat);
 
+    
+    
+
     $('#Fullscreen').css('height', $(document).outerHeight() + 'px');
     $('#Fullscreen img').click(function () {
         $(this).fadeOut(); //this will hide the fullscreen div if you click away from the image. 
@@ -53,6 +49,7 @@ $(function () {
 
     $('#taButtonCancel').on("click", () => {
         enableActionsNow();
+        ignoreEnter();
         $('#tadiv').css('display', 'none');
         $("#ta").text('');
         return false;
@@ -70,6 +67,34 @@ $(function () {
             return false;
         });
 });
+
+function catchEnter(dialog) {
+    switch(dialog) {
+        case "comment": // Enter when editing comment will Submit (Update)
+        $('body').on('keypress', function(args) {
+            if (args.keyCode == 13) {
+                $('#taButtonUpdate').click();
+                return false;
+            }
+        });
+        break;
+
+        case "undo": // Enter for Undo Update triggers click on Submit button
+        $('body').on('keypress', function(args) {
+            if (args.keyCode == 13) {
+                $('#undoSubmit').click();
+                return false;
+            }
+        });
+        break;
+    }
+}
+
+// Enter to trigger "Yes Delete it!"
+
+function ignoreEnter() {
+    $('body').off('keypress');
+}
 
 function fullscreenSingle() {
     let img = $('img.iv-large-image');
@@ -252,6 +277,7 @@ function editComment(ev) {
         { img: ev.data.img },
         updateComment);
     disableActionsNow();
+    catchEnter("comment");
     $("#tadiv").css("display", "flex");
     return false;
 }
@@ -278,6 +304,7 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
             Yes: {
                 text: "Yes - Delete it!",
                 btnClass: 'btn-blue',
+                keys: ['enter'],
                 action: function () {
                     // remove from 2.html (small and large)
                     //deletedImages[link].push(imgWrap);
@@ -349,6 +376,7 @@ function updateComment(/*ev*/) { //RMA INWORK
     // modify the db
     $('single .comment').text(currentVal);
     enableActionsNow();
+    ignoreEnter();
     $('#tadiv').css('display', 'none');
 
     return false;
@@ -393,7 +421,7 @@ function undoChoices(ev) {
     if (remaining > 0) {
         if (remaining > 1) {
             undo.find('p').text("Restore Images");
-            let button = $('<button id="checkAll">Check All</button>');
+            let button = $('<button id="checkAll" tabIndex="-1">Check All</button>');
             button.on("click", checkAllUndos); // RMA do off for button after actions
             checkboxes.prepend(button);
         } else {
@@ -402,6 +430,7 @@ function undoChoices(ev) {
 
         
         disableActionsNow();
+        catchEnter("undo");
         undo.show();
     }
 }
@@ -412,7 +441,7 @@ function checkAllUndos() {
 }
 
 function undoSubmit(/*ev*/) {
-    //console.log("undoSubmit " + $('#undoMenu form input[name=undoItems]:checked').length);
+    let undo = $('#undoMenu');
     $('#undoMenu form input[name=undoItems]:checked').each(
         (index, ele) => {
             let item = $(ele).val();
@@ -426,7 +455,7 @@ function undoSubmit(/*ev*/) {
                 "comment": img.attr('comment')
             };
 
-            console.log("undo " + img.attr('filename'));
+            //console.log("undo " + img.attr('filename'));
             let turret, position, spindle, offset;
             [turret, position, spindle, offset] = link.split(/_/); // Careful!
             let query = {
@@ -464,7 +493,8 @@ function undoSubmit(/*ev*/) {
     );
     enableActionsNow();
 
-    $('#undoMenu').hide();
+    undo.hide();
+    ignoreEnter();
     $('#checkAll').off(); // no need to keep function around
     return false;
 }
