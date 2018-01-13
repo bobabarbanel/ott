@@ -37,8 +37,8 @@ $(function () {
         });
     $("#floatButton").on('click', hideShowFloat);
 
-    
-    
+
+
 
     $('#Fullscreen').css('height', $(document).outerHeight() + 'px');
     $('#Fullscreen img').click(function () {
@@ -69,7 +69,8 @@ $(function () {
 });
 
 function catchEnter(dialog) {
-    switch(dialog) {
+    // note: confim dialogs handle this on their own
+    switch (dialog) {
         // Don't Catch Enter for editing comment... then can have no newlines.
         // case "comment": // Enter when editing comment will Submit (Update)
         // $('body').on('keypress', function(args) {
@@ -81,13 +82,13 @@ function catchEnter(dialog) {
         // break;
 
         case "undo": // Enter for Undo Update triggers click on Submit button
-        $('body').on('keypress', function(args) {
-            if (args.keyCode == 13) {
-                $('#undoSubmit').click();
-                return false;
-            }
-        });
-        break;
+            $('body').on('keypress', function (args) {
+                if (args.keyCode == 13) {
+                    $('#undoSubmit').click();
+                    return false;
+                }
+            });
+            break;
     }
 }
 
@@ -270,15 +271,13 @@ function imgClick() { // when small image clicked to show larger image
 }
 
 function editComment(ev) {
-
     $('#ta').val(ev.data.img.attr("comment"));
-    //$('taButtonUpdate').attr('img', ev.data.img);
+
     $('#taButtonUpdate').off()
         .on("click", null,
         { img: ev.data.img },
         updateComment);
     disableActionsNow();
-    //catchEnter("comment");
     $("#tadiv").css("display", "flex");
     return false;
 }
@@ -293,6 +292,7 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
     let dirs = [img.attr('dir'), img.attr('dir_small'), img.attr('dir_large')];
 
     $.confirm({
+        // keyboardEnabled: true,
         boxWidth: '500px',
         useBootstrap: false,
         type: 'dark',
@@ -301,6 +301,9 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
         title: "Image Deletion",
         content: '<img src="' + dirs[1] + '/' + fileName + '"/>' + SPACE + SPACE +
             'Do you want to delete this image?',
+        // cancel: {
+        //     //return false;
+        // },
         buttons: {
             Yes: {
                 text: "Yes - Delete it!",
@@ -369,16 +372,22 @@ function deleteImage(wrapper, img, dirs, fileName, comment) {
     );
 }
 
-function updateComment(/*ev*/) { //RMA INWORK
-    //alert("change text");
+function updateComment(ev) { //RMA INWORK
     let currentVal = $('#ta').val();
-    //ev.data.img.attr("comment", ); // change image's comment attribute
-    // modify the small image displayed
+
     // modify the db
-    $('single .comment').text(currentVal);
-    enableActionsNow();
-    //ignoreEnter();
+    $('single .comment').text(currentVal);   // modify the displayed large image comment
+    ev.data.img.attr("comment", currentVal); // modify the small image comment
+    dbUpdateImageComment(ev.data.img).then(
+        success => {
+            alert("db updated comment");
+        },
+        failure => {
+            alert("failure db NOT updated comment");
+        }
+    );
     $('#tadiv').css('display', 'none');
+    enableActionsNow();
 
     return false;
 }
@@ -398,7 +407,7 @@ function enableActionsNow() {
 }
 
 function undoChoices(ev) {
-    
+
     let link = ev.data.link;
     let undo = $('#undoMenu');
     let checkboxes = undo.find('form > ul').empty();
@@ -429,7 +438,7 @@ function undoChoices(ev) {
             undo.find('p').text("Restore Image");
         }
 
-        
+
         disableActionsNow();
         catchEnter("undo");
         undo.show();
@@ -498,6 +507,39 @@ function undoSubmit(/*ev*/) {
     ignoreEnter();
     $('#checkAll').off(); // no need to keep function around
     return false;
+}
+
+function dbUpdateImageComment(img) {
+    let turret, position, spindle, offset;
+    [turret, position, spindle, offset] =
+        img.attr("link").split(/_/)
+            .map(val => parseInt(val));
+    let query = {
+        "key4": getKey4id(),
+        "turret": turret,
+        "spindle": spindle,
+        "position": position,
+        "offset": offset,
+        "tab": "Tools"
+    };
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "/updateImageComment",
+            type: 'post',
+            data: {
+                "query": query,
+                "filename": img.attr('filename'),
+                "dir": img.attr('dir'),
+                "comment": img.attr('comment')
+            },
+            dataType: 'json'
+        })
+            .done(result => {
+                alert("updateImageComment " + JSON.stringify(result));
+                resolve(result);
+            })
+            .fail((request, status, error) => reject(error));
+    });
 }
 // function archiveImages(dirs, fileName) {
 //     return new Promise((resolve, reject) => {

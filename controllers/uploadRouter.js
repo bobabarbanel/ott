@@ -46,31 +46,31 @@ module.exports = function (dir, app, db) {
         return s.substr(s.length - 4);
     }
 
-    app.post('/archiveImages', (req, res) => {
-        let dirs = req.body.dirs;
-        let fileName = req.body.fileName;
+    // app.post('/archiveImages', (req, res) => {
+    //     let dirs = req.body.dirs;
+    //     let fileName = req.body.fileName;
 
-        dirs.forEach(
-            aDir => {
-                let archiveDir = aDir.replace("Tools", "Archive/Tools");
+    //     dirs.forEach(
+    //         aDir => {
+    //             let archiveDir = aDir.replace("Tools", "Archive/Tools");
 
-                let fullPath = path.normalize(dir + "/public" + archiveDir);
-                if (!fs.existsSync(fullPath)) {
-                    fs.mkdirSync(fullPath);
-                }
-                fs.renameSync(
-                    path.normalize(dir + "/public" + aDir + '/' + fileName),
-                    fullPath + '/' + fileName
-                );
-            }
-        );
+    //             let fullPath = path.normalize(dir + "/public" + archiveDir);
+    //             if (!fs.existsSync(fullPath)) {
+    //                 fs.mkdirSync(fullPath);
+    //             }
+    //             fs.renameSync(
+    //                 path.normalize(dir + "/public" + aDir + '/' + fileName),
+    //                 fullPath + '/' + fileName
+    //             );
+    //         }
+    //     );
 
-        res.json("success");
-        return;
-    });
-    function isString(value) {
-        return typeof value === 'string' || value instanceof String;
-    };
+    //     res.json("success");
+    //     return;
+    // });
+    // function isString(value) {
+    //     return typeof value === 'string' || value instanceof String;
+    // };
 
 
 
@@ -81,12 +81,16 @@ module.exports = function (dir, app, db) {
         ["turret", "position", "spindle", "offset"].forEach(
             term => query[term] = parseInt(query[term])
         );
-        // remove timestamp is present
-        if (req.body.filedata.when !== undefined)
-            delete req.body.filedata.when;
-        let deleteItem = {
+
+        // copy chosen fileRef to archived slot; and dlete from files slot
+        let arch = Object.assign({}, req.body.filedata);
+        arch.when = new Date();      // add datetime 
+        let updates = {
             "$pull": {
                 "files": req.body.filedata
+            },
+            "$push": {
+                "archived": arch
             }
         };
 
@@ -94,33 +98,16 @@ module.exports = function (dir, app, db) {
         fs.appendFileSync('undoLog.txt', 'Delete ' + req.body.filedata.filename + "\n");
         //////////////////DEBUG
 
-        db.collection("images").update(query, deleteItem).then(
+        db.collection("images").update(query, updates).then(
             doc => {
+                res.json(doc);
                 return (doc);
             },
             err => {
                 console.log("deleteDbImages files out error " + JSON.stringify(err));
                 res.json(err);
-            }
-        ).then(
-            doc => {
-                // add timestamp
-                req.body.filedata.when = new Date();
-                let addItem = {
-                    "$push": {
-                        "archived": req.body.filedata
-                    }
-                };
-                db.collection("images").update(query, addItem).then(
-                    doc => {
-                        res.json(doc);
-                    },
-                    err => {
-                        console.log("deleteDbImages archived in error " + JSON.stringify(err));
-                        res.json(err);
-                    }
-                );
             });
+
     });
 
     ///////////////////DEBUG
@@ -131,6 +118,41 @@ module.exports = function (dir, app, db) {
             JSON.stringify(req.body.r) + "\n\n");
     });
     //////////////////DEBUG
+
+
+
+    app.post('/updateImageComment', (req, res) => {
+        let query = req.body.query;
+        query.turret = parseInt(query.turret);
+        query.spindle = parseInt(query.spindle);
+        query.position = parseInt(query.position);
+        query.offset = parseInt(query.offset);
+        let filename = req.body.filename;
+        let dir = req.body.dir;
+        let new_comment = req.body.comment;
+
+        query.files = { $elemMatch: { filename: filename, dir: dir } };
+
+        db.collection('images').update(
+            query,
+            { $set: { "files.$.comment": new_comment } },
+            {
+                arrayFilters: [
+                    { "$.filename": filename }, { "$.dir": dir }
+                ]
+            }
+        ).then(
+            doc => {
+                console.log(doc);
+                res.json(doc);
+            },
+            err => {
+                console.log("updateImageComment error " +
+                    JSON.stringify(err));
+                res.json(err);
+            }
+            );
+    });
 
     app.post('/restoreDbImages', (req, res) => {
         let query = req.body.query;
