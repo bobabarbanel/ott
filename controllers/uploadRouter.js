@@ -38,8 +38,9 @@ module.exports = function (dir, app, db) {
     function addWebSitePublic(dir1, dir2, fname) {
         return [dir1, "public", dir2, fname].join("/");
     }
-    function calcFullTargetBaseFileName(key4, position, offset) {
-        return [key4.partId, key4.op, key4.machine, position, offset].join("_");
+    function calcFullTargetBaseFileName(key4, turret, position, spindle, offset) {
+        return [key4.partId, key4.op, key4.machine,
+            turret, position, spindle, offset].join("_");
     }
     function pad4(num) { // pads for number tail of length 4
         let s = "000000000000" + num;
@@ -320,7 +321,8 @@ module.exports = function (dir, app, db) {
                 let tail = fileName.substring(fileName.lastIndexOf("."));
 
                 //  public/images/Tools_large/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
-                let base = calcFullTargetBaseFileName(key4, position, offset);
+                let base = calcFullTargetBaseFileName(key4, turret, 
+                    position, spindle, offset);
                 let ffn = base + "_" + pad4(tailnum) + tail; // _001 file
 
                 let toLarge = path.normalize(addWebSitePublic(dir, ftdLarge, ffn));
