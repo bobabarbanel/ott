@@ -84,7 +84,7 @@ $(function () {
         fields.key4 = getKey4id();
         fields.addFiles = addFiles;
         fields.tab = SECTION;
-        alert("updateFT " + fields.key4 + " " + fields.function);
+        // alert("updateFT " + fields.key4 + " " + fields.function);
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "/updateFT",

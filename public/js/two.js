@@ -5,6 +5,23 @@ var cookieValue = "not set";
 const floatName = "#floatMenu";
 const SPACE = "&nbsp;";
 const deletedImages = {}; // tracks list of deleted images for each link
+const allImgWraps = []; // array of objects, {warp: the imgWrap jq object, deleted: boolean}
+const lgp = [];
+//const deletedImgWraps = [];
+let maxImageShowing = 0; // incremneted as images are displayed
+let LG;
+let undoChoosing = false;
+let deleteChoosing = false;
+
+const TAB_KEY = 9;
+const RIGHT_KEY = 39;
+const LEFT_KEY = 37;
+const DOWN_KEY = 40;
+const UP_KEY = 38;
+const ESCAPE_KEY = 27;
+const ENTER_KEY = 13;
+
+let imageShowing = -1; // an integer, no image visible
 $(function () {
 
     $.getScript("/js/common.js")
@@ -17,7 +34,7 @@ $(function () {
 
             $("#cookie").text(getCookie());
             setThisTab(2);
-            $("#job").text(
+            $("#job p").text(
                 [
                     key5.partId, key5.pName, key5.dept, key5.op, key5.machine
                 ].join(" : ")
@@ -37,7 +54,7 @@ $(function () {
         });
     $("#floatButton").on('click', hideShowFloat);
 
-
+    // $('body').on('keydown', nextImage);
 
 
     $('#Fullscreen').css('height', $(document).outerHeight() + 'px');
@@ -49,7 +66,6 @@ $(function () {
 
     $('#taButtonCancel').on("click", () => {
         enableActionsNow();
-        //ignoreEnter();
         $('#tadiv').css('display', 'none');
         $("#ta").text('');
         return false;
@@ -64,13 +80,39 @@ $(function () {
             $("#Fullscreen").hide();
             $("#Fullscreen img").show(); // reset for next use
             $('#checkAll').off(); // no need to keep function around
+            undoChoosing = false;
             return false;
         });
 });
 
-function catchEnter(dialog) {
+function LinkGroup(prev, next, start, stop, link) {
+
+    this.start = start;
+    this.stop = stop;
+    this.prev = prev;
+    this.next = next;
+    this.link = link;
+
+    this.setPrev = (p) => this.prev = p;
+    this.getPrev = () => this.prev;
+
+    this.setNext = (n) => this.next = n;
+    this.getNext = () => this.next;
+
+    this.getLink = () => this.link;
+    this.setLink = (n) => this.link = n;
+
+    this.getStart = () => this.start;
+    this.setStart = (s) => this.start = s;
+
+    this.getStop = () => this.stop;
+    this.setStop = (s) => this.stop = s;
+}
+
+function catchKeys(state, code) {
     // note: confim dialogs handle this on their own
-    switch (dialog) {
+
+    switch (state) {
         // Don't Catch Enter for editing comment... then can have no newlines.
         // case "comment": // Enter when editing comment will Submit (Update)
         // $('body').on('keypress', function(args) {
@@ -81,21 +123,135 @@ function catchEnter(dialog) {
         // });
         // break;
 
-        case "undo": // Enter for Undo Update triggers click on Submit button
-            $('body').on('keypress', function (args) {
-                if (args.keyCode == 13) {
-                    $('#undoSubmit').click();
+        // case "undo": // Enter for Undo Update triggers click on Submit button
+        //     // $('body').on('keypress', function (args) {
+        //     //     if (codes.indexOf(args.keyCode) != -1) {
+        //     //         $('#undoSubmit').click();
+        //     //         return false;
+        //     //     }
+        //     // });
+        //     alert("catchKeys -- error: should not be here for undo");
+        //     break;
+
+        case "single":
+            var $events = jQuery._data(jQuery("body")[0], "events");
+            //validate if the element has an event attached
+            if (typeof $events !== "undefined" && typeof $events.keydown[0] !== "undefined") {
+                //iteration to get each one of the handlers
+                // jQuery.each($events, function (i, event) {
+                //     jQuery.each(event, function (i, handler) {
+                //         console.log("has keydown " + handler); // write on console the handler
+                //     });
+                // });
+                // keydown event for body already defined
+            } else {
+                //alert("catchKeys(" + state + "," + code + ")");
+
+                $('body').on('keydown', function (args) {
+                    if (args.keyCode === ENTER_KEY) {
+                        if (undoChoosing === true) {
+                            alert("enter key");
+                            $('#undoMenu form input[value=Submit]').trigger('click');
+                            return false;
+                        } else if(deleteChoosing == true) {
+                            $('div.jconfirm').find('button.confirm-deletion').trigger('click');
+                            return false;
+                        }
+                    }
+                    else
+                        switch (args.keyCode) {
+
+                            case LEFT_KEY:
+                                nextImage(-1);
+                                break;
+
+                            case TAB_KEY:
+                            case RIGHT_KEY:
+                                nextImage(1);
+                                break;
+
+                            case ESCAPE_KEY:
+                                closeSingle();
+                                break;
+
+                            case UP_KEY:
+                                moveToGroup('prev');
+                                break;
+
+                            case DOWN_KEY:
+                                moveToGroup('next');
+                                break;
+
+                            default:
+                                break;
+                        }
                     return false;
-                }
-            });
+                });
+            }
             break;
+
+        case 'off':
+            $('body').off(code);
+            break;
+
     }
 }
 
-// Enter to trigger "Yes Delete it!"
+function moveToGroup(direction) {
+    let myLG = lgp[imageShowing];
+    // reset imageShowing for previous or next group
+    if (direction === 'prev') {
+        if (myLG.prev !== null) {
+            imageShowing = myLG.prev.getStart();
+            if (allImgWraps[imageShowing].deleted === true) {
+                let i = imageShowing;
+                for (; i > 0; i--) {
+                    if (allImgWraps[imageShowing].deleted !== true) {
+                        imageShowing = i;
+                        break;
+                    }
+                }
+                if (i === 0) return; // reached beginning so do not move
+            }
+            goGroup();
+        } else {
+            return;
+        }
+    } else {
+        if (myLG.next !== null) {
+            imageShowing = myLG.next.getStart();
+            if (allImgWraps[imageShowing].deleted === true) {
+                let i = imageShowing;
+                for (; i < maxImageShowing; i++) {
+                    if (allImgWraps[imageShowing].deleted !== true) {
+                        imageShowing = i;
+                        break;
+                    }
+                }
+                if (i === maxImageShowing) return; // reached end so do not move
+            }
+            goGroup();
+        } else {
+            return;
+        }
+    }
+}
 
-function ignoreEnter() {
-    $('body').off('keypress');
+function goGroup() { // move page and open first image in group
+    let img = $(allImgWraps[imageShowing].wrap).find('img'); // get imag for this img-wrap
+    let anchorName = img.attr('link'); // get link for the image group
+    let aTag = $('#' + anchorName); // set aTag to the anchor for the link
+    $('html,body').animate({ scrollTop: aTag.offset().top }); // scroll the page
+    img.trigger('click'); // "click" on the image
+}
+
+
+function closeSingle() {
+    singleToEmpty();
+    $("pictures img[showingsingle='true']")
+        .attr('showingsingle', false)
+        .css("border-color", "transparent");
+    catchKeys('off', 'keydown');
 }
 
 function fullscreenSingle() {
@@ -126,10 +282,25 @@ function paintPage(toolSpecs, toolData) {
     let pictures = $('pictures');
     let currentTurret = 0;
     let currentSpindle = 0;
+    maxImageShowing = 0;
+    let curLG = null;
     toolData.forEach(
         item => {
             let link = [item.turret, item.position, item.spindle, item.offset].join('_');
             deletedImages[link] = []; // empty to start
+
+            if (curLG !== null) { // have a group
+                if (curLG.getStart() !== curLG.getStop()) { // ignore groups with no images
+                    curLG.setNext(new LinkGroup(curLG, null, maxImageShowing, null, link));
+                    curLG = curLG.getNext();
+                } else {
+                    curLG.setLink(link);
+                }
+            } else { // initialize
+                curLG = new LinkGroup(null, null, maxImageShowing, null, link);
+                LG = curLG;
+            }
+
             let text = item.position + '-' + item.offset + ") " +
                 item.function + ":  " + item.type;
             let linkText = item.position + '-' + item.offset + ") " +
@@ -157,19 +328,28 @@ function paintPage(toolSpecs, toolData) {
             let pic = $('<div class="pic" id="pic' + link + '">');
             let div = $('<div/>');
             let p = $('<p/>');
-            p.html(text +
+
+            let buttonHTML =
+                '<button class="checkAllDel doAll" type="button">' +
+                '&nbsp;&nbsp;&#10004; All</button>';
+
+            p.html(buttonHTML + "&nbsp;&nbsp;" + text +
                 '<i class="fa fa-undo redUndo"></i>');
             p.find('i').on('click', null, {
                 "link": link
             }, undoChoices).hide();
             div.append(p);
             let pItems = $('<pItems/>');
+            let count = 0;
             item.files.forEach(
                 (path, index) => {
                     let small = path.dir.replace('/Tools/', '/Tools_small/');
                     let large = path.dir.replace('/Tools/', '/Tools_large/');
-                    let idiv = $('<div class="img-wrap"><span class="close">' +
-                        '&times;</span></div>');
+                    let idiv = $('<div class="img-wrap"/>');
+                    idiv.append($('<span class="close">&times;</span>'));
+                    idiv.append($('<input class="ckbx" name="' +
+                        link +
+                        '" type="checkbox">'));
                     // add handlers for video
                     let img = $('<img/>', {
                         height: "100px",
@@ -185,20 +365,46 @@ function paintPage(toolSpecs, toolData) {
                         showingSingle: false,
                         order: index,
                         spindle: item.spindle,
-                        turret: item.turret
+                        turret: item.turret,
+                        sequence: maxImageShowing
                     });
+                    idiv.attr('sequence', maxImageShowing + "");
+                    lgp[maxImageShowing] = curLG; // save LinkGroup for each image
+
+                    allImgWraps[maxImageShowing] = { wrap: idiv, deleted: false };
+                    maxImageShowing++;
+
+                    count = index + 1;
                     idiv.append(img);
                     pItems.append(idiv);
                 }
             );
+            let groupButton = p.find('button');
+            groupButton.on('click', null, { link: link }, delSelectAll);
+            groupButton.hide();
+            if (count > 0) {
+                groupButton.show();
+            }
             pic.append(div);
             div.append(pItems);
             pictures.append(pic);
-        });
 
+            curLG.setStop(maxImageShowing);
+        });
+    if (curLG.getStart() === curLG.getStop()) {
+        // remove last LG
+        curLG.getPrev().setNext(null);
+        curLG = curLG.getPrev();
+    }
+    // form circle so that UP and DOWN arrows move in continuous circle
+    curLG.setNext(LG);
+    LG.setPrev(curLG);
+
+    // alert("maxImageShowing " + maxImageShowing);
     $('.img-wrap .close').on('click', closeDelete);
 
     $("pictures img").on("click", imgClick);
+    // $('body').on("keypress", nextImage);
     // build floating menu
     let float = $(floatName);
     let dash = /-/;
@@ -219,18 +425,66 @@ function paintPage(toolSpecs, toolData) {
             }
         });
     float.append($('</ul>'));
+    enableCheckBoxes();
+}
+function delSelectAll(e) {
+    let link = e.data.link;
+    let boxes = $('#pic' + link).find('.ckbx');
+    let html = '';
+    if ($(this).html().includes('un')) {
+        html = ' &nbsp;&nbsp;'
+        boxes.prop('checked', false);
+        $(this).removeClass('undoAll').addClass('doAll');
+    } else {
+        html = 'un';
+        boxes.prop('checked', true);
+        $(this).removeClass('doAll').addClass('undoAll');
+    }
+    $(this).html(html + '&#10004; All');
+    return false;
+}
+function nextImage(direction) {
+    if (imageShowing != -1) {
+        showNextSingle(direction);
+    }
+}
+function showNextSingle(direction) {
+    // console.log("showNextSingle(" + direction + ") " + imageShowing);
+    // alert("showing " + imageShowing);
+    imageShowing = imageShowing + direction;
+
+    // are we rolling back over start, or beyond end?
+    if (imageShowing >= maxImageShowing) imageShowing = 0;
+    else if (imageShowing < 0) imageShowing = maxImageShowing - 1;  // RMA check range
+
+    // replace single with new image
+    if (allImgWraps[imageShowing].deleted === true) {
+        // console.log("again");
+        // find next imgWrap showing, then trigger click there
+        showNextSingle(direction);
+    }
+    // console.log("showNextSingle calc: " + imageShowing);
+    let img = $(allImgWraps[imageShowing].wrap).find('img');
+    let anchorName = img.attr('link');
+    let aTag = $('#' + anchorName);
+    $('html,body').animate({ scrollTop: aTag.offset().top });
+
+    img.trigger('click');
 }
 function singleToEmpty() {
     $('#expand').off().empty();
-    $('single').empty();
+    $('single > form').empty();
+    imageShowing = -1;
+
 }
 
 function imgClick() { // when small image clicked to show larger image
     $(".pic").removeClass('highlight');
     $(this).closest('.pic').addClass('highlight');
-    let single = $("single");
-
+    let single = $("single > form");
+    let wrapper = $(this).closest('.img-wrap');
     singleToEmpty();
+    //catchKeys('off', 'keydown'); // turns off keydown on body
     $("pictures img[showingsingle='true']")
         .attr('showingsingle', false)
         .css("border-color", "transparent");
@@ -261,6 +515,9 @@ function imgClick() { // when small image clicked to show larger image
     in_single.append(img);
 
     single.append(in_single);
+    // img.focus();
+    imageShowing = parseInt($(this).attr('sequence')); // global, impacts arrow/tab handling
+    // alert("single for " + imageShowing);
     $('.pannable-image').ImageViewer();
     let commentP = $('<p class="comment">' + $(this).attr("comment") + "</p>")
         .on("click",
@@ -268,6 +525,8 @@ function imgClick() { // when small image clicked to show larger image
         { img: $(this) },
         editComment);
     single.append(commentP);
+    catchKeys("single"); // on for keydown
+
 }
 
 function editComment(ev) {
@@ -285,53 +544,107 @@ function editComment(ev) {
 function closeDelete() { // when X is clicked in small image, invokes deletion
 
     let imgWrap = $(this).closest('.img-wrap');
-    let img = imgWrap.find('img');
-    //let link = img.attr('link');
-    let fileName = img.attr('filename');
-    let comment = img.attr('comment');
-    let dirs = [img.attr('dir'), img.attr('dir_small'), img.attr('dir_large')];
+    let siblings = imgWrap.closest('pitems').find('.ckbx:checked');
+    let dCount = siblings.length;
 
-    $.confirm({
-        // keyboardEnabled: true,
-        boxWidth: '500px',
-        useBootstrap: false,
-        type: 'dark',
-        draggable: true,
-        animation: 'left',
-        title: "Image Deletion",
-        content: '<img src="' + dirs[1] + '/' + fileName + '"/>' + SPACE + SPACE +
-            'Do you want to delete this image?',
-        // cancel: {
-        //     //return false;
-        // },
-        buttons: {
-            Yes: {
-                text: "Yes - Delete it!",
-                btnClass: 'btn-blue',
-                keys: ['enter'],
-                action: function () {
-                    // remove from 2.html (small and large)
-                    //deletedImages[link].push(imgWrap);
-                    deleteImage(imgWrap, img, dirs, fileName, comment);
+    if (dCount !== 0) { // some checkboxes checked among siblings
+        if (imgWrap.find('.ckbx:checked').length != 1) {
+            $.confirm({
+                title: '<br/>Please click X on one of<br/>the Selected images.',
+                content: "",
+                autoClose: 'ok|5000',
+                icon: 'fa fa-warning',
+                useBootstrap: false,
+                boxWidth: '500px',
+                type: 'orange',
+                typeAnimated: true,
+                buttons: {
+                    ok: {
+                        text: 'OK'
+                    }
                 }
-            },
-            No: {
-                btnClass: 'btn-red'
-            },
-        }
-    });
+            });
 
+            return false;
+        }
+    }
+
+    let ximg = imgWrap.find('img');
+    if (dCount < 2) { // ONE item selected, or simply X with no selection
+        //alert("one matching");
+        let fileName = ximg.attr('filename');
+        let dir_small = ximg.attr('dir_small');
+        deleteChoosing = true;
+        $.confirm({
+            boxWidth: '500px',
+            useBootstrap: false,
+            type: 'dark',
+            draggable: true,
+            animation: 'left',
+            title: "Image Deletion",
+            content: '<img src="' + dir_small + '/' + fileName + '"/>' +
+                SPACE + SPACE +
+                'Do you want to delete this image?',
+
+            buttons: {
+                Yes: {
+                    text: "Yes - Delete it!",
+                    btnClass: 'btn-blue confirm-deletion',
+                    keys: ['enter'],
+                    action: function () {
+                        delete1Image(imgWrap, ximg);
+                        deleteChoosing = false;
+                    }
+                },
+                No: {
+                    btnClass: 'btn-red',
+                    action: function () {
+                        deleteChoosing = false;
+                    }
+                },
+            }
+        });
+    } else {
+        deleteChoosing = true;
+        $.confirm({
+            // keyboardEnabled: true,
+            boxWidth: '500px',
+            useBootstrap: false,
+            type: 'dark',
+            draggable: true,
+            animation: 'left',
+            title: "Image Deletion",
+            content: SPACE + SPACE +
+                'Do you want to delete ' + dCount + ' images?',
+
+            buttons: {
+                Yes: {
+                    text: "Yes - Delete them!",
+                    btnClass: 'btn-blue confirm-deletion',
+                    keys: ['enter'],
+                    action: function () {
+                        deleteNImages(siblings, ximg);
+                        deleteChoosing = true;
+                    }
+                },
+                No: {
+                    btnClass: 'btn-red',
+                    action: function () {
+                        deleteChoosing = true;
+                    }
+                },
+            }
+        });
+    }
     return false;
 }
 
-function deleteImage(wrapper, img, dirs, fileName, comment) {
+function delete1Image(wrapper, ximg) {
     // remove from db
     let turret, position, spindle, offset;
-    let link = img.attr('link');
-    let order = img.attr('order');
+    let link = ximg.attr('link');
     [turret, position, spindle, offset] =
         link.split('_').map(val => parseInt(val));
-
     let query = {
         "key4": getKey4id(),
         "turret": turret, // need int for actual query, have to convert in router code
@@ -340,10 +653,13 @@ function deleteImage(wrapper, img, dirs, fileName, comment) {
         "offset": offset,
         "tab": "Tools"
     };
+
+    let img = ximg; // wrapper.find('img');
+    let order = ximg.attr('order');
     let filedata = {
-        "dir": dirs[0],
-        "filename": fileName,
-        "comment": comment
+        "dir": ximg.attr('dir'),
+        "filename": ximg.attr('filename'),
+        "comment": ximg.attr('comment')
     };
     dbImagesDelete(query, filedata).then(
         () => {
@@ -357,6 +673,7 @@ function deleteImage(wrapper, img, dirs, fileName, comment) {
 
             let pic = $('#pic' + link);
             deletedImages[link][order] = wrapper;
+            allImgWraps[parseInt(img.attr('sequence'))].deleted = true;
 
             pic.find("div > p > i").html(
                 SPACE +
@@ -364,12 +681,105 @@ function deleteImage(wrapper, img, dirs, fileName, comment) {
                 .show();
 
             // adjust UI (hide imagewrap)
-            wrapper.hide();
+
+            renderCheckAllButton(wrapper, 'hide');
+
         },
         failure => alert(
             "Unable to perform database delete from images collection.\n" +
             JSON.stringify(failure))
     );
+}
+
+function deleteNImages(siblings, ximg) {
+    let wrappers = siblings.map(
+        (index, element) => {
+            return $(element).closest('.img-wrap')
+        }).get();
+    // remove from db
+    let turret, position, spindle, offset;
+    let link = ximg.attr('link');
+    [turret, position, spindle, offset] =
+        link.split('_').map(val => parseInt(val));
+    let query = {
+        "key4": getKey4id(),
+        "turret": turret, // need int for actual query, have to convert in router code
+        "spindle": spindle,
+        "position": position,
+        "offset": offset,
+        "tab": "Tools"
+    };
+
+    $.makeArray(wrappers).forEach(
+        element => {
+            let wrapper = $(element);
+            let img = wrapper.find('img');
+            let order = img.attr('order');
+            // alert(img.attr('filename'));
+            let filedata = {
+                "dir": img.attr('dir'),
+                "filename": img.attr('filename'),
+                "comment": img.attr('comment')
+            };
+            dbImagesDelete(query, filedata).then(
+                () => {
+
+                    // remove single if showing this image
+                    if (img.attr("showingSingle") === "true") {
+                        wrapper.closest('.pic').css('background', '');
+                        wrapper.find('img').css('border-color', '');
+                        singleToEmpty();
+                    }
+
+                    let pic = $('#pic' + link);
+                    deletedImages[link][order] = wrapper;
+                    allImgWraps[parseInt(img.attr('sequence'))].deleted = true;
+
+                    pic.find("div > p > i").html(
+                        SPACE +
+                        deletedImages[link].filter(x => x !== null).length)
+                        .show();
+
+                    // adjust UI (hide imagewrap)
+
+                    renderCheckAllButton(wrapper, 'hide');
+
+                },
+                failure => alert(
+                    "Unable to perform database delete from images collection.\n" +
+                    JSON.stringify(failure))
+            );
+        });
+}
+
+function countShowing(sibs) {
+    let count = 0;
+    sibs.each((index, element) => {
+        // console.log(index + " " + $(element).css('display'));
+        count += ($(element).css('display') !== 'none') ? 1 : 0;
+    });
+    return count;
+}
+
+function renderCheckAllButton(wrapper, action) {
+    let sibs = wrapper.closest('pitems').find('.img-wrap');
+    const delAllButtonClass = '.checkAllDel';
+
+    let button = wrapper.closest('.pic').find(delAllButtonClass);
+
+    if (action === 'hide') {
+        wrapper.hide();
+    } else {
+        wrapper.show();
+    }
+
+    let stillShowing = countShowing(sibs);
+
+    if (stillShowing === 0) {
+        button.hide();
+    } else {
+        button.show();
+    }
 }
 
 function updateComment(ev) { //RMA INWORK
@@ -380,10 +790,10 @@ function updateComment(ev) { //RMA INWORK
     ev.data.img.attr("comment", currentVal); // modify the small image comment
     dbUpdateImageComment(ev.data.img).then(
         success => {
-            alert("db updated comment");
+            //alert("db updated comment");
         },
         failure => {
-            alert("failure db NOT updated comment");
+            alert("failure: db NOT updated comment");
         }
     );
     $('#tadiv').css('display', 'none');
@@ -407,10 +817,10 @@ function enableActionsNow() {
 }
 
 function undoChoices(ev) {
-
     let link = ev.data.link;
     let undo = $('#undoMenu');
-    let checkboxes = undo.find('form > ul').empty();
+    let formUl = undo.find('form > ul').empty();
+    // disable submit button
     let choices = deletedImages[link];
     let remaining = 0;
     choices.forEach(
@@ -420,34 +830,61 @@ function undoChoices(ev) {
                 let showImg = '<img src="' +
                     theImg.attr('dir_small') + '/' +
                     theImg.attr('filename') + '">';
-                checkboxes.append($(
+                let li = $(
                     '<li><input type="checkbox" name="undoItems" value="' +
                     link + ":" + theImg.attr('order') + '"> ' +
                     SPACE + (++remaining) + SPACE +
-                    showImg + '</li>'));
+                    showImg + '</li>');
+                formUl.append(li);
             }
         }
     );
+    // start with Submit disabled
+    undo.find('form').find('[value="Submit"]').prop('disabled', true);
+    formUl.find("input[type=checkbox]").on('click',
+        () => { // RMA -- check if all unchecked?? If so - disable Submit
+            $('#undoMenu')
+                .find('form')
+                .find('[value="Submit"]').prop('disabled', false);;
+        });
     if (remaining > 0) {
         if (remaining > 1) {
             undo.find('p').text("Restore Images");
-            let button = $('<button id="checkAll" tabIndex="-1">Check All</button>');
-            button.on("click", checkAllUndos); // RMA do off for button after actions
-            checkboxes.prepend(button);
+            let button = $('<button id="checkAll">Check All</button>');
+            button.on("click", toggleAllUndos); // RMA do off for button after actions
+            formUl.prepend(button);
         } else {
             undo.find('p').text("Restore Image");
         }
 
 
         disableActionsNow();
-        catchEnter("undo");
+        //catchKeys([13], "undo");
+        undoChoosing = true;
         undo.show();
     }
 }
 
-function checkAllUndos() {
-    $('#undoMenu form input[name=undoItems]').prop('checked', true);
+function toggleAllUndos() {
+    if ($("#checkAll").text() === "Check All") {
+        toUnCheckAll()
+    } else {
+        toCheckAll();
+    }
+
     return false;
+}
+
+function toUnCheckAll() {
+    $("#checkAll").text("Uncheck All");
+    $('#undoMenu form input[name=undoItems]').prop('checked', true);
+    $('#undoMenu form input[value=Submit]').prop('disabled', false);
+}
+
+function toCheckAll() {
+    $("#checkAll").text("Check All");
+    $('#undoMenu form input[name=undoItems]').prop('checked', false);
+    $('#undoMenu form input[value=Submit]').prop('disabled', true);
 }
 
 function undoSubmit(/*ev*/) {
@@ -458,6 +895,7 @@ function undoSubmit(/*ev*/) {
             let link, order;
             [link, order] = item.split(":");
             let imgWrap = deletedImages[link][parseInt(order)];
+            let sequence = parseInt(imgWrap.attr('sequence'));
             let img = imgWrap.find('img');
             let filedata = {
                 "dir": img.attr('dir'),
@@ -483,14 +921,21 @@ function undoSubmit(/*ev*/) {
             );
 
             // restore imgWrap
-            imgWrap.show();
+
+            renderCheckAllButton(imgWrap, 'show');
+            // uncheck restored image
+            imgWrap.find('.ckbx').prop('checked', false);
             // indicate restored images with orange border
-            imgWrap.find('img').css("border-color", "orange");
+
+            img.css("border-color", "orange");
             setTimeout(
                 () => {
                     // remove orange border
-                    imgWrap.find('img').css("border-color", "transparent");
+                    img.css("border-color", "transparent");
                 }, 1000);
+
+            allImgWraps[sequence].deleted = false;
+
             deletedImages[link][parseInt(order)] = null;
             let remaining = deletedImages[link].filter(x => x !== null).length;
             let icon = $("#pic" + link).find("div > p > i");
@@ -501,10 +946,10 @@ function undoSubmit(/*ev*/) {
             }
         }
     );
+    undoChoosing = false;
     enableActionsNow();
 
     undo.hide();
-    ignoreEnter();
     $('#checkAll').off(); // no need to keep function around
     return false;
 }
@@ -611,9 +1056,9 @@ function dbImagesRestore(query, filedata) {
                     //////////////////DEBUG
                     debugLogReport(query, result, filedata.filename);
 
-                    console.log("dbImagesRestore done " + JSON.stringify(result));
-                    console.log(JSON.stringify(query));
-                    console.log(filedata.filename);
+                    // console.log("dbImagesRestore done " + JSON.stringify(result));
+                    // console.log(JSON.stringify(query));
+                    // console.log(filedata.filename);
                     alert("result.nModified !== 1");
                     //////////////////DEBUG
                     reject(result);
@@ -675,4 +1120,43 @@ function delayedFragmentTargetOffset() {
             div.css("background-color", "");
         }, 3000);
     }
+}
+// function checkboxHandler(action, checked) {
+//     alert("checkbox handler");
+//     // switch (action) {
+//     //   case "test1":
+//     //       console.log("1", action, checked);
+//     //       break;
+//     //   case "test2":
+//     //       console.log("2", action, checked);
+//     //       break;
+//     //   case "test3":
+//     //       console.log("3", action, checked);
+//     //       break;
+//     //   default:
+//     //       console.log(action + " not found", checked);
+// }
+
+function enableCheckBoxes() {
+
+    // Using Sibling Icon as Checkbox
+    // $(".ckbx").on("click", function () {
+    //     var //$icon = $(this),
+    //         //$checkbox = $icon.siblings(":checkbox"),
+    //         $checkbox = $(this),
+    //         checked = !$checkbox.prop("checked"),
+    //         action;
+
+    //     $checkbox.prop("checked", checked);
+    //     // $icon.toggleClass('fa-check-square-o', checked)
+    //     //     .toggleClass('fa-square-o', !checked);
+    //     //action = $checkbox.data('action');
+
+    //     // Run Action
+    //     //checkboxHandler.call(undefined, action, checked);
+    //     return false;
+    // });
+    //$(".ckbx").siblings(":checkbox").hide();
+    // As a convenience, hide native checkboxes, when sibling with .ckbx
+    //$(document).ready(function () { $(".ckbx").siblings(":checkbox").hide(); });
 }
