@@ -1,5 +1,5 @@
 "use strict";
-// two.js
+// two.js AAA
 const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
 const floatName = "#floatMenu";
