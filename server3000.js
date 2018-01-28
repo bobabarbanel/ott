@@ -50,8 +50,8 @@ MongoClient.connect(url,
     topRouter(dir, app, database);
 
     /////////////DEBUG
-    const today = new Date();
-    fs.writeFileSync('undoLog.txt', '---------' + today.toString() + "\n");
+    // const today = new Date();
+    // fs.writeFileSync('undoLog.txt', '---------' + today.toString() + "\n");
     /////////////DEBUG
 
     app.listen(port, () => {

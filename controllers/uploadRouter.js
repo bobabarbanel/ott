@@ -47,32 +47,6 @@ module.exports = function (dir, app, db) {
         return s.substr(s.length - 4);
     }
 
-    // app.post('/archiveImages', (req, res) => {
-    //     let dirs = req.body.dirs;
-    //     let fileName = req.body.fileName;
-
-    //     dirs.forEach(
-    //         aDir => {
-    //             let archiveDir = aDir.replace("Tools", "Archive/Tools");
-
-    //             let fullPath = path.normalize(dir + "/public" + archiveDir);
-    //             if (!fs.existsSync(fullPath)) {
-    //                 fs.mkdirSync(fullPath);
-    //             }
-    //             fs.renameSync(
-    //                 path.normalize(dir + "/public" + aDir + '/' + fileName),
-    //                 fullPath + '/' + fileName
-    //             );
-    //         }
-    //     );
-
-    //     res.json("success");
-    //     return;
-    // });
-    // function isString(value) {
-    //     return typeof value === 'string' || value instanceof String;
-    // };
-
 
 
     app.post('/deleteDbImages', (req, res) => {
@@ -96,7 +70,7 @@ module.exports = function (dir, app, db) {
         };
 
         //////////////////DEBUG
-        fs.appendFileSync('undoLog.txt', 'Delete ' + req.body.filedata.filename + "\n");
+        //fs.appendFileSync('undoLog.txt', 'Delete ' + req.body.filedata.filename + "\n");
         //////////////////DEBUG
 
         db.collection("images").update(query, updates).then(
@@ -112,12 +86,12 @@ module.exports = function (dir, app, db) {
     });
 
     ///////////////////DEBUG
-    app.post('/reportLog', (req, res) => {
-        fs.appendFileSync('undoLog.txt', '\n\nReport ' +
-            JSON.stringify(req.body.f) + "\n" +
-            JSON.stringify(req.body.q) + "\n" +
-            JSON.stringify(req.body.r) + "\n\n");
-    });
+    // app.post('/reportLog', (req, res) => {
+    //     fs.appendFileSync('undoLog.txt', '\n\nReport ' +
+    //         JSON.stringify(req.body.f) + "\n" +
+    //         JSON.stringify(req.body.q) + "\n" +
+    //         JSON.stringify(req.body.r) + "\n\n");
+    // });
     //////////////////DEBUG
 
 
@@ -144,7 +118,7 @@ module.exports = function (dir, app, db) {
             }
         ).then(
             doc => {
-                console.log(doc);
+                //console.log(doc);
                 res.json(doc);
             },
             err => {
@@ -167,45 +141,39 @@ module.exports = function (dir, app, db) {
             delete req.body.filedata.when;
         // let comment = req.body.filedata.comment;
         // delete req.body.filedata.comment;
-        let deleteItem = {
+        // let deleteItem = {
+        //     "$pull": {
+        //         "archived": req.body.filedata
+        //     }
+        // };
+
+        let updates = {
             "$pull": {
                 "archived": req.body.filedata
+            },
+            "$push": {
+                "files": {
+                    filename: req.body.filedata.filename,
+                    dir: req.body.filedata.dir,
+                    comment: req.body.filedata.comment,
+                    date: new Date()
+                }
             }
         };
         ////////////////DEBUG
-        fs.appendFileSync('undoLog.txt', 'Restore ' +
-            req.body.filedata.filename + "\n");
+        // fs.appendFileSync('undoLog.txt', 'Restore ' +
+        //     req.body.filedata.filename + "\n");
         ////////////////DEBUG
-        db.collection("images").update(query, deleteItem).then(
+        db.collection("images").update(query, updates).then(
             doc => {
-                return (doc);
+                res.json(doc);
             },
             err => {
-                console.log("restoreDbImages archived out error " +
+                console.log("restoreDbImages updates error " +
                     JSON.stringify(err));
                 res.json(err);
             }
-        ).then(
-            doc => {
-                // add timestamp
-                req.body.filedata.when = new Date();
-                // req.data.filedata.comment = comment;
-                let addItem = {
-                    "$push": {
-                        "files": req.body.filedata
-                    }
-                };
-                db.collection("images").update(query, addItem).then(
-                    doc => {
-                        res.json(doc);
-                    },
-                    err => {
-                        console.log("deleteDbImages files in error " +
-                            JSON.stringify(err));
-                        res.json(err);
-                    }
-                );
-            });
+        );
     });
 
     app.post('/countImages', (req, res) => {
@@ -230,55 +198,21 @@ module.exports = function (dir, app, db) {
         );
     });
 
-    // app.post('/jobArchive', (req, res) => {
-    //     let key4 = req.body.key4; // key4 of parts.images
-    //     let tab = req.body.tab; // part of primary key on parts.images
-    //     let key5 = req.body.key5; // _id of parts.main
-    //     let idOrderedKeys = req.body.idOrderedKeys;
-    //     // console.log("jobArchive: " + key4 + " " + tab + " " + key5);
-    //     db.collection("main").remove(
-    //         { "_id": key5 }
-    //     ).then(
-    //         success => {
-    //             // console.log("main removed " + success);
-    //             let keyFields = key5.split('|');
-    //             let archiveMainEntry = {
-    //                 "_id": key5
-    //             };
-    //             idOrderedKeys.forEach(
-    //                 (k, i) => {
-    //                     archiveMainEntry[k] = keyFields[i];
-    //                 }
-    //             );
-    //             db.collection("archive_main").create(archiveMainEntry).then(
-    //                 success => {
-    //                     // console.log("archive_main created " + success);
-    //                     db.collection("images").remove(
-    //                         {
-    //                             "key4": key4,
-    //                             "tab": tab
-    //                         }
-    //                     ).then(
-    //                         // archive images (Tools,Tools_large, Tools_small) TBD
-    //                         );
-    //                 },
-    //                 error => {
-    //                     console.log("archive_main NOT created " + error);
-    //                     res.json({ "main": true, "archive_main": false, "images": false })
-    //                 }
-    //             );
 
-
-    //         },
-    //         error => {
-    //             console.log("main NOT removed " + error);
-    //             res.json({ "main": false, "archive_main": false, "images": false })
-    //         }
-    //         );
-
-    // });
 
     app.post('/upload', (req, res) => {
+        // be sure we have /iamges/Tools[_large,_small] directories
+        [SECTION + '_large', SECTION, SECTION + '_small'].forEach(
+            toolDir => {
+                let aDir = targetHeadString + '/' + toolDir;
+                let aPath = path.normalize(dir + "/public/" + aDir);
+                
+                if (!fs.existsSync(aPath)) {
+                    fs.mkdirSync(aPath);
+                }
+            }
+        );
+
         let form = new formidable.IncomingForm();
         form.multiples = true;
         let myFiles = [];
@@ -302,17 +236,25 @@ module.exports = function (dir, app, db) {
 
             // if only a single file is selected, it does NOT come in array
             if (myFiles.length === undefined) { myFiles = [myFiles]; }
-            let ftdMedium, ftdSmall, ftdLarge;
+            
+            
 
+            // add machine (2 chars) to directories
+            let ftdMedium, ftdSmall, ftdLarge;
             ftdLarge = calcFullTargetDir(key4, SECTION + '_large');
             ftdMedium = calcFullTargetDir(key4, SECTION);
             ftdSmall = calcFullTargetDir(key4, SECTION + '_small');
-
             // public/images/Tools_large/img/MLetters (first 2 letters of machine name)
-            let fullPath = path.normalize(dir + "/public/" + ftdLarge);
-            if (!fs.existsSync(fullPath)) {
-                fs.mkdirSync(fullPath);
-            }
+
+            [ftdLarge, ftdMedium, ftdSmall].forEach(
+                mDir => {
+                    let fullPath = path.normalize(dir + "/public/" + mDir);
+                    if (!fs.existsSync(fullPath)) {
+                        fs.mkdirSync(fullPath);
+                    }
+                }
+            );
+
             let tailnum = 1;
             let uploadCount = 0;
 
@@ -321,7 +263,7 @@ module.exports = function (dir, app, db) {
                 let tail = fileName.substring(fileName.lastIndexOf("."));
 
                 //  public/images/Tools_large/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
-                let base = calcFullTargetBaseFileName(key4, turret, 
+                let base = calcFullTargetBaseFileName(key4, turret,
                     position, spindle, offset);
                 let ffn = base + "_" + pad4(tailnum) + tail; // _001 file
 

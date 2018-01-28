@@ -183,7 +183,7 @@ function catchKeys(state, code) {
                                 break;
 
                             default:
-                                break;
+                                return true;
                         }
                     return false;
                 });
@@ -980,7 +980,7 @@ function dbUpdateImageComment(img) {
             dataType: 'json'
         })
             .done(result => {
-                alert("updateImageComment " + JSON.stringify(result));
+                //alert("updateImageComment " + JSON.stringify(result));
                 resolve(result);
             })
             .fail((request, status, error) => reject(error));
@@ -1054,7 +1054,7 @@ function dbImagesRestore(query, filedata) {
                 }
                 else {
                     //////////////////DEBUG
-                    debugLogReport(query, result, filedata.filename);
+                    //debugLogReport(query, result, filedata.filename);
 
                     // console.log("dbImagesRestore done " + JSON.stringify(result));
                     // console.log(JSON.stringify(query));
