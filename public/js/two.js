@@ -21,6 +21,8 @@ const UP_KEY = 38;
 const ESCAPE_KEY = 27;
 const ENTER_KEY = 13;
 
+const SECTION = 'Tools';
+
 let imageShowing = -1; // an integer, no image visible
 $(function () {
 
@@ -42,7 +44,7 @@ $(function () {
 
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
-                    getImages("Tools").then((toolData) => {
+                    getImages(SECTION).then((toolData) => {
                         paintPage(machineSpecs, toolData);
                     });
                 });
@@ -150,10 +152,10 @@ function catchKeys(state, code) {
                 $('body').on('keydown', function (args) {
                     if (args.keyCode === ENTER_KEY) {
                         if (undoChoosing === true) {
-                            alert("enter key");
+                            //alert("enter key");
                             $('#undoMenu form input[value=Submit]').trigger('click');
                             return false;
-                        } else if(deleteChoosing == true) {
+                        } else if (deleteChoosing == true) {
                             $('div.jconfirm').find('button.confirm-deletion').trigger('click');
                             return false;
                         }
@@ -343,8 +345,11 @@ function paintPage(toolSpecs, toolData) {
             let count = 0;
             item.files.forEach(
                 (path, index) => {
-                    let small = path.dir.replace('/Tools/', '/Tools_small/');
-                    let large = path.dir.replace('/Tools/', '/Tools_large/');
+                    let small = path.dir.replace('/' + SECTION + '/',
+                        '/' + SECTION + '_small/');
+                    let large = path.dir.replace('/' + SECTION + '/',
+                        '/' + SECTION + '_large/');
+
                     let idiv = $('<div class="img-wrap"/>');
                     idiv.append($('<span class="close">&times;</span>'));
                     idiv.append($('<input class="ckbx" name="' +
@@ -564,7 +569,7 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
                     }
                 }
             });
-
+            
             return false;
         }
     }
@@ -593,6 +598,7 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
                     keys: ['enter'],
                     action: function () {
                         delete1Image(imgWrap, ximg);
+                        siblings.prop('checked',false);
                         deleteChoosing = false;
                     }
                 },
@@ -624,13 +630,14 @@ function closeDelete() { // when X is clicked in small image, invokes deletion
                     keys: ['enter'],
                     action: function () {
                         deleteNImages(siblings, ximg);
-                        deleteChoosing = true;
+                        siblings.prop('checked',false);
+                        deleteChoosing = false;
                     }
                 },
                 No: {
                     btnClass: 'btn-red',
                     action: function () {
-                        deleteChoosing = true;
+                        deleteChoosing = false;
                     }
                 },
             }
@@ -651,7 +658,7 @@ function delete1Image(wrapper, ximg) {
         "spindle": spindle,
         "position": position,
         "offset": offset,
-        "tab": "Tools"
+        "tab": SECTION
     };
 
     let img = ximg; // wrapper.find('img');
@@ -707,7 +714,7 @@ function deleteNImages(siblings, ximg) {
         "spindle": spindle,
         "position": position,
         "offset": offset,
-        "tab": "Tools"
+        "tab": SECTION
     };
 
     $.makeArray(wrappers).forEach(
@@ -840,12 +847,12 @@ function undoChoices(ev) {
         }
     );
     // start with Submit disabled
-    undo.find('form').find('[value="Submit"]').prop('disabled', true);
+    let undoForm = undo.find('form');
+
+    undoForm.find('[value="Submit"]').prop('disabled', true);
     formUl.find("input[type=checkbox]").on('click',
         () => { // RMA -- check if all unchecked?? If so - disable Submit
-            $('#undoMenu')
-                .find('form')
-                .find('[value="Submit"]').prop('disabled', false);;
+            undoForm.find('[value="Submit"]').prop('disabled', false).focus();
         });
     if (remaining > 0) {
         if (remaining > 1) {
@@ -853,10 +860,10 @@ function undoChoices(ev) {
             let button = $('<button id="checkAll">Check All</button>');
             button.on("click", toggleAllUndos); // RMA do off for button after actions
             formUl.prepend(button);
+
         } else {
             undo.find('p').text("Restore Image");
         }
-
 
         disableActionsNow();
         //catchKeys([13], "undo");
@@ -912,7 +919,7 @@ function undoSubmit(/*ev*/) {
                 "spindle": spindle,
                 "position": position,
                 "offset": offset,
-                "tab": "Tools"
+                "tab": SECTION
             };
             // puts "archived" back in "files"
             dbImagesRestore(query, filedata).then(
@@ -946,6 +953,7 @@ function undoSubmit(/*ev*/) {
             }
         }
     );
+    //$('#undoMenu form input[name=undoItems]').prop('checked', false);
     undoChoosing = false;
     enableActionsNow();
 
@@ -965,7 +973,7 @@ function dbUpdateImageComment(img) {
         "spindle": spindle,
         "position": position,
         "offset": offset,
-        "tab": "Tools"
+        "tab": SECTION
     };
     return new Promise((resolve, reject) => {
         $.ajax({

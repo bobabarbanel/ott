@@ -2,6 +2,7 @@
 // two.js
 const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
+const SECTION = 'Tools';
 
 $(function () {
     $.getScript("/js/common.js")
@@ -23,7 +24,7 @@ $(function () {
             $("#floatButton").hide();
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
-                    getSheetTags("Tools").then((toolData) => {
+                    getSheetTags(SECTION).then((toolData) => {
                         paintPage(machineSpecs, toolData);
                     });
                 });

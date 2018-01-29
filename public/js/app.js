@@ -171,22 +171,22 @@ function refreshFromDB() {
 let existingWindow;
 let TABNAME = "Tools";
 
-function jobArchive(key4, key5) {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: "/jobArchive",
-            type: 'post',
-            data: {
-                "key4": key4,
-                "key5": key5,
-                "tab": TABNAME,
-                "idOrderedKeys": idOrderedKeys
-            }
-        })
-            .success(result => resolve(result))
-            .fail((request, status, error) => reject(error));
-    });
-}
+// function jobArchive(key4, key5) {
+//     return new Promise((resolve, reject) => {
+//         $.ajax({
+//             url: "/jobArchive",
+//             type: 'post',
+//             data: {
+//                 "key4": key4,
+//                 "key5": key5,
+//                 "tab": TABNAME,
+//                 "idOrderedKeys": idOrderedKeys
+//             }
+//         })
+//             .success(result => resolve(result))
+//             .fail((request, status, error) => reject(error));
+//     });
+// }
 
 function countImages(key4) {
     return new Promise((resolve, reject) => {
