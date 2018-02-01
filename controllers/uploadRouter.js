@@ -201,7 +201,13 @@ module.exports = function (dir, app, db) {
 
 
     app.post('/upload', (req, res) => {
-        // be sure we have /iamges/Tools[_large,_small] directories
+        // be sure we have /images directory
+        let imagesPath = path.normalize(dir + "/public/images");
+        if (!fs.existsSync(imagesPath)) {
+            fs.mkdirSync(imagesPath);
+        }
+        
+        // be sure we have /images/Tools[_large,_small] directories
         [SECTION + '_large', SECTION, SECTION + '_small'].forEach(
             toolDir => {
                 let aDir = targetHeadString + '/' + toolDir;

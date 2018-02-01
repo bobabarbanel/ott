@@ -508,7 +508,7 @@ function imgClick() { // when small image clicked to show larger image
 
     $("#expand").html('<i class="fa fa-arrows-alt fa-2x"/>')
         .on("click", fullscreenSingle)
-        .css('cursor', 'url(' + '"/images/expand.png"' + '), pointer');
+        .css('cursor', 'url(' + '"/img/expand.png"' + '), pointer');
 
     var img = $('<img class="pannable-image"/>');
     let fileName = $(this).attr('filename');

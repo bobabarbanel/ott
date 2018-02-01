@@ -97,7 +97,7 @@ $(function () {
                     str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
                         '<td class="qvalue">' + spaces4 + QUERY[key] +
                         '</td><td rowspan="4"><img class="shiftd" ' +
-                        'src="/images/trashfull_sm.jpg"/></td></tr>';
+                        'src="/img/trashfull_sm.jpg"/></td></tr>';
                 }
                 else {
                     str += '<tr><th class="qname">' + idToText[key] + ":</th>" +

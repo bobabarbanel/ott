@@ -303,7 +303,7 @@ p.comment:hover {
     height: 100%;
     display: block;
     margin: 0 auto;
-    cursor: url("/images/contract.png"), pointer;
+    cursor: url("/img/contract.png"), pointer;
 }
 
 #tadiv {
