@@ -14,7 +14,9 @@ content {
     border-collapse: collapse;
 }
 
-table, th, td {
+table,
+th,
+td {
     border: 1px solid black;
     text-align: center;
 }
@@ -70,7 +72,8 @@ td.disabled {
     background-color: pink;
 }
 
-.colT, .colS {
+.colT,
+.colS {
     width: 200px;
 }
 
@@ -95,7 +98,17 @@ span.popup {
 }
 
 .stripes {
-    background: repeating-linear-gradient( 45deg, #ae60bc, #ae60bc 5px, #5d3364 5px, #5d3364 10px);
+    background: repeating-linear-gradient( 45deg, #ae60bc, 
+    #ae60bc 5px, #5d3364 5px, 
+    #5d3364 10px);
+    background-size: 200% 200%;
+    animation: barberpole 4s linear infinite;
+}
+
+@keyframes barberpole {
+    100% {
+        background-position: 100% 100%;
+    }
 }
 
 @keyframes rotating {
@@ -196,7 +209,8 @@ tr.colnames th {
     background-color: yellow;
 }
 
-.fCol, .tCol {
+.fCol,
+.tCol {
     width: 500px;
 }
 
@@ -205,7 +219,9 @@ tr.colnames th {
     width: 60%;
 }
 
-#header, #header tr, #header td {
+#header,
+#header tr,
+#header td {
     border: 0;
 }
 

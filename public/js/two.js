@@ -13,7 +13,7 @@ let LG;
 let undoChoosing = false;
 let deleteChoosing = false;
 let isFullPage = false;
-let viewer;
+
 
 const TAB_KEY = 9;
 const RIGHT_KEY = 39;
@@ -27,11 +27,10 @@ const SECTION = 'Tools';
 let deleteMode = false;
 let deleteCount = 0;
 let imageShowing = -1; // an integer, no image visible
+let viewSmall = null, viewLarge = null;
 $(function () {
     $(window).unload(function () {
-        if (viewer !== undefined) {
-            viewer = viewer.destroy(); // ImageViewer cleanup
-        }
+        cleanView();
     });
 
 
@@ -197,11 +196,12 @@ function LinkGroup(prev, next, start, stop, link) {
     this.setStop = (s) => this.stop = s;
 }
 let keystate;
+
 function catchKeys(state, code) {
     // alert("catchKeys "  + state)
     // note: confim dialogs handle this on their own
     keystate = state;
-    
+
     switch (state) {
         // case "comment on":
         // // do we need this?
@@ -221,11 +221,10 @@ function catchKeys(state, code) {
                         //     $('#undoMenu form input[value=Submit]').trigger('click');
                         //     return false;
                         // } else 
-                        if(keystate === "comment") {
-                            $(".comment").text($(".comment").text()+"\n");
+                        if (keystate === "comment") {
+                            $(".comment").text($(".comment").text() + "\n");
                             return false;
-                        }
-                        else if (deleteChoosing) {
+                        } else if (deleteChoosing) {
                             $('div.jconfirm').find('button.confirm-deletion').trigger('click');
                             return false;
                         }
@@ -235,31 +234,31 @@ function catchKeys(state, code) {
 
                             case LEFT_KEY:
                                 // console.log("left");
-                                if(keystate !== "comment") nextImage(-1);
+                                if (keystate !== "comment") nextImage(-1);
                                 break;
 
                             case TAB_KEY:
-                            if(keystate !== "comment") nextImage((args.shiftKey) ? -1 : 1); // shift Tab goes left(-1)
+                                if (keystate !== "comment") nextImage((args.shiftKey) ? -1 : 1); // shift Tab goes left(-1)
                                 break;
 
                             case RIGHT_KEY:
                                 // console.log("right tab");
-                                if(keystate !== "comment") nextImage(1);
+                                if (keystate !== "comment") nextImage(1);
                                 break;
 
                             case ESCAPE_KEY:
                                 // console.log("escape");
-                                if(keystate !== "comment") closeSingle();
+                                if (keystate !== "comment") closeSingle();
                                 break;
 
                             case UP_KEY:
                                 // console.log("up");
-                                if(keystate !== "comment") moveToGroup('prev');
+                                if (keystate !== "comment") moveToGroup('prev');
                                 break;
 
                             case DOWN_KEY:
                                 // console.log("down");
-                                if(keystate !== "comment") moveToGroup('next');
+                                if (keystate !== "comment") moveToGroup('next');
                                 break;
 
                             default:
@@ -333,7 +332,7 @@ function goGroup() { // move page and open first image in group
 
 
 function closeSingle() {
-    if (viewer != undefined) viewer = viewer.destroy();
+
     singleToEmpty();
     $("pitems").find("img[showingsingle='true']")
         .attr('showingsingle', false)
@@ -357,13 +356,11 @@ function fullscreenSingle() {
     $('#Fullscreen img').fadeIn();
     isFullPage = true;
     */
-    let v2 = ImageViewer({
+   cleanViewSpecific(viewLarge);
+    viewLarge = ImageViewer({
         maxZoom: 800
     });
-    v2.show(srcNormal, srcLarge);
-    v2 = null;
-    //v2 = vs.destroy();
-
+    viewLarge.show(srcNormal, srcLarge);
 }
 
 function hideShowFloat() {
@@ -639,7 +636,24 @@ function markGroup(link, state) { // state true ==> delete, otheruise undelete
     );
 }
 
+function cleanView() {
+    cleanViewSpecific(viewSmall);
+    cleanViewSpecific(viewLarge);
+}
+function cleanViewSpecific(view) {
+    if(view !== null) {
+        if(view === viewSmall) {
+            viewSmall = viewSmall.destroy();
+        }
+        if (view === viewLarge) {
+            viewLarge = viewLarge.destroy();
+        }
+    }
+}
+
 function imgClick() { // when small image clicked to show larger image
+    cleanView();
+
     let prev = singleToEmpty();
     $(".pic").removeClass('highlight');
     if (deleteMode) {
@@ -712,7 +726,8 @@ function imgClick() { // when small image clicked to show larger image
             single_pannable.height(($(window).height() * 0.80) + "px");
             // hack = single_pannable.height();
         }
-        viewer = ImageViewer('#pannable-image', {
+        cleanViewSpecific(viewSmall);
+        viewSmall = ImageViewer('#pannable-image', {
             maxZoom: 800
         });
 
@@ -726,13 +741,13 @@ function imgClick() { // when small image clicked to show larger image
 }
 
 function editComment(ev) {
-    
-    
+
+
 
     disableActionsNow();
-    
+
     catchKeys("off", "keydown");
-   
+
     $.confirm({
         title: 'Edit the Comment',
         animation: 'scale',
@@ -1057,7 +1072,7 @@ function toCheckAll() {
 // }
 
 function dbUpdateImageComment(img) {
-    
+
     return new Promise((resolve, reject) => {
         $.ajax({
                 url: "/updateImageComment",
