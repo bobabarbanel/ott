@@ -1,10 +1,19 @@
 "use strict";
 const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
+const ENTER = 13;
+const TAB = 9;
+let multiButtons; // RMA
 $(function () {
 
     setUpTable();
     refreshFromDB();
 
+    let button_ids = [];
+    let buttons = $('#buttons > button');
+    buttons.each((i, ele) => button_ids[i] = ele.id);
+    let buttonActiveNum = button_ids.indexOf("run");
+    let maxTabIndex = button_ids.length;
+    multiButtons = false;
     $("#reset").on("click", function () {
         resetVars().then(
             () => {
@@ -28,6 +37,38 @@ $(function () {
             error => console.log("handleChoice Error: " + error));
     });
 
+
+    $('body').on('keydown', (e) => {
+        switch (e.which) {
+            case ENTER: // Enter
+                $("#buttons button.active").trigger('click');
+                break;
+
+            case TAB: // use TAB to select next active button
+                if (multiButtons) {
+                    $('#' + button_ids[buttonActiveNum]).toggleClass("active");
+                    if (e.shiftKey === false) {
+                        ++buttonActiveNum;
+                        e.preventDefault();
+                        if (buttonActiveNum === maxTabIndex) {
+                            buttonActiveNum = 0;
+                        }
+
+                    } else if (e.shiftKey === true) {
+                        --buttonActiveNum;
+                        e.preventDefault();
+                        if (buttonActiveNum < 0) {
+                            buttonActiveNum = maxTabIndex - 1;
+                        }
+                    }
+                    $('#' + button_ids[buttonActiveNum]).toggleClass("active").focus();
+                    break;
+                }
+            default:
+                break;
+        }
+    });
+
     $("#upload_action").on("click", function () {
 
         if (existingWindow !== undefined && existingWindow !== null) {
@@ -49,7 +90,7 @@ $(function () {
                 //debugger;
                 let fileCount = r.fileCount;
                 $.confirm({
-                    closeIcon: true, 
+                    closeIcon: true,
                     icon: 'fa fa-exclamation fa-3x',
                     boxWidth: '700px',
                     useBootstrap: false,
@@ -62,7 +103,8 @@ $(function () {
                             btnClass: 'btn-red',
                             action: () => {
                                 let key5 = [QUERY.dept, QUERY.machine,
-                                QUERY.op, QUERY.pName, QUERY.partId].join("|");
+                                    QUERY.op, QUERY.pName, QUERY.partId
+                                ].join("|");
                                 jobArchive(key4, key5);
                                 location.reload();
                             }
@@ -71,15 +113,15 @@ $(function () {
                             btnClass: 'btn-blue cancelButtonClass'
                         }
                     }
-                    
-                    
+
+
                 });
             },
             err => console.log("err " + err)
         );
     });
 
-    
+
 
     function showVals(fileCount) { // used in confirmation for job Archive
         // include number of images for this job
@@ -92,14 +134,12 @@ $(function () {
                     str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
                         '<td colspan="2" class="qvalue">' + spaces4 + QUERY[key] +
                         '</td><td/></tr>';
-                }
-                else if (idx === 1) {
+                } else if (idx === 1) {
                     str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
                         '<td class="qvalue">' + spaces4 + QUERY[key] +
                         '</td><td rowspan="4"><img class="shiftd" ' +
                         'src="/img/trashfull_sm.jpg"/></td></tr>';
-                }
-                else {
+                } else {
                     str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
                         '<td class="qvalue">' + spaces4 + QUERY[key] +
                         "</td><td/></tr>";
@@ -110,11 +150,10 @@ $(function () {
         str += '</table><br/>This job currently has ';
         if (fileCount === 0) {
             str += "no images.";
-        }
-        else {
+        } else {
             str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
         }
-            str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
+        str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
         return str;
     }
 
@@ -126,12 +165,13 @@ $(function () {
         var newval = chooser.val();
         QUERY[field] = newval;
         STATUS[field] = 1;
-        $("#" + field + "_num", "#container").text(1);
-
+        setNum(field, 1);
 
         // find possible values for other fields
         FIELDS.forEach((f) => {
-            if (QUERY[f] === undefined) { updateField(f); }
+            if (QUERY[f] === undefined) {
+                updateField(f);
+            }
         });
 
         var selector = "#" + $(this).attr("id");
@@ -191,13 +231,13 @@ let TABNAME = "Tools";
 function countImages(key4) {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "/countImages",
-            type: 'post',
-            data: {
-                "key4": key4,
-                "tab": TABNAME
-            }
-        })
+                url: "/countImages",
+                type: 'post',
+                data: {
+                    "key4": key4,
+                    "tab": TABNAME
+                }
+            })
             .success(result => resolve(result[0]))
             .fail((request, status, error) => reject(error));
     });
@@ -207,10 +247,10 @@ function handleChoice() {
     //console.log("handleChoice " + QUERY.partId);
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "/go_parts",
-            type: 'post',
-            data: QUERY
-        })
+                url: "/go_parts",
+                type: 'post',
+                data: QUERY
+            })
             .done((result) => resolve(result))
             .fail((request, status, error) => reject(error));
         //.always(() => console.log("handlechoice complete"));
@@ -221,10 +261,10 @@ function uploadChoice() {
     //console.log("uploadChoice " + JSON.stringify(QUERY));
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "/go_parts",
-            type: 'post',
-            data: QUERY
-        })
+                url: "/go_parts",
+                type: 'post',
+                data: QUERY
+            })
             .done((result) => resolve(result))
             .fail((request, status, error) => reject(error));
         //.always(() => console.log("handlechoice complete"));
@@ -240,9 +280,9 @@ function resetVars() {
     }
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "/reset",
-            type: 'get'
-        })
+                url: "/reset",
+                type: 'get'
+            })
             .done((result) => resolve(result))
 
             .fail((request, status, error) => reject(error));
@@ -285,6 +325,7 @@ function updateTable(rows) {
     formatTableCells();
     annotateTableCount(rows.length);
 }
+
 function refreshFilterTable() { // set new (reduced) jsonData in table, uses QUERY
     updateTable(jsonData.filter((row) => rowMatchesQuery(row)));
 }
@@ -313,7 +354,7 @@ function setUpTable() {
                 width: "20px",
                 onClick: cellSingleClick,
                 sortable: false,
-                formatter: function (/*value, data, cell, row, options, formatterParams*/) {
+                formatter: function ( /*value, data, cell, row, options, formatterParams*/ ) {
                     return '<div><input type="radio"></div>';
                 }
             },
@@ -367,13 +408,13 @@ function setUpTable() {
     });
 }
 
-function getData(/*message*/) {
+function getData( /*message*/ ) {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "/data",
-            type: 'get',
-            dataType: 'json'
-        })
+                url: "/data",
+                type: 'get',
+                dataType: 'json'
+            })
             .done((result) => resolve(result))
 
             .fail((request, status, error) => reject(error));
@@ -403,9 +444,12 @@ function annotateTableCount(count) {
 }
 
 function rowMatchesQuery(row) { // does a table row match current selectors
-    if (Object.keys(QUERY).length === 0) { return true; }
+    if (Object.keys(QUERY).length === 0) {
+        return true;
+    }
     return Object.keys(QUERY).every((key) => (row[key] === QUERY[key]));
 }
+
 function isFullySelected() {
     return FIELDS.every((f) => (STATUS[f] === 1));
 }
@@ -416,7 +460,8 @@ function rowSelected(rowData) {
         QUERY[fName] = val;
         var selector = "#" + fName + "_select";
         $(selector, "#container").empty();
-        $("#" + fName + "_num", "#container").text(1);
+        setNum(fName, 1);
+
         var option = $("<option>").val(val).text(val);
         $(selector, "#container").append(option);
         STATUS[fName] = 1;
@@ -426,11 +471,16 @@ function rowSelected(rowData) {
     pageComplete();
 }
 
+function setNum(fName, number) {
+    $("#" + fName + "_num", "#container").text((number === 1) ? "" : number);
+}
+
 function pageComplete() {
     $("#dataTable").hide();
     $("#run").show();
     $("#upload_action").show();
     $("#delete_action").show();
+    multiButtons = true;
 }
 
 
@@ -445,13 +495,14 @@ function cellSingleClick(e, cell, value, data) {
         var fName = $(this)[0].field;
         QUERY[fName] = data[fName];
         STATUS[fName] = 1;
-
-        $("#" + fName + "_num", "#container").text(1);
+        setNum(fName, 1);
 
         updateField(fName);
         // find possible values for other fields
         FIELDS.forEach((f) => {
-            if (QUERY[f] === undefined) { updateField(f); }
+            if (QUERY[f] === undefined) {
+                updateField(f);
+            }
         });
 
         var selector = "#" + fName + "_select";
@@ -488,7 +539,9 @@ function findUnique(fName) {
 }
 
 function keyMatch(row) {
-    if (Object.keys(QUERY).length === 0) { return true; }
+    if (Object.keys(QUERY).length === 0) {
+        return true;
+    }
     return Object.keys(QUERY).every((key) => (row[key] === QUERY[key]));
 }
 
@@ -503,14 +556,13 @@ function initField(fName) { // set up options for one field fName .chosen and in
 
     $(selector, "#container").empty();
     var howMany = oneColVals.length;
-    $("#" + fName + "_num", "#container").text(howMany);
+    setNum(fName, howMany);
     STATUS[fName] = howMany;
     //console.log("init   "+ fName + ": " + oneColVals.length);
     //FOUND[fName] = oneColVals.slice(0); // a copy
     if (howMany > 1) {
         oneColVals.unshift(""); // add empty option at top of list
-    }
-    else {
+    } else {
         //console.log("initField QUERY field " + fName + " = " + oneColVals[0]);
         QUERY[fName] = oneColVals[0];
     }
@@ -556,14 +608,15 @@ function updateField(fName) { // set up options for one field fName .chosen and 
     //console.log("init   "+ fName + ": " + oneColVals.length);
 
     if (howMany > 1) {
-        oneColVals.unshift("");       // add empty option at top of list
+        oneColVals.unshift(""); // add empty option at top of list
     } else {
         QUERY[fName] = oneColVals[0]; // QUERY now adjusted for this new found single value
     }
 
-    oneColVals.forEach((datum) => { $(selector, "#container").append($("<option>").val(datum).text(datum)); });
-
-    $("#" + fName + "_num", "#container").text(howMany); // update count for this field's unqiue values
+    oneColVals.forEach((datum) => {
+        $(selector, "#container").append($("<option>").val(datum).text(datum));
+    });
+    setNum(fName, howMany);
     if (howMany === 1) { // always disable if there is but one value
         $(".chosen-" + fName, "#container").prop('disabled', true);
     }

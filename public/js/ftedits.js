@@ -7,7 +7,12 @@ const SECTION = "Tools";
 let existingValues = {};
 
 var debug = false;
-function debugLog(text) { if (debug) { console.log(text); } }
+
+function debugLog(text) {
+    if (debug) {
+        console.log(text);
+    }
+}
 
 $(function () {
     function disableButton(state) {
@@ -29,16 +34,15 @@ $(function () {
         var evMod = jQuery.extend(true, {}, existingValues); // a deep copy
         Object.keys(evMod).forEach(
             link => {
-                let ret = (evMod[link].f_change || 
-                           evMod[link].t_change);
+                let ret = (evMod[link].f_change ||
+                    evMod[link].t_change);
                 if (ret) {
                     if (evMod[link].function === '') {
                         nowNew.push(link);
                         // now, modify the existing values
                         evMod[link].function = $('#' + idStr(link, 'function')).val();
                         evMod[link].type = $('#' + idStr(link, 'type')).val();
-                    }
-                    else {
+                    } else {
                         // now, modify the existing values
                         evMod[link].function = $('#' + idStr(link, 'function')).val();
                         evMod[link].type = $('#' + idStr(link, 'type')).val();
@@ -51,7 +55,7 @@ $(function () {
         );
         let old_some_empty = old.some(link => hasEmptyString(evMod, link));
         let new_some_empty = nowNew.some(link => hasEmptyString(evMod, link));
-        if ( old_some_empty || new_some_empty){
+        if (old_some_empty || new_some_empty) {
             alert("Must have both a non-empty Function and Type Name.");
         } else {
             let newPromises = nowNew.map(link => updateFT(evMod[link], true));
@@ -60,17 +64,17 @@ $(function () {
             //alert("old " + oldPromises.length);
             Promise.all(newPromises.concat(oldPromises)).then(
                 complete => {
-                    if(!complete[0].status) {
+                    if (!complete[0].status) {
                         alert("Unable to complete updates.");
                     }
                     //alert("complete status " + complete[0].status);
-                    window.location = window.location.href+'?eraseCache=true';
+                    window.location = window.location.href + '?eraseCache=true';
                     //window.location.reload(true);
                 },
                 () => { // error
                     //alert("error " + JSON.stringify(error));
                     //window.location.reload(true);
-                    window.location = window.location.href+'?eraseCache=true';
+                    window.location = window.location.href + '?eraseCache=true';
                 }
             );
         }
@@ -87,16 +91,16 @@ $(function () {
         // alert("updateFT " + fields.key4 + " " + fields.function);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "/updateFT",
-                type: 'post',
-                data: fields,
-                datatype: "json",
-                "Content-Type": "application/json"
-            })
-                .done(
-                result => {
-                    resolve(result);
+                    url: "/updateFT",
+                    type: 'post',
+                    data: fields,
+                    datatype: "json",
+                    "Content-Type": "application/json"
                 })
+                .done(
+                    result => {
+                        resolve(result);
+                    })
                 .fail((request, status, error) => reject(error));
         });
     }
@@ -106,27 +110,27 @@ $(function () {
         let key = JSON.parse(getCookie());
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "/sheetTags",
-                type: 'post',
-                data: {
-                    "key": key,
-                    "tab": tab,
-                    "files": 0 // **do** retrieve files/images list
-                },
-                dataType: 'json'
-            })
-                .done(
-                result => {
-
-                    resolve(result);
+                    url: "/sheetTags",
+                    type: 'post',
+                    data: {
+                        "key": key,
+                        "tab": tab,
+                        "files": false // **do** retrieve files/images list
+                    },
+                    dataType: 'json'
                 })
+                .done(
+                    result => {
+
+                        resolve(result);
+                    })
                 .fail((request, status, error) => reject(error));
         });
     }
 
 
     $.getScript("/js/common.js")
-        .done(function (/*script, textStatus*/) {
+        .done(function ( /*script, textStatus*/ ) {
 
             ////////////////////////////////////////////////////////////
             cookieValue = unescape(readCookie(COOKIE));
@@ -148,10 +152,9 @@ $(function () {
 
             ////////////////////////////////////////////////////////////
         })
-        .fail(function (/*jqxhr, settings, exception*/) {
+        .fail(function ( /*jqxhr, settings, exception*/ ) {
             debugLog("getScript " + "Triggered ajaxError handler.");
-        }
-        );
+        });
 
 
     function paintPage(machineSpecs, toolData) {
@@ -223,7 +226,7 @@ $(function () {
         let lowS = specs[turretStr][spindleStr][0];
         let numT = numsOf(turretStr);
         let numS = numsOf(spindleStr);
-        for (var t = lowT, s = lowS; t <= highT; t++ , s++) {
+        for (var t = lowT, s = lowS; t <= highT; t++, s++) {
 
             let link = [numT, t, numS, s].join("_");
             if (existingValues[link] === undefined) {
@@ -236,9 +239,9 @@ $(function () {
                     "offset": s,
                     "f_change": false,
                     "t_change": false
+                    // "nextNum": NumberInt(1)
                 };
-            }
-            else {
+            } else {
                 existingValues[link].f_change = false;
                 existingValues[link].t_change = false;
             }
@@ -264,21 +267,21 @@ $(function () {
             f_input.attr("id", idStr(link, "function"));
             f_input.val(existingValues[link].function);
             f_input.on("input", null, 'f_change', inputChanges); //function (ev) {
-                // let now = $(this).val();
-                // ev.preventDefault();
+            // let now = $(this).val();
+            // ev.preventDefault();
 
-                // let ids = $(this).attr('id').split('_');
-                // let inputId = ids.shift();
-                // let link = ids.join('_');
-                // if (existingValues[link][inputId] !== now) {
-                //     disableButton('false');
-                //     $(this).parent().addClass('changed');
-                //     existingValues[link].f_change = true;
-                // } else {
-                //     $(this).parent().removeClass('changed');
-                //     existingValues[link].f_change = false;
-                // }
-                // checkForChanges();
+            // let ids = $(this).attr('id').split('_');
+            // let inputId = ids.shift();
+            // let link = ids.join('_');
+            // if (existingValues[link][inputId] !== now) {
+            //     disableButton('false');
+            //     $(this).parent().addClass('changed');
+            //     existingValues[link].f_change = true;
+            // } else {
+            //     $(this).parent().removeClass('changed');
+            //     existingValues[link].f_change = false;
+            // }
+            // checkForChanges();
 
             //});
             td.append(f_input);
@@ -312,6 +315,7 @@ $(function () {
             table.append(tr);
         }
     }
+
     function inputChanges(ev) { // called from type and function input text elements
         let now = $(this).val();
         ev.preventDefault();
@@ -347,8 +351,7 @@ $(function () {
         let arr;
         if (isString(idFields)) {
             arr = idFields.split('_');
-        }
-        else {
+        } else {
             arr = idFields.slice(); // copies array at top level
         }
 

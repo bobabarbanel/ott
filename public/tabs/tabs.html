@@ -5,42 +5,104 @@
       w3.includeHTML();
   </script>
 -->
-<div class="w3-top">
-  <div class="w3-bar w3-light-grey w3-border w3-card-4">
-    <a id="t1" href="/tabs/1.html">
+<div class="w3-top top_tabs">
+  <button id="tab-menu-trigger">&#9776;</button>
+
+  <div id="topbar" class="w3-bar w3-light-grey w3-border w3-card-4">
+    <a id="t1" class="w3-bar-item w3-button " href="/tabs/1.html">
       <span class="bold">Setup Sheet</span>
     </a>
-    <a id="t2" href="/tabs/2.html">
-      <span  class="bold">Tools</span>
+    <a id="t2" class="w3-bar-item w3-button " href="/tabs/2.html">
+      <span class="bold">Tools</span>
     </a>
     <!-- href="/tabs/3.html"> -->
-    <a id="t3"  >
+    <a id="t3" class="w3-bar-item w3-button">
       <span>Tooling/Fixtures</span>
     </a>
     <!-- href="/tabs/4.html" -->
-    <a id="t4" >
+    <a id="t4" class="w3-bar-item w3-button">
       <span>Offsets</span>
     </a>
     <!-- href="/tabs/5.html" -->
-    <a id="t5" >
+    <a id="t5" class="w3-bar-item w3-button">
       <span>Deburr and Storage</span>
     </a>
     <!-- href="/tabs/6.html" -->
-    <a id="t6" >
+    <a id="t6" class="w3-bar-item w3-button">
       <span>Inspection</span>
     </a>
     <!-- href="/tabs/7.html" -->
-    <a id="t7" >
+    <a id="t7" class="w3-bar-item w3-button">
       <span>Rejection Hx</span>
     </a>
     <!-- href="/tabs/8.html" -->
-    <a id="t8" >
+    <a id="t8" class="w3-bar-item w3-button">
       <span>Known Issues</span>
     </a>
     <!-- href="/tabs/9.html" -->
-    <a id="t9" >
+    <a id="t9" class="w3-bar-item w3-button">
       <span>Comments</span>
     </a>
-    <button id="floatButton" onclick="hideShowFloat()">&#9776;</button>
+    
   </div>
+  
 </div>
+
+<ul id="topbar-menu" style="display:none">
+  <li>
+    <a href="/tabs/1.html">
+      <span class="bold">Setup Sheet</span>
+  </li>
+  <li>
+    <a href="/tabs/2.html">
+      <span class="bold">Tools</span>
+  </li>
+  </a>
+  <li>
+    <!-- href="/tabs/3.html"> -->
+    <a  >
+      <span>Tooling/Fixtures</span>
+    </a>
+  </li>
+  <li>
+    <!-- href="/tabs/4.html" -->
+    <a  >
+      <span>Offsets</span>
+    </a>
+  </li>
+  <li>
+    <!-- href="/tabs/5.html" -->
+    <a  >
+      <span>Deburr and Storage</span>
+    </a>
+  </li>
+  <li>
+    <!-- href="/tabs/6.html" -->
+    <a  >
+      <span>Inspection</span>
+    </a>
+  </li>
+  <li>
+    <!-- href="/tabs/7.html" -->
+    <a  >
+      <span>Rejection Hx</span>
+    </a>
+  </li>
+  <li>
+    <!-- href="/tabs/8.html" -->
+    <a  >
+      <span>Known Issues</span>
+    </a>
+  </li>
+  <li>
+    <!-- href="/tabs/9.html" -->
+    <a  >
+      <span>Comments</span>
+    </a>
+  </li>
+
+</ul>
+<buttons>
+<button class="deleteButton" onclick="toggleDeleteMode()"><i class="far fa-trash-alt" style="font-size:20px"></i></button>
+<button class="floatButton" onclick="hideShowFloat()"><i class="fa fa-bars"></i></button>
+</buttons>

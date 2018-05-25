@@ -1,13 +1,14 @@
 body {
 	background-repeat: no-repeat;
 	background-attachment: fixed;
-	background-position: center; 
+	background-position: center;
 }
 
 #error {
 	font-size: 32px;
 	color: blueviolet;
 }
+
 .chosen-container {
 	font-size: 16px;
 }
@@ -15,10 +16,12 @@ body {
 div a.chosen-single:not(.chosen-default) {
 	background: pink;
 }
-div a.chosen-single:not(.chosen-default) span{
+
+div a.chosen-single:not(.chosen-default) span {
 	color: black;
 }
-a.chosen-single:not(.chosen-default) span{
+
+a.chosen-single:not(.chosen-default) span {
 	color: white;
 	font-weight: bold;
 	background-color: inherit;
@@ -27,23 +30,65 @@ a.chosen-single:not(.chosen-default) span{
 .chosen-container .chosen-drop {
 	background-color: #eef;
 }
+
 .chosen-container-single .chosen-single {
 	border: 2px solid blue;
 	height: 32px;
-}	
-.chosen-disabled .chosen-single {
-  opacity: 0.8 !important;
-  cursor: default;
 }
 
-#container div{
-	display: inline-block;
-	margin-left: 5px;
+.chosen-disabled .chosen-single {
+	opacity: 0.8 !important;
+	cursor: default;
 }
-#container .horiz {
-	display: inline-block;
+
+#container {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	list-style: none;
+	border: 1px solid silver;
+	-ms-box-orient: horizontal;
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: -webkit-flex;
+	display: flex;
 }
-#container label {
+
+.wrap {
+	-webkit-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+
+li.horiz {
+	/* background: tomato; */
+	padding: 5px;
+	/* width: 100px; */
+	/* height: 100px; */
+	margin: 10px;
+	border: 1px solid silver;
+}
+
+/* #container li.horiz {
+	margin-right: 50px;
+	
+} */
+
+li label {
+	margin-right: 10px;
+}
+
+li.horiz {
+	/* width: 180px; */
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: center;
+}
+
+li.horiz p {
 	margin-left: 10px;
 }
 
@@ -53,34 +98,33 @@ a.chosen-single:not(.chosen-default) span{
 	font-size: 16px;
 }
 
-
 .counter {
 	float: left;
 	font-weight: bold;
 }
+
 .tabulator-col-content {
 	background: lightgreen;
 	color: black;
 	text-align: center;
 	font-weight: bold;
 }
-.tabulator .tabulator-tableHolder .tabulator-table .tabulator-row .tabulator-cell.partIdCol,
-.tabulator .tabulator-tableHolder .tabulator-table .tabulator-row .tabulator-cell.machineCol {
-	padding-left:20px
-} 
+
+.tabulator .tabulator-tableHolder .tabulator-table .tabulator-row .tabulator-cell.partIdCol, .tabulator .tabulator-tableHolder .tabulator-table .tabulator-row .tabulator-cell.machineCol {
+	padding-left: 20px
+}
 
 #new_key_input {
 	width: 60%;
-
 }
+
 #new_key_input tr th {
 	text-align: right;
 	width: 180px;
 }
 
-
 #insertNotice {
-	margin-left:100px;
+	margin-left: 100px;
 	color: white;
 	width: 400px;
 	display: none;
@@ -92,22 +136,43 @@ a.chosen-single:not(.chosen-default) span{
 	width: 260px;
 	color: red;
 }
+
 #buttons {
+	margin-top: 20px;
 	display: inline-block;
 }
+#buttons button {
+	border-radius: 6px;
+	cursor: pointer;
+}
+
 .action {
 	margin-left: 40px;
 }
+
 #run {
 	background: blue;
 	color: white;
 }
+
 #buttons {
 	width: 80%;
 }
+
 #buttons button {
 	margin-left: 4em;
+	cursor:pointer;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	outline: none;
 }
+.active {
+	box-shadow: 2px 3px 0px 0px red;
+}
+
 #delete_action {
 	float: right;
 	background: rgb(146, 123, 8);
@@ -120,19 +185,20 @@ a.chosen-single:not(.chosen-default) span{
 	width: 100%;
 	margin: 0 auto;
 }
+
 .fa-exclamation {
 	color: rgb(146, 123, 8);
-    text-shadow: 2px 2px 2px #ccc;
-    font-size: 4.5em;
+	text-shadow: 2px 2px 2px #ccc;
+	font-size: 4.5em;
 }
 
 .qname {
 	padding: 10px;
 }
+
 .qname, .qvalue {
 	width: 200px;
 }
-
 
 .qtable .qname {
 	text-align: right;
@@ -142,22 +208,18 @@ a.chosen-single:not(.chosen-default) span{
 	/*margin-top: 20px;*/
 	height: 150px;
 }
+
 .jconfirm-content {
 	float: right;
 	margin-right: 100px;
 }
+
 .cancelButtonClass {
 	margin-left: 50px !important;
 }
+
 .qmsg {
 	font-size: 1.5em;
 	color: rgb(146, 123, 8);
 	text-decoration: underline;
 }
-
-
-
-
-
-
-	

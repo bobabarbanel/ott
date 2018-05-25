@@ -1,396 +1,400 @@
-content {
-    position: absolute;
-    left: 20px;
-    top: 50px;
-    width: 50%;
+container {
+    width: 100%;
+    /* padding-top: 30px; */
+    padding-right: 20px;
+    padding-bottom: 0;
+    padding-left: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
 }
 
-#expand {
-    position: fixed;
-    top: 93px;
-    z-index: 50;
-    color: hotpink;
-}
-#image-gallery {
-    position: fixed;
-}
-
-#image-gallery img {
-    height: 500px;
-    top: 65px;
-}
-
-button.checkAllDel {
-    font-size: 60%;
-    border-radius: 8px;
-    width: 49px;
-}
-.doAll {
-    background: rgb(192, 192, 248);
-}
-.undoAll {
-    background: rgb(247, 248, 192);
-}
-
-single p {
-    position: fixed;
-    top: 610px;
-}
-
-single h4 {
-    position: fixed;
-    top: 45px;
-    font-size: 70%;
-}
-
-single h2 {
-    position: fixed;
-    top: 50px;
-}
-
-single:hover {
-    z-index: 5;
+one {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 1em;
+    width: 40%;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    /* background: pink; */
 }
 
 .headtext {
-    background: lightgreen;
-    display: block;
-    margin-top: 1.33em;
-    margin-bottom: 1.33em;
-    margin-left: 0;
-    margin-right: 0;
+    background: rgb(240, 220, 194);
+}
+
+job {
+    font-size: 1em;
+    font-weight: bold;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+content {
+    width: 100%;
+}
+
+/* #undoMenu, #Fullscreen {
+    display: none;
+} */
+
+/* #Fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(70,70,70,0.7);
+    justify-content: center;
+    cursor: zoom-out;
+} */
+
+#tadiv {
+    display: none;
+}
+
+#deleteMenu {
+    position: fixed;
+    top: 70px;
+    right: 100px;
+    display: none;
+    background: tan;
+    border-radius: 25px;
+    padding: 20px
+}
+
+#deleteMenu p {
+    font-weight: bold;
+    text-align: center;
+    border-radius: 25px;
+}
+
+#deleteMenu button {
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1px solid black;
+    /* background: grey; */
+}
+
+#undoDelete {
+    background: rgb(159, 217, 235);
+    color: rgb(31, 3, 95);
     font-weight: bold;
 }
 
 #floatMenu {
     position: fixed;
-    top: 85px; /* down a bit to accomodate long type/function names */
-    right: 20px;
-    margin-left: 40px;
-    width: 250px;
-    z-index: 0;
-    max-height: 550px;
-    overflow-y: auto;
+    top: 70px;
+    right: 30px;
+    background: rgb(170, 194, 201);
+    ;
+    padding-right: 10px;
 }
 
 #floatMenu ul {
-    margin-bottom: 20px;
-    list-style: none;
-    background: #ccc;
-    color: #222;
-    padding-left: 10px;
-    font-size: 115%;
+    margin-left: -20px;
+    list-style-type: none;
+    color: white;
 }
 
 #floatMenu ul a {
-    background: lightgreen;
-
-    color: black;
-    font-weight: bold;
-    font-size: 50%;
+    color: white;
+    background: rgb(52, 76, 83);
 }
 
-#floatMenu ul li a {
-    display: block;
-    border: 2px solid #999;
-    background-color: #222;
-    /*border-left:6px solid #999;*/
+#floatMenu ul a:hover {
+    background: rgb(2, 88, 2);
+    border: 1px solid yellow;
+}
+
+#floatMenu li {
+    color: white;
+    background: rgb(52, 76, 83);
+    border: 1px solid black;
+    padding-bottom: 2px;
+}
+
+#floatMenu li:hover {
+    background: green;
+    border: 1px solid yellow;
+}
+
+#floatMenu a:link {
     text-decoration: none;
-    color: #ccc;
-    padding: 5px 5px 5px 5px;
 }
 
-#floatMenu ul li a:hover, #floatMenu ul a:hover {
-    border-color: yellow;
+.showfloat {
+    display: none;
 }
 
-a.anchor {
-    display: block;
-    position: relative;
-    top: -60px;
-    visibility: hidden;
+#floatMenu ul>a.floathead {
+    background: rgb(22, 97, 22);
+}
+
+single {
+    position: fixed;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    width: 100%;
+}
+
+single tsHead {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin: 20px 0 10px 0;
+    align-items: center;
+    flex-flow: row nowrap;
+}
+
+/* #tsInfo {
+    margin-top: 20px;
+} */
+
+#tsSection {
+    text-overflow: ellipsis;
+    font-weight: bold;
+    font-size: 120%;
+    margin-left: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+singleFlexR {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+singleFlexC {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+#imageGallery {
+    order: 0;
+}
+
+.comment {
+    order: 1;
+    border: 1px solid blue;
+    /* max-height: 40px; */
+    height: 500px;
+    width: 300px;
+    /* margin-left: 30px; */
+    margin-top: 2px;
+}
+
+pictures {
+    width: 100%;
+}
+
+div.img-wrap {
+    text-align: center;
+}
+
+/* .delItem {
+    margin-bottom: 20px;
+} */
+
+.delList {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background: rgb(250, 250, 207);
+    margin-bottom: 20px;
+}
+
+.taedit {
+    width: 80%;
+}
+
+.delList img {
+    padding: 5px;
+}
+
+.close {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 128px;
+    transform: translate(-50%, -50%);
+}
+
+.red {
+    border: 1px inset red;
+}
+
+pitems {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    /* max-width:40%; */
+    flex-direction: row;
+    border-bottom: 1px solid black;
 }
 
 .pic {
     border: 20px;
     background: white;
     color: #222;
-    border-bottom: 1px solid black;
 }
+
 .highlight {
     background: rgb(240, 240, 131);
 }
 
-.img-wrap {
+.ckbx {
     position: relative;
-    display: inline-block;
-    font-size: 0;
-}
-
-.img-wrap img {
-    border: 4px solid transparent;
-}
-
-.img-wrap .close {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    z-index: 100;
-    background-color: lightgrey;
-    padding: 5px 2px 4px;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    opacity: .3;
-    text-align: center;
-    font-size: 22px;
-    line-height: 10px;
-    border-radius: 50%;
-}
- .ckbx {
-    position: absolute;
-    top: 82px;
-    right: 6px;
-    z-index: 100;
-    
+    top: -39px;
+    right: -16px;
     cursor: pointer;
     transform: scale(1.2);
-    position: absolute;
-    top: 82px;
-    right: 6px;
-    z-index: 100;
-} 
-
-.img-wrap:hover .close {
-    opacity: 1;
-}
-
-#floatButton {
-    float: right;
-    margin-right: 40px;
-    margin-top: 6px;
-    background: blue;
-    color: white;
-}
-
-.hidden {
-    display: none;
-}
-
-#job {
-    position: absolute;
-    top: 2.5em;
-    left: 0.5em;
-    font-size: 1em;
-    font-weight: bold;
-    max-width: 30%;
-    max-height: 2.2em;
-    overflow-x: hidden;
-    overflow-y:hidden;
-}
-
-
-
-.redUndo {
-    color: red;
-    text-shadow: 1px 1px 4px grey;
-    margin-left: 0.8em;
-    font-size: 16px;
-}
-
-.redUndo:hover {
-    background: lightyellow;
-    cursor: pointer;
-}
-
-.horiz {
-    display: inline-block;
-}
-main {
-    margin-top: 1em;
-}
-#undoMenu {
-    display: none;
-    position: fixed;
-    
-    /* top: 80px;
-    left: 530px; */
-    margin-left: 35%;
-    /* margin-right: 40px; */
-    width: 250px;
     z-index: 500;
-    
-    border: 10px solid blue;
-    background: white;
-    border-radius: 12px;
 }
 
-#undoMenu p {
-    margin-top: 10px;
-    margin-left: 20px;
-    color: black;
-    font-weight: bold;
+.transparent {
+    border: 3px solid transparent;
 }
 
-#undoMenu ul {
-    padding-left: 10px;
-    overflow-y: auto;
-    max-height: 550px;
+.deleting {
+    border: 3px solid red;
 }
 
-#undoMenu ul li {
-    margin-top: 10px;
-    margin-bottom: 10px;
+.showing {
+    border: 3px solid blue;
 }
 
-#undoMenu ul li img {
-    height: 80px;
-}
-
-#undoButtons {
+two {
+    width: 100%;
     display: flex;
-    flex-direction: row;
-    margin: 0px 20px 10px 20px;
-    background: white;
-    
-}
-
-
-#undoButtons>input[value="Submit"] {
-    margin-right: 40px;
-    background: blue;
-    color: white;
-    cursor: pointer;
-    border-radius: 8px;
-}
-#undoButtons>input[type=Submit]:disabled {
-    background: #dddddd;
-}
-
-#undoButtons>input[value="Cancel"] {
-    background: red;
-    color: white;
-    cursor: pointer;
-    border-radius: 12px;
-}
-
-#checkAll {
-    background: lightblue;
-    color: black;
-    cursor: pointer;
-    border-radius: 12px;
-}
-
-p.comment:hover {
-    cursor: pointer;
-}
-
-
-
-#Fullscreen {
-    height: 100%;
-    display: none;
-    position: fixed;
-    z-index: 499;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.8);
-}
-
-#Fullscreen img {
-    height: 100%;
-    display: block;
-    margin: 0 auto;
-    cursor: url("/img/contract.png"), pointer;
-}
-
-#tadiv {
-    display: none;
-    /* display: flex; when running */
-    background: grey;
-    position: fixed; /* so does not scroll with page */
-    top: 120px;
-    left: 300px;
+    justify-content: flex-start;
+    align-items: flex-start;
     flex-direction: column;
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-    border: 10px solid blue;
-    background: white;
-    border-radius: 12px;
-}
-
-#ta {
-    background: white;
-}
-
-#taButtons {
-    /* margin: 5px 0 10px 0; */
-    display: flex;
-    flex-direction: row;
-    font-weight: bold;
-}
-
-#taButtonCancel {
-    margin: 5px 0px 10px 30px;
-    background: red;
-    color: white;
-    cursor: pointer;
-}
-
-#taButtonUpdate {
-    margin: 5px 30px 10px 0px;
-    background: blue;
-    color: white;
-    cursor: pointer;
-}
-
-.w3-bar span {
-    color: grey;
-}
-
-.w3-bar span.bold {
-    color: black;
-    font-weight: bold;
-}
-
-single .comment {
-    width: 650px;
-    overflow-y: auto;
-    max-height: 70px;
-}
-
-content {
-    margin-top: 1em;
-    width: 90%;
-    display: inline-flex;
-}
-pictures {
-    /* float: left; */
-    order: 1;
-    flex-basis: 30%;
-    /* margin-left: 50px;
     margin-top: 10px;
-    margin-right: 50px; */
-    /* width: 30%; */
-    /* display: inline-block; */
+    /* background: yellow; */
 }
 
 single {
-    order: 2;
-    margin: 3em 0 0 3em;
-    /* display: inline-block; */
-    /* position: absolute; */
-    /* left: 600px; */
+    margin-left: 3em;
 }
 
 #img-gallery {
-    /* display: relative; */
-    top: 2.0em;
     margin-top: 1em;
 }
 
+#tab-menu-trigger {
+    display: none;
+}
 
+#topbar-menu {
+    padding: 10px;
+    width: 20%;
+    list-style: none;
+    display: none;
+    background: #F1F1F1;
+    position: fixed;
+    z-index: 900;
+    top: 10px;
+    left: 10px;
+    border: 2px solid black;
+}
 
+#topbar-menu li {
+    margin-left: 10px;
+    border: 1px solid silver;
+}
+
+buttons {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 900;
+}
+
+button.floatButton {
+    background: blue;
+    color: white;
+}
+
+div.img-wrap.redborder {
+    border-color: red;
+}
+
+.dim {
+    opacity: 0.3
+}
+
+#delButtons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.img-wrap img {
+    cursor: pointer;
+}
+
+.scroller {
+    display: block;
+}
+
+#expand {
+    position: relative;
+    z-index: 99;
+    top: 32px;
+    left: 2px;
+    cursor: zoom-in;
+}
+
+#out_single {
+    margin-top: -32px;
+}
+
+#taedit {
+    height: 200px;
+}
+#edit-popup {
+    position: absolute;
+    top: 500;
+    left: 400;
+    z-index: 300;
+}
+
+@media screen and (max-width: 1225px) {
+    #tab-menu-trigger {
+        display: block;
+    }
+    #topbar {
+        display: none;
+    }
+    single {
+        position: relative;
+    }
+    container {
+        flex-direction: column;
+    }
+    two {
+        order: 0;
+        margin-top: 30px;
+    }
+    one {
+        order: 1;
+        width: 100%;
+    }
+    #deleteMenu {
+        position: fixed;
+        top: 20px;
+        left: 100px;
+        width: 340px;
+    }
+}

@@ -53,3 +53,35 @@ td.left a:link {
 #header, #header tr, #header td {
     border: 0;
 }
+#tab-menu-trigger {
+    display: none;
+}
+#topbar-menu {
+    padding: 10px;
+	width: 20%;
+    list-style: none;
+    display: none;
+    background: #F1F1F1;
+    position: relative;
+    z-index: 99;
+    top: 10px;
+    left: 10px;
+    border: 2px solid black;
+    
+}
+#topbar-menu li {
+    margin-left: 10px;
+    border: 1px solid silver;
+}
+.floatButton {
+    display: none;
+}
+
+@media screen and (max-width: 1225px) {
+    #tab-menu-trigger {
+        display: block;
+    }
+    #topbar {
+        display: none;
+    }
+}

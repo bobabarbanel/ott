@@ -31,88 +31,87 @@
 </head>
 
 <body>
-	<a href="#">
-		<img src="/img/Ott.jpg">
+	<a tabindex="-1" href="#">
+		<img tabindex="-1" src="/img/Ott.jpg">
 	</a>
-	<div id="container">
+	<ul tabindex="-1" id="container" class="wrap">
 		<!-- partId -->
-		<div class="horiz">
-			<div>
+		<li tabindex="-1" class="horiz">
+			
 				<label for="partId_select">Part Number</label>
 				<select id="partId_select" data-placeholder="Select a Part..." class="chooser chosen-partId">
 					<option value=""></option>
 				</select>
-
-			</div>
-			<div>
 				<p id="partId_num"></p>
-			</div>
-		</div>
+			
+			<!-- <div>
+				
+			</div> -->
+		</li>
 
 		<!-- pName -->
-		<div class="horiz">
-			<div>
+		<li tabindex="-1" class="horiz">
+			
 				<label for="pName_select">Part Name</label>
 				<select id="pName_select" data-placeholder="Select a Name..." class="chooser chosen-pName">
 					<option value=""></option>
 				</select>
-
-			</div>
-			<div>
 				<p id="pName_num"></p>
-			</div>
-		</div>
+			
+			<!-- <div>
+				
+			</div> -->
+		</li>
 
 		<!-- dept -->
-		<div class="horiz">
+		<li tabindex="-1" class="horiz">
 
-			<div>
+			
 				<label for="dept_select">Dept</label>
 				<select id="dept_select" data-placeholder="Select a Department..." class="chooser chosen-dept">
 					<option value=""></option>
 				</select>
-			</div>
-			<div>
 				<p id="dept_num"></p>
-			</div>
-		</div>
+			
+			<!-- <div>
+				
+			</div> -->
+		</li>
 
 		<!-- op -->
-		<div class="horiz">
-			<div>
+		<li tabindex="-1" class="horiz">
+			
 				<label for="op_select">Op</label>
 				<select id="op_select" data-placeholder="Select an Operation..." class="chooser chosen-op">
 					<option value=""></option>
 				</select>
-			</div>
-			<div>
 				<p id="op_num"></p>
-			</div>
-		</div>
+			
+			<!-- <div>
+				
+			</div> -->
+		</li>
 
 		<!-- machine -->
-		<div class="horiz">
-			<div>
+		<li tabindex="-1" class="horiz">
+			
 				<label for="machine_select">Machine</label>
 				<select id="machine_select" data-placeholder="Select a Machine..." class="chooser chosen-machine">
 					<option value=""></option>
 				</select>
-				<div>
-					<p id="machine_num"></p>
-				</div>
-			</div>
-		</div>
-		<br/>
-		<div id="buttons">
-			<button id="reset" class="action" type="button">Reset</button>
-			<button id="run" class="action" type="button">&nbsp;&nbsp;Go&nbsp;&nbsp;</button>
-			<button id="upload_action" class="action" type="button">&nbsp;&nbsp;Uploads&nbsp;&nbsp;</button>
-			<button id="delete_action" class="action" type="button">&nbsp;&nbsp;Delete&nbsp;&nbsp;</button>
-		</div>
-		<br/>
+				
+				<p id="machine_num"></p>
+				
+			
+			</li>
+		</ul>
+	<div id="buttons">
+		<button id="reset" tabindex="4" class="action" type="button">Reset</button>
+		<button id="run" tabindex="1" class="action active" type="button">&nbsp;&nbsp;Go&nbsp;&nbsp;</button>
+		<button id="upload_action" tabindex="2" class="action" type="button">&nbsp;&nbsp;Uploads&nbsp;&nbsp;</button>
+		<button id="delete_action" tabindex="3" class="action" type="button">&nbsp;&nbsp;Delete&nbsp;&nbsp;</button>
 	</div>
-
-	<div id="dataTable"></div>
+	<div tabindex="-1" id="dataTable"></div>
 
 
 	<script src="/js/app.js"></script>

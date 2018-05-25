@@ -18,6 +18,7 @@ function getSpec(machine) {
     });
 }
 
+
 function getCookie() {
     return cookieValue;
 }

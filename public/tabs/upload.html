@@ -3,16 +3,18 @@
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-    <meta http-equiv="Pragma" content="no-cache"/>
-    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
-	<link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Upload Images</title>
     <link rel="stylesheet" href="/css/jquery-ui-1.12.1.custom/jquery-ui.min.css">
     <link rel="stylesheet" href="/css/upload.css">
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+        crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
         crossorigin="anonymous"></script>
 
 </head>
@@ -20,15 +22,26 @@
 <body>
     <div>
         <content>
+            <p id="spin" class="rotating">
+                <i class="fas fa-spinner fa-pulse"></i>
+            </p>
+            <!-- <img id="spin" src="/img/loader.gif" /> -->
             <table id="header">
                 <tr>
-                    <img id="progress" src="/img/loader.gif"/>
                     <td id="title">Upload Images</td>
                     <td id="job"></td>
+                    <td></td>
                 </tr>
                 <tr id="eftrow">
                     <td colspan="2">
                         <button id="edit_func_type">Edit Functions and Types</button>
+                    </td>
+                    <td>
+                        <div id="progress">
+                            <div id="progress_bar">
+                                <div class="percent"></div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             </table>

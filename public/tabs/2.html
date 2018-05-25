@@ -12,68 +12,96 @@
   <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
   <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
   <!--link rel="stylesheet" href="/css/jquery-ui-1.12.1.custom/jquery-ui.min.css"-->
-  <!-- <script src="https://use.fontawesome.com/cddef1effa.js"></script> -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
     crossorigin="anonymous"></script>
   <!--script src="/css/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script-->
-  <link href="/css/imageviewer.css" rel="stylesheet" type="text/css" />
+  <link href="/ImageViewer-master/imageviewer.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
 
-  <script src="/js/imageviewer.js"></script>
+  <script src="/ImageViewer-master/imageviewer.min.js"></script>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <!--link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" 
-    rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-    crossorigin="anonymous"-->
-  <script src="https://use.fontawesome.com/cddef1effa.js"></script>
-  <!-- <script defer src="https://use.fontawesome.com/releases/v5.0.2/js/all.js"></script> -->
+
+  <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+    crossorigin="anonymous"></script>
+    <!-- <link type="text/css" rel="stylesheet" href="/css/jquery-te-1.4.0.css">
+
+    <script type="text/javascript" src="/js/jquery-te-1.4.0.min.js" charset="utf-8"></script>
+     -->
+
   <link rel="stylesheet" href="/css/two.css">
 </head>
 
 <body>
-
   <div w3-include-html="./tabs.html"></div>
-
-  <h1></h1>
-  <p id="cookie"></p>
-  <div>
-    <main>
-    <div id="job"><p></p></div>
-    <content>
-      <pictures></pictures>
-      <single><form></form></single>
-    </content>
-  </main>
-
-    <div id="floatMenu">
-      <ul/>
-    </div>
-    <div id="undoMenu">
-      <p></p>
-      <form action="javascript:void()">
-        <ul></ul>
-        <div id="undoButtons">
-          <input id="undoSubmit" type="submit" value="Submit">
-          <input type="submit" value="Cancel">
+  <container>
+    <one>
+      <div id="deleteMenu" class="showFloat">
+        <div id="delInfo">
+          <img src="/img/notdeleting.jpg" width="20px" />
+          <span>Click Image to Mark for Deletion</span>
+          <img src="/img/deleting.jpg" width="20px" />
         </div>
-      </form>
-    </div>
-
-    <div id="tadiv">
-      <textarea id="ta" rows="6" cols="80"></textarea>
-      <div id: "taButtons">
-        <button id="taButtonUpdate">Update Comment</button>
-        <button id="taButtonCancel">Cancel</button>
+        <p id="delCount"></p>
+        <div id="delButtons">
+          <button id="doDone" onClick="deletionsComplete()">Done</button>
+          <button id="doClear" onClick="clearDeleteSelections()">Clear</button>
+          <button id="doDelete" >Delete Images</button>
+          <button id="undoDelete" onClick="unDeleteImages()">
+            <i class="fas fa-undo" style="color:red"></i>&nbsp;Undo Delete
+          </button>
+        </div>
       </div>
+      <job>
+      </job>
+      <content>
+        <pictures></pictures>
+      </content>
+    </one>
+    <two>
+    </two>
+  </container>
+
+  <div id="floatMenu" class="showFloat">
+
+  </div>
+  <!-- <div id="undoMenu">
+    <p></p>
+    <form action="javascript:void()">
+      <ul></ul>
+      <div id="undoButtons">
+        <input id="undoSubmit" type="submit" value="Submit">
+        <input type="submit" value="Cancel">
+      </div>
+    </form>doMenu">
+    <p></p>
+    <form action="javascript:void()">
+      <ul></ul>
+      <div id="undoButtons">
+        <input id="undoSubmit" type="submit" value="Submit">
+        <input type="submit" value="Cancel">
+      </div>
+    </form>
+  </div> -->
+  
+  <!-- <div id="tadiv">
+    <textarea id="ta" class="jqte-test" rows="6" cols="80"></textarea>
+    <div id: "taButtons">
+      <button id="taButtonUpdate">Update Comment</button>
+      <button id="taButtonCancel">Cancel</button>
     </div>
-    <div id="Fullscreen">
-      <img src="" alt="" />
-    </div>
-    <script src="https://www.w3schools.com/lib/w3.js"></script>
-    <script>
-      w3.includeHTML();
-    </script>
-    <script src="/js/two.js"></script>
+  </div> -->
+  <!-- <div id="Fullscreen">
+    <img src="" alt="" />
+  </div> -->
+  <!-- <div id="edit-popup" style="display: none">
+    <textarea name="textarea" class="jqte-test"><b>My contents are from <u><span style="color:rgb(0, 148, 133);">TEXTAREA</span></u></b></textarea>
+</div> -->
+  <script src="https://www.w3schools.com/lib/w3.js"></script>
+  <script>
+    w3.includeHTML();
+  </script>
+  <script src="/js/two.js"></script>
 
   </div>
 </body>

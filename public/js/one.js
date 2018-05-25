@@ -1,5 +1,5 @@
 "use strict";
-// two.js
+// one.js
 const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
 const SECTION = 'Tools';
@@ -13,15 +13,18 @@ $(function () {
             var key5 = getParsedCookie();
             var title = "Setup " + key5.partId;
             $("title").text(title);
-            
+
             setThisTab(1);
-            
+
             $("#job").text(
                 [
                     key5.partId, key5.pName, key5.dept, key5.op, key5.machine
                 ].join(" : ")
             );
-            $("#floatButton").hide();
+            $(".floatButton").hide();
+            $("#tab-menu-trigger").on('click',
+                () => $("#topbar-menu").show()
+            );
             getSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
                     getSheetTags(SECTION).then((toolData) => {
@@ -33,9 +36,6 @@ $(function () {
         .fail(function (/*jqxhr, settings, exception*/) {
             console.log("getScript " + "Triggered ajaxError handler.");
         });
-
-        
-
 });
 function genLinkObj(tDoc) {
     return [tDoc.turret, tDoc.position, tDoc.spindle, tDoc.offset].join('_');
@@ -77,23 +77,23 @@ function doRows(specs, turret, spindle, table, haves) {
     table.append(tr);
 
     tr = $("<tr/>");
-    let lowT  = specs[turret].range[0];
+    let lowT = specs[turret].range[0];
     let highT = specs[turret].range[1];
-    let lowS  = specs[turret][spindle][0];
+    let lowS = specs[turret][spindle][0];
     //let highS = specs[turret][spindle][1];
     for (var t = lowT, s = lowS; t <= highT; t++ , s++) {
-        var link = genLinkList([numsOf(turret),t,numsOf(spindle),s]);
-        console.log("link: " + link);
+        var link = genLinkList([numsOf(turret), t, numsOf(spindle), s]);
+        //console.log("link: " + link);
         let trClass = (haves[link] !== undefined) ? "slightgrey" : "nogrey";
 
         let tr = $('<tr class="' + trClass + '"/>');
         var td = $('<td class="left"/>');
-        if(haves[link] !== undefined) {
+        if (haves[link] !== undefined) {
             // white circle symbol in first column
-            var a = '<a target="_blank" href="/tabs/2.html#' + link + '">' + "&#9675;" + '</a>'; 
+            var a = '<a target="_blank" href="/tabs/2.html#' + link + '">' + "&#9675;" + '</a>';
             td.html(a);
         }
-        
+
         tr.append(td);
 
         td = $('<td class="digit"/>');
@@ -122,7 +122,7 @@ function doRows(specs, turret, spindle, table, haves) {
 }
 
 function getSheetTags(tab) {
-    console.log("getSheetTags");
+    //console.log("getSheetTags");
     var key = JSON.parse(getCookie());
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -131,7 +131,7 @@ function getSheetTags(tab) {
             data: {
                 "key": key,
                 "tab": tab,
-                "files": 0 // do not retrieve files/images list
+                "files": false // do not retrieve files/images list
             },
             dataType: 'json'
         })

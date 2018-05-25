@@ -23,7 +23,9 @@ module.exports = function (dir, app, db) {
 				partId: 1,
 				machine: 1,
 				pName: 1
-			}).sort({ partId: 1 });
+			}).sort({
+				partId: 1
+			});
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
 			if (doc !== null) {
@@ -39,7 +41,16 @@ module.exports = function (dir, app, db) {
 		// get parts data to start
 		data = [];
 		var cursor = db.collection('main')
-			.find({}, { '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 }).sort({ partId: 1 });
+			.find({}, {
+				'_id': 0,
+				dept: 1,
+				op: 1,
+				partId: 1,
+				machine: 1,
+				pName: 1
+			}).sort({
+				partId: 1
+			});
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
 			if (doc !== null) {
@@ -52,8 +63,12 @@ module.exports = function (dir, app, db) {
 
 	app.get('/machine/:mnum', (req, res) => {
 
-		var query = { "machines.mid": req.params.mnum };
-		db.collection('machineSpecs').findOne(query, { "_id": 0 }).then(
+		var query = {
+			"machines.mid": req.params.mnum
+		};
+		db.collection('machineSpecs').findOne(query, {
+			"_id": 0
+		}).then(
 			doc => {
 				res.json(doc);
 			},
@@ -67,18 +82,60 @@ module.exports = function (dir, app, db) {
 
 	app.post('/images', (req, res) => {
 		var key4 = [req.body.key.dept, req.body.key.partId,
-		req.body.key.op, req.body.key.machine].join("|");
-
-		var myPromise = db.collection('images').find({
+			req.body.key.op, req.body.key.machine
+		].join("|");
+		let archived = (req.body.archived !== 'false');
+		let query = {
 			"key4": key4,
-			"tab": req.body.tab
-		},
-			{ "_id": 0, "key4": 0, "tab": 0 })
-			.sort({ turret: 1, position: 1, spindle: 1, offset: 1 })
-			.toArray();
+			"tab": req.body.tab,
+			"files.archived": archived // req.body.attr is a string
+			// usually only want non-archived images, i.e query has archived === false
+		};
+		let col = db.collection('images');
+		// want ONLY those docs which have active images
+		//console.log(query);
+		var myPromise = col.aggregate([{
+				$match: query
+			},
+			{
+				$project: {
+					// key4: 1,
+					turret: 1,
+					spindle: 1,
+					position: 1,
+					offset: 1,
+					type: 1,
+					function: 1,
+					files: {
+						$filter: {
+							input: '$files',
+							as: 'item',
+							cond: {
+								$eq: ['$$item.archived', archived]
+							}
+						}
+					}
+				}
+			},
+			{
+				$sort: {
+					turret: 1,
+					position: 1,
+					spindle: 1,
+					offset: 1
+				}
+			}
+		]).toArray();
+		// var myPromise = col('images').find(query,
+		// 	{ "key4": 0, "tab": 0 })
+		// 	.sort({ turret: 1, position: 1, spindle: 1, offset: 1 })
+		// 	.toArray();
 
 		myPromise.then(
-			r => res.json(r),
+			r => {
+				// console.log(r);
+				res.json(r);
+			},
 			() => res.json([])
 		);
 		return;
@@ -87,29 +144,67 @@ module.exports = function (dir, app, db) {
 	app.post('/addkey', (req, res) => {
 		req.body.lastUpdated = new Date(); // timestamp for jobs
 		db.collection('main').insertOne(req.body).then(
-			result => {
-				res.send(result);
-			})
+				result => {
+					res.send(result);
+				})
 			.catch(
-			reason => {
-				res.send({ "error": reason });
-			});
+				reason => {
+					res.send({
+						"error": reason
+					});
+				});
 
 	});
 	app.post('/sheetTags', (req, res) => {
+		let key4 = [req.body.key.dept, req.body.key.partId,
+			req.body.key.op, req.body.key.machine
+		].join("|");
+		let includeFiles = req.body.files;
+		
+		let col = db.collection('images');
+		let query = {
+			"key4": key4,
+			"tab": req.body.tab
+		};
+		let project = {
+			_id: 0,
+			turret: 1,
+			spindle: 1,
+			position: 1,
+			offset: 1,
+			type: 1,
+			function: 1,
+			files: {
+				$filter: {
+					input: '$files',
+					as: 'item',
+					cond: {
+						$eq: ['$$item.archived', false]
+					}
+				}
+			}
+		};
+		if (includeFiles !== "true") {
+			delete project.files;
+		}
+		
 
-		var key4 = [req.body.key.dept, req.body.key.partId,
-		req.body.key.op, req.body.key.machine].join("|");
-		var includeFiles = req.body.files;
+		let myPromise = col.aggregate([{
+				$match: query
+			},
+			{
+				$project: project
+			},
+			{
+				$sort: {
+					turret: 1,
+					position: 1,
+					spindle: 1,
+					offset: 1
+				}
+			}
+		]).toArray();
 
-		var query = { "key4": key4, "tab": req.body.tab };
-		var project = { "_id": 0, "key4": 0, "tab": 0, "files": 0 };
-		if (includeFiles !== 1) { delete project.files; }
-
-		var myPromise = db.collection('images')
-			.find(query, project)
-			.sort({ turret: 1, position: 1, spindle: 1, offset: 1 })
-			.toArray();
 
 		myPromise.then(
 			r => {
@@ -129,7 +224,7 @@ module.exports = function (dir, app, db) {
 	// send json data
 	app.get('/data',
 		(req, res) =>
-			res.json(data));
+		res.json(data));
 
 
 	// do Mongo query
@@ -137,8 +232,14 @@ module.exports = function (dir, app, db) {
 
 		data = [];
 		// project out the ids
-		var cursor = db.collection('main').find({},
-			{ '_id': 0, dept: 1, op: 1, partId: 1, machine: 1, pName: 1 });
+		var cursor = db.collection('main').find({}, {
+			'_id': 0,
+			dept: 1,
+			op: 1,
+			partId: 1,
+			machine: 1,
+			pName: 1
+		});
 		cursor.each(function (err, doc) {
 			assert.equal(err, null);
 			if (doc !== null) {
@@ -163,7 +264,9 @@ module.exports = function (dir, app, db) {
 			"op": req.body.op,
 			"partId": req.body.partId
 		};
-		var project = { "pName": 1 };
+		var project = {
+			"pName": 1
+		};
 		var myPromise = db.collection('main')
 			.findOne(query, project);
 

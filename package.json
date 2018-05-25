@@ -6,27 +6,32 @@
   "private": true,
   "dependencies": {
     "assert": "^1.4.1",
-    "body-parser": "^1.17.1",
+    "async": "^2.6.1",
+    "body-parser": "^1.18.3",
     "child_process": "^1.0.2",
     "cookie-parser": "^1.4.3",
-    "ejs": "^2.5.7",
-    "express": "^4.15.2",
-    "filehound": "^1.16.1",
-    "formidable": "^1.1.1",
-    "fs-extra": "^4.0.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "filehound": "^1.16.3",
+    "formidable": "^1.2.1",
+    "fs-extra": "^4.0.3",
+    "hoek": "^5.0.3",
+    "http": "0.0.0",
     "jimp": "^0.2.28",
     "jshint": "^2.9.5",
-    "mongodb": "^2.2.34",
+    "lint": "^1.1.2",
+    "mongodb": "^3.0.8",
     "path": "^0.12.7",
     "readline": "^1.3.0",
     "util": "^0.10.3"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.17.5"
   },
   "scripts": {
     "test": "node server3000.js",
     "remote": "node server3000.js remote",
+    "debug": "node --inspect server3000.js",
     "dev": "nodemon -e html,css,js --watch . --watch controllers --watch public/js server3000.js"
   },
   "author": "abarbanel",

@@ -1,0 +1,22 @@
+db.jeff_images.aggregate(
+   [
+    {
+        "$unwind":
+          {
+            "path": "$files"
+          }
+      },
+      {
+          "$project":{
+              "_id": 1,
+              "files.filename": 1
+          }
+      },
+      { "$group":
+        {
+            "_id" : "$_id",
+            "mdate": { "$max": "$files.filename" }
+         }
+      }
+   ]
+)
