@@ -65,7 +65,7 @@ module.exports = function (dir, app, db) {
         myFiles.forEach(
             (aFile, index) => {
                 let fileName = aFile.name;
-                console.log(index + "> " + fileName);
+                // console.log(index + "> " + fileName);
                 let tail = fileName.substring(fileName.lastIndexOf("."));
 
                 //  public/images/Tools_large/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
@@ -116,7 +116,7 @@ module.exports = function (dir, app, db) {
                                 });
                                 return;
                             } else {
-                                console.log(uploadCount);
+                                // console.log(uploadCount);
                             }
                         },
 
@@ -145,7 +145,7 @@ module.exports = function (dir, app, db) {
 
     // rma test
     app.get('/progress/:id', (req, res) => {
-        console.log("/progress " + req.params.id + " " + uploadCount);
+        // console.log("/progress " + req.params.id + " " + uploadCount);
         res.json({
             "progress": uploadCount,
             "total": numberOfFiles,
@@ -156,7 +156,7 @@ module.exports = function (dir, app, db) {
     });
 
     app.post('/archiveImages', (req, res, next) => {
-        console.log("/archiveImages");
+        // console.log("/archiveImages");
         let col = db.collection('images');
         let promises =
             Object.keys(req.body.fileinfo).map(
@@ -165,7 +165,7 @@ module.exports = function (dir, app, db) {
                         let _id = new ObjectId(identifier);
                         let filenames = req.body.fileinfo[identifier];
                         // repeat(req.body.fileinfo);
-                        console.log("del id / count = " + identifier + " " + filenames.length);
+                        // console.log("del id / count = " + identifier + " " + filenames.length);
                         let query = {
                             "_id": _id,
                             "files.archived": false
