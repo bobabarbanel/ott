@@ -116,7 +116,7 @@ module.exports = function (dir, app, db) {
                                 });
                                 return;
                             } else {
-                                // console.log(uploadCount);
+                                console.log(uploadCount + " " + new Date());
                             }
                         },
 

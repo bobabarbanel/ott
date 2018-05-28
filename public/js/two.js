@@ -27,7 +27,8 @@ const SECTION = 'Tools';
 let deleteMode = false;
 let deleteCount = 0;
 let imageShowing = -1; // an integer, no image visible
-let viewSmall = null, viewLarge = null;
+let viewSmall = null,
+    viewLarge = null;
 $(function () {
     $(window).unload(function () {
         cleanView();
@@ -216,7 +217,7 @@ function catchKeys(state, code) {
             // keydown event for body already defined
             if ($events.keydown === undefined) {
                 $('body').on('keydown', function (args) {
-                    if (args.keyCode === ENTER_KEY) {
+                    if (args.which === ENTER_KEY) {
                         // if (undoChoosing === true) {
                         //     $('#undoMenu form input[value=Submit]').trigger('click');
                         //     return false;
@@ -230,7 +231,7 @@ function catchKeys(state, code) {
                         }
                     } else
 
-                        switch (args.keyCode) {
+                        switch (args.which) {
 
                             case LEFT_KEY:
                                 // console.log("left");
@@ -340,23 +341,66 @@ function closeSingle() {
     catchKeys('off', 'keydown');
 }
 
+function swipedetect(elSelect, callback) {
+// console.log("swipedetect");
+    var touchsurface = $(elSelect).get(0),
+        swipedir,
+        startX,
+        startY,
+        distX,
+        distY,
+        threshold = 150, //required min distance traveled to be considered swipe
+        restraint = 100, // maximum distance allowed at the same time in perpendicular direction
+        allowedTime = 300, // maximum time allowed to travel that distance
+        elapsedTime,
+        startTime,
+        handleswipe = callback || function (swipedir) {};
+
+    touchsurface.addEventListener('touchstart', function (e) {
+        var touchobj = e.changedTouches[0];
+        swipedir = 'none';
+        // dist = 0;
+        startX = touchobj.pageX;
+        startY = touchobj.pageY;
+        startTime = new Date().getTime(); // record time when finger first makes contact with surface
+        e.preventDefault();
+    }, false);
+
+    touchsurface.addEventListener('touchmove', function (e) {
+        e.preventDefault(); // prevent scrolling when inside DIV
+    }, false);
+
+    touchsurface.addEventListener('touchend', function (e) {
+        var touchobj = e.changedTouches[0];
+        distX = touchobj.pageX - startX; // get horizontal dist traveled by finger while in contact with surface
+        distY = touchobj.pageY - startY; // get vertical dist traveled by finger while in contact with surface
+        elapsedTime = new Date().getTime() - startTime; // get time elapsed
+        if (elapsedTime <= allowedTime) { // first condition for awipe met
+            if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint) { // 2nd condition for horizontal swipe met
+                swipedir = (distX < 0) ? 'left' : 'right'; // if dist traveled is negative, it indicates left swipe
+            } else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint) { // 2nd condition for vertical swipe met
+                swipedir = (distY < 0) ? 'up' : 'down'; // if dist traveled is negative, it indicates up swipe
+            }
+        }
+        handleswipe(swipedir);
+        e.preventDefault();
+    }, false);
+}
+
+//USAGE:
+
+
+
 function fullscreenSingle() {
     let srcLarge = $('#pannable-image').attr('data-high-res-src');
     let srcNormal = $('#pannable-image').attr('src');
-    /*
-    //get the high res source attribute of the pannable image image
-    //assign it to the tag for your fullscreen div
-    
-    $('#Fullscreen').css('display', 'flex');
-    $('#Fullscreen img').attr('src', srcLarge).height($(window).height() + 'px');
+    swipedetect(".iv-image-wrap",
+        (swipedir) => {
+            //swipedir contains either "none", "left", "right", "top", or "down"
 
-    $('#expand').hide();
-    $(dList).css("pointer-events", "none"); // diabled actions while Fullscreen
-    $('#Fullscreen').css('top', document.documentElement.scrollTop).fadeIn();
-    $('#Fullscreen img').fadeIn();
-    isFullPage = true;
-    */
-   cleanViewSpecific(viewLarge);
+            console.log(swipedir);
+        });
+    cleanViewSpecific(viewLarge);
     viewLarge = ImageViewer({
         maxZoom: 800
     });
@@ -364,9 +408,6 @@ function fullscreenSingle() {
 }
 
 function hideShowFloat() {
-    // if (isFullPage) {
-    //     return false;
-    // }
     $(floatName).toggleClass('showfloat');
 }
 
@@ -640,9 +681,10 @@ function cleanView() {
     cleanViewSpecific(viewSmall);
     cleanViewSpecific(viewLarge);
 }
+
 function cleanViewSpecific(view) {
-    if(view !== null) {
-        if(view === viewSmall) {
+    if (view !== null) {
+        if (view === viewSmall) {
             viewSmall = viewSmall.destroy();
         }
         if (view === viewLarge) {
