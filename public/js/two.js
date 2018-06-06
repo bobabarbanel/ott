@@ -62,7 +62,7 @@ $(function () {
             $("title").text("Part " + getParsedCookie().partId);
 
             setThisTab(2);
-            $("job").text(
+            $('job').text(
                 [
                     key5.partId, key5.pName, key5.dept, key5.op, key5.machine
                 ].join(" : ")
@@ -342,7 +342,7 @@ function closeSingle() {
 }
 
 function swipedetect(elSelect, callback) {
-// console.log("swipedetect");
+    // console.log("swipedetect");
     var touchsurface = $(elSelect).get(0),
         swipedir,
         startX,
@@ -735,46 +735,101 @@ function imgClick() { // when small image clicked to show larger image
             this_img.attr("dir_large") + '/' + fileName);
 
         imageShowing = parseInt(this_img.attr('sequence')); // global, impacts arrow/tab handling
+
+        // containers for imageViewer and decorations for navigation
         let out_single = $('<div id="out_single"/>'); // outer div to contain expand icon
         let in_single = $('<div id="image-gallery" class="in_single cf"/>');
 
+        // expand decoration
         let expand = $('<span id="expand"/>');
         expand.html('<i class="fas fa-expand-arrows-alt fa-2x" style="color:yellow"></i>')
             .on("click", fullscreenSingle);
 
-        let commentP = $('<textarea class="comment">' + this_img.attr("comment") + "</textarea>")
+        // left decoration
+        let left = $('<span id="left" class="direction"/>');
+        left.html('<i class="fas fa-caret-left fa-4x"></i>')
+            .on("click", () => {
+                nextImage(-1);
+                return false;
+            });
+        left.css('top', "50%");
+
+        // right decoration
+        let right = $('<span id="right" class="direction"/>');
+        right.html('<i class="fas fa-caret-right fa-4x"></i>')
+            .on("click", () => {
+                nextImage(1);
+                return false;
+            });
+        right.css('top', "50%");
+
+        // down decoration
+        let down = $('<span id="down" class="direction"/>');
+        down.html('<i class="fas fa-caret-down fa-4x"></i>')
+            .on("click", () => {
+                moveToGroup('next');
+                return false;
+            });
+        down.css('left', "50%");
+
+        // up decoration
+        let up = $('<span id="up" class="direction"/>');
+        up.html('<i class="fas fa-caret-up fa-4x"></i>')
+            .on("click", () => {
+                moveToGroup('prev');
+                return false;
+            });
+        up.css('left', "50%");
+
+
+
+        // comment field
+        let commentP = $('<textarea class="comment">' +
+                this_img.attr("comment") + "</textarea>")
             .on("click",
                 null, {
                     img: this_img, // has _id, filename and dir
                     collection: this_img.closest('.pic').attr('collection')
                 },
                 editComment);
-        in_single.append(single_pannable);
-        out_single.append(expand).append(in_single);
 
-        let hack;
+        // containers
+        in_single
+            .append(single_pannable);
+        out_single
+            .append(in_single);
+
+
+
         if (this_img.height() > this_img.width()) {
+            // maintain row
             $("singleflexr").append(out_single, commentP).css('display', 'flex');
             $("singleflexc").remove();
             commentP.css("margin-left", "30px");
             single_pannable.height(($(window).height() * 0.85) + "px");
-            // hack = single_pannable.height();
+
         } else {
+            // maintain column
             $("singleflexc").append(out_single, commentP).css('display', 'flex');
             $("singleflexr").remove();
             commentP.width(
-                    (($(window).height() * 0.80) * this_img.width() / this_img.height()) + "px")
+                    (($(window).height() * 0.80) * this_img.width() / this_img.height() - 4) +
+                    "px")
                 .height("40px");
             single_pannable.height(($(window).height() * 0.80) + "px");
-            // hack = single_pannable.height();
         }
         cleanViewSpecific(viewSmall);
         viewSmall = ImageViewer('#pannable-image', {
             maxZoom: 800
         });
-
-        $('.iv-large-image').height(hack);
+        
         $('single').show();
+        out_single
+            .append(expand)
+            .append(left)
+            .append(right)
+            .append(down)
+            .append(up);
         if (!wideScreen()) {
             $('html, body').scrollTop(0);
         }
