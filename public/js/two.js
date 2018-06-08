@@ -12,7 +12,7 @@ let maxImageShowing = 0; // incremneted as images are displayed
 let LG;
 let undoChoosing = false;
 let deleteChoosing = false;
-let isFullPage = false;
+// let isFullPage = false;
 
 
 const TAB_KEY = 9;
@@ -30,9 +30,9 @@ let imageShowing = -1; // an integer, no image visible
 let viewSmall = null,
     viewLarge = null;
 $(function () {
-    $(window).unload(function () {
-        cleanView();
-    });
+    // $(window).unload(function () {
+    //     cleanViews();
+    // });
 
 
 
@@ -394,16 +394,14 @@ function swipedetect(elSelect, callback) {
 function fullscreenSingle() {
     let srcLarge = $('#pannable-image').attr('data-high-res-src');
     let srcNormal = $('#pannable-image').attr('src');
-    swipedetect(".iv-image-wrap",
-        (swipedir) => {
-            //swipedir contains either "none", "left", "right", "top", or "down"
+    //cleanView();
 
-            console.log(swipedir);
+    // let prev = singleToEmpty();
+    // cleanViewSpecific(viewLarge);
+    if (viewLarge === null)
+        viewLarge = ImageViewer({
+            maxZoom: 800
         });
-    cleanViewSpecific(viewLarge);
-    viewLarge = ImageViewer({
-        maxZoom: 800
-    });
     viewLarge.show(srcNormal, srcLarge);
 }
 
@@ -640,8 +638,12 @@ function modeScroll(tag) {
 
 function singleToEmpty() {
     let prev = $('#tsSection').html();
-    //$('#image_gallery').remove();
-    $('#expand').off().empty();
+    $('#image_gallery').remove();
+    $('#expand').off().remove();
+    $('#left').off().remove();
+    $('#right').off().remove();
+    $('#up').off().remove();
+    $('#down').off().remove();
     $('two').empty();
     $('two').append('<single><tshead><div id="tsinfo"></div><div id="tsSection">' +
         '</div></tshead><singleflexr></singleflexr><singleflexc></singleflexc></single>');
@@ -677,24 +679,26 @@ function markGroup(link, state) { // state true ==> delete, otheruise undelete
     );
 }
 
-function cleanView() {
-    cleanViewSpecific(viewSmall);
-    cleanViewSpecific(viewLarge);
-}
+// function cleanViews() {
+//     cleanViewSpecific(viewSmall);
+//     cleanViewSpecific(viewLarge);
+// }
 
 function cleanViewSpecific(view) {
     if (view !== null) {
-        if (view === viewSmall) {
+        if (view === viewSmall && viewSmall !== null) {
+            // alert("destroy small");
             viewSmall = viewSmall.destroy();
         }
-        if (view === viewLarge) {
-            viewLarge = viewLarge.destroy();
+        if (view === viewLarge && viewLarge !== null) {
+            // alert("destroy large");
+            // viewLarge = viewLarge.destroy();
         }
     }
 }
 
 function imgClick() { // when small image clicked to show larger image
-    cleanView();
+    // cleanViewSpecific(viewLarge);
 
     let prev = singleToEmpty();
     $(".pic").removeClass('highlight');
@@ -726,8 +730,11 @@ function imgClick() { // when small image clicked to show larger image
         setImgWrapClass(wrapper, "showing");
 
         this_img.attr("showingSingle", true);
-        let single_pannable = $('<img id="pannable-image"></img>');
 
+        let single_pannable = $('<img id="pannable-image"></img>');
+        // viewSmall = ImageViewer(single_pannable, {
+        //     maxZoom: 800
+        // });
         let fileName = this_img.attr('filename');
         single_pannable.attr('src', this_img.attr("dir") + '/' + fileName);
 
@@ -819,10 +826,10 @@ function imgClick() { // when small image clicked to show larger image
             single_pannable.height(($(window).height() * 0.80) + "px");
         }
         cleanViewSpecific(viewSmall);
-        viewSmall = ImageViewer('#pannable-image', {
+        viewSmall = ImageViewer(single_pannable, {
             maxZoom: 800
         });
-        
+        // viewSmall.load(this_img.attr("dir") + '/' + fileName, this_img.attr("dir_large") + '/' + fileName);
         $('single').show();
         out_single
             .append(expand)
@@ -1312,9 +1319,9 @@ function delayedFragmentTargetOffset() {
 
 
 function toggleDeleteMode() {
-    if (isFullPage) { // prevent button action when in Fullscreen mode
-        return false;
-    }
+    // if (isFullPage) { // prevent button action when in Fullscreen mode
+    //     return false;
+    // }
     $("#deleteMenu p").text("Count: " + deleteCount);
     if (deleteMode) { // currently in delete mode
         $("#deleteMenu").hide();
