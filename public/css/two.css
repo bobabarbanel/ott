@@ -177,18 +177,14 @@ singleFlexC {
     align-items: flex-start;
 }
 
-#imageGallery {
-    order: 0;
-}
-
 .comment {
-    order: 1;
+    
     border: 1px solid blue;
-    /* max-height: 40px; */
+    
     height: 500px;
     width: 300px;
-    /* margin-left: 30px; */
-    margin-top: 25px;
+    
+    /* margin-top: 25px; */
 }
 
 pictures {
@@ -354,7 +350,7 @@ div.img-wrap.redborder {
 }
 .direction {
     cursor: pointer;
-    color:rgba(200, 200, 0, 0.8);;
+    color:rgba(252, 252, 252, 0.8);;
 }
 #expand {
     top: 0px;
@@ -370,15 +366,19 @@ div.img-wrap.redborder {
     right: -2px;  
 }
 #up {
-    top: -20px;
+    top: -18px;
 }
 #down {
-    bottom: -12px;
+    bottom: -10px;
 }
 
 
 #out_single {
     margin-top: -32px;
+    display: inline-block;
+}
+.wide {
+    display: none;
 }
 
 #taedit {

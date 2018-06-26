@@ -1,4 +1,5 @@
 "use strict";
+/* globals ImageViewer */
 // two.js
 const COOKIE = 'chosenCookie';
 var cookieValue = "not set";
@@ -10,9 +11,10 @@ const lgp = [];
 //const deletedImgWraps = [];
 let maxImageShowing = 0; // incremneted as images are displayed
 let LG;
-let undoChoosing = false;
+// let undoChoosing = false;
 let deleteChoosing = false;
 // let isFullPage = false;
+const viewers = {};
 
 
 const TAB_KEY = 9;
@@ -27,8 +29,7 @@ const SECTION = 'Tools';
 let deleteMode = false;
 let deleteCount = 0;
 let imageShowing = -1; // an integer, no image visible
-let viewSmall = null,
-    viewLarge = null;
+
 $(function () {
     // $(window).unload(function () {
     //     cleanViews();
@@ -96,30 +97,6 @@ function startUp() {
 
 
     setTimeout(delayedFragmentTargetOffset, 500);
-    ////////////////////////////////////////////////////////////
-    // $('#Fullscreen').css('height', $(document).outerHeight() + 'px');
-    // $('#Fullscreen img').click(function () {
-    //     //this will hide the fullscreen div if click away from the image. 
-    //     exitFullScreenMode($(this));
-    // });
-
-    // function exitFullScreenMode(jq) {
-    //     $(dList).css("pointer-events", "auto"); // enable actions
-    //     jq.fadeOut();
-    //     jq.parent().fadeOut();
-    //     $('#expand').show();
-    //     isFullPage = false;
-    // }
-
-    // function enterFullScreenMode(jq) {
-    //     $(dList).css("pointer-events", "none"); // enable actions
-    //     jq.fadeIn();
-    //     jq.parent().fadeIn();
-    //     $('#expand').hide();
-    //     isFullPage = true;
-    // }
-
-
 
     $('#taButtonCancel').on("click", () => {
         enableActionsNow();
@@ -127,20 +104,6 @@ function startUp() {
         $("#ta").text('');
         return false;
     });
-
-    // let form = $('#undoMenu').find('form');
-    // form.find('[value="Submit"]').on("click", undoSubmit);
-    // form.find('[value="Cancel"]').on("click",
-    //     () => {
-    //         $('#undoMenu').hide();
-    //         // enableActionsNow();
-    //         // $("#Fullscreen").hide();
-    //         // $("#Fullscreen img").show(); // reset for next use
-    //         // isFullPage = false;
-    //         $('#checkAll').off(); // no need to keep function around
-    //         undoChoosing = false;
-    //         return false;
-    //     });
 
     spaceForDeleteMenu(false);
 }
@@ -235,38 +198,48 @@ function catchKeys(state, code) {
 
                             case LEFT_KEY:
                                 // console.log("left");
-                                if (keystate !== "comment") nextImage(-1);
+                                if (keystate !== "comment") {
+                                    nextImage(-1);
+                                }
                                 break;
 
                             case TAB_KEY:
-                                if (keystate !== "comment") nextImage((args.shiftKey) ? -1 : 1); // shift Tab goes left(-1)
+                                if (keystate !== "comment") {
+                                    nextImage((args.shiftKey) ? -1 : 1);
+                                } // shift Tab goes left(-1)
                                 break;
 
                             case RIGHT_KEY:
                                 // console.log("right tab");
-                                if (keystate !== "comment") nextImage(1);
+                                if (keystate !== "comment") {
+                                    nextImage(1);
+                                }
                                 break;
 
                             case ESCAPE_KEY:
                                 // console.log("escape");
-                                if (keystate !== "comment") closeSingle();
+                                if (keystate !== "comment") {
+                                    closeSingle();
+                                }
                                 break;
 
                             case UP_KEY:
                                 // console.log("up");
-                                if (keystate !== "comment") moveToGroup('prev');
+                                if (keystate !== "comment") {
+                                    moveToGroup('prev');
+                                }
                                 break;
 
                             case DOWN_KEY:
                                 // console.log("down");
-                                if (keystate !== "comment") moveToGroup('next');
+                                if (keystate !== "comment") {
+                                    moveToGroup('next');
+                                }
                                 break;
 
                             default:
                                 return true;
                         }
-
-
                     return false;
                 });
             }
@@ -279,6 +252,7 @@ function catchKeys(state, code) {
 }
 
 function moveToGroup(direction) {
+    debugger;
     let myLG = lgp[imageShowing];
     // reset imageShowing for previous or next group
     if (direction === 'prev') {
@@ -333,82 +307,22 @@ function goGroup() { // move page and open first image in group
 
 
 function closeSingle() {
-
-    singleToEmpty();
+    hideSingle();
     $("pitems").find("img[showingsingle='true']")
         .attr('showingsingle', false)
-        .closest('.img-wrap').addClass("transparent").removeClass("deleting showing");
+        .closest('.img-wrap')
+        .addClass("transparent")
+        .removeClass("deleting showing");
     catchKeys('off', 'keydown');
 }
 
-function swipedetect(elSelect, callback) {
-    // console.log("swipedetect");
-    var touchsurface = $(elSelect).get(0),
-        swipedir,
-        startX,
-        startY,
-        distX,
-        distY,
-        threshold = 150, //required min distance traveled to be considered swipe
-        restraint = 100, // maximum distance allowed at the same time in perpendicular direction
-        allowedTime = 300, // maximum time allowed to travel that distance
-        elapsedTime,
-        startTime,
-        handleswipe = callback || function (swipedir) {};
-
-    touchsurface.addEventListener('touchstart', function (e) {
-        var touchobj = e.changedTouches[0];
-        swipedir = 'none';
-        // dist = 0;
-        startX = touchobj.pageX;
-        startY = touchobj.pageY;
-        startTime = new Date().getTime(); // record time when finger first makes contact with surface
-        e.preventDefault();
-    }, false);
-
-    touchsurface.addEventListener('touchmove', function (e) {
-        e.preventDefault(); // prevent scrolling when inside DIV
-    }, false);
-
-    touchsurface.addEventListener('touchend', function (e) {
-        var touchobj = e.changedTouches[0];
-        distX = touchobj.pageX - startX; // get horizontal dist traveled by finger while in contact with surface
-        distY = touchobj.pageY - startY; // get vertical dist traveled by finger while in contact with surface
-        elapsedTime = new Date().getTime() - startTime; // get time elapsed
-        if (elapsedTime <= allowedTime) { // first condition for awipe met
-            if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint) { // 2nd condition for horizontal swipe met
-                swipedir = (distX < 0) ? 'left' : 'right'; // if dist traveled is negative, it indicates left swipe
-            } else if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint) { // 2nd condition for vertical swipe met
-                swipedir = (distY < 0) ? 'up' : 'down'; // if dist traveled is negative, it indicates up swipe
-            }
-        }
-        handleswipe(swipedir);
-        e.preventDefault();
-    }, false);
-}
-
-//USAGE:
-
-
-
 function fullscreenSingle() {
-    let srcLarge = $('#pannable-image').attr('data-high-res-src');
-    let srcNormal = $('#pannable-image').attr('src');
-    //cleanView();
+    let srcLarge = $('#expand').attr('large');
+    let srcNormal = $('#expand').attr('small');
 
-    // let prev = singleToEmpty();
-    // cleanViewSpecific(viewLarge);
-    if (viewLarge === null)
-        viewLarge = ImageViewer({
-            maxZoom: 800
-        });
+    let viewLarge = getViewer('full');
     viewLarge.show(srcNormal, srcLarge);
 }
-
-function hideShowFloat() {
-    $(floatName).toggleClass('showfloat');
-}
-
 
 function paintPage(toolSpecs, toolData) {
     let links = []; // for float menu
@@ -572,9 +486,6 @@ function paintPage(toolSpecs, toolData) {
     float.append($('</ul>'));
 }
 
-function deleteAGroup() {
-    return false;
-}
 
 function delSelectAll(e) {
     let link = e.data.link;
@@ -636,19 +547,13 @@ function modeScroll(tag) {
     }
 }
 
-function singleToEmpty() {
-    let prev = $('#tsSection').html();
-    $('#image_gallery').remove();
-    $('#expand').off().remove();
-    $('#left').off().remove();
-    $('#right').off().remove();
-    $('#up').off().remove();
-    $('#down').off().remove();
-    $('two').empty();
-    $('two').append('<single><tshead><div id="tsinfo"></div><div id="tsSection">' +
-        '</div></tshead><singleflexr></singleflexr><singleflexc></singleflexc></single>');
-    imageShowing = -1;
+function hideSingle() {
     $('single').hide();
+
+    let prev = $('#tsSection').html();
+
+    imageShowing = -1;
+
     return prev;
 }
 
@@ -679,174 +584,210 @@ function markGroup(link, state) { // state true ==> delete, otheruise undelete
     );
 }
 
-// function cleanViews() {
-//     cleanViewSpecific(viewSmall);
-//     cleanViewSpecific(viewLarge);
-// }
 
-function cleanViewSpecific(view) {
-    if (view !== null) {
-        if (view === viewSmall && viewSmall !== null) {
-            // alert("destroy small");
-            viewSmall = viewSmall.destroy();
-        }
-        if (view === viewLarge && viewLarge !== null) {
-            // alert("destroy large");
-            // viewLarge = viewLarge.destroy();
+let one_time = false;
+
+function do_once() {
+    if (one_time) { // this functiuon will execute only one time
+        return;
+    }
+    one_time = true;
+    // outer div to contain expand, and navigation icons
+    let out_single = $('<div id="out_single"/>');
+    let in_single = $('<div id="image-gallery" class="in_single cf"/>');
+
+    // expand decoration
+    let expand = $('<span id="expand"/>');
+    expand.html('<i class="fas fa-expand-arrows-alt fa-2x" style="color:yellow"></i>')
+        .on("click", fullscreenSingle);
+
+    // left decoration
+    let left = $('<span id="left" class="direction"/>');
+    left.html('<i class="fas fa-caret-left fa-4x"></i>')
+        .on("click", () => {
+            nextImage(-1);
+            return false;
+        });
+    left.css('top', "50%");
+
+    // right decoration
+    let right = $('<span id="right" class="direction"/>');
+    right.html('<i class="fas fa-caret-right fa-4x"></i>')
+        .on("click", () => {
+            nextImage(1);
+            return false;
+        });
+    right.css('top', "50%");
+
+    // down decoration
+    let down = $('<span id="down" class="direction"/>');
+    down.html('<i class="fas fa-caret-down fa-4x"></i>')
+        .on("click", () => {
+            moveToGroup('next');
+            return false;
+        });
+    down.css('left', "50%");
+
+    // up decoration
+    let up = $('<span id="up" class="direction"/>');
+    up.html('<i class="fas fa-caret-up fa-4x"></i>')
+        .on("click", () => {
+            moveToGroup('prev');
+            return false;
+        });
+    up.css('left', "50%");
+
+    // comment field
+    let commentP = $('<textarea id="commentta" class="comment"></textarea>');
+
+    let single_pannable = $('<img id="pannable-image"></img>');
+    // containers
+    in_single
+        .append(single_pannable);
+    out_single
+        .append(in_single);
+    out_single
+        .append(expand)
+        .append(left)
+        .append(right)
+        .append(down)
+        .append(up);
+    // <br> will be displayed OR not depending on orientation of image
+    let br = $('<br id="singlebreak"/>');
+    $("singleImg").append(out_single, br, commentP).css('display', 'block');
+}
+
+function getViewer(id, container) {
+    const options = { // container for imageViewer
+        maxZoom: 800
+    };
+    if (typeof viewers[id] === 'undefined') {
+        // alert("new viewer");
+        if (typeof container === 'undefined') {
+            viewers[id] = new ImageViewer(options);
+        } else {
+            viewers[id] = new ImageViewer(container, options);
         }
     }
+    // else {
+    //     alert("old viewer");
+    // }
+    return viewers[id];
+}
+
+function loadViewer(viewer,small,large) {
+    viewer.load(small, large);
 }
 
 function imgClick() { // when small image clicked to show larger image
-    // cleanViewSpecific(viewLarge);
+    debugger;
 
-    let prev = singleToEmpty();
-    $(".pic").removeClass('highlight');
+    let prev = hideSingle(); // prev holds the title string from last single image shown
+    $(".pic").removeClass('highlight'); // un-highlight any previous image
+
     if (deleteMode) {
-        flipImgDelState($(this)); // allow to flip state of a single image
+        flipImgDelState($(this)); // allow to flip state of one image
     } else {
-        let this_img = $(this);
-        let pic = this_img.closest('.pic').addClass('highlight');
-
-        let wrapper = this_img.closest('.img-wrap');
-
-        let showingImg = $("pictures img[showingsingle='true']").attr('showingsingle', false);
-        setImgWrapClass(showingImg.closest('.img-wrap'), 'transparent');
-
-        $("#tsinfo")
-            .html("Turret" + SPACE + this_img.attr("turret") +
-                SPACE + SPACE + SPACE + "Spindle" + SPACE + this_img.attr("spindle"));
-        let txt = "Tool " + this_img.attr("tag") + ") " + this_img.attr("alt");
-        if (prev !== txt) {
-            $("#tsSection").html(txt).css("background", "orange");
-            setTimeout(
-                () => {
-                    // remove orange border
-                    $("#tsSection").css("background", "transparent");
-                }, 1000);
-        } else {
-            $("#tsSection").html(txt);
-        }
-        setImgWrapClass(wrapper, "showing");
-
-        this_img.attr("showingSingle", true);
-
-        let single_pannable = $('<img id="pannable-image"></img>');
-        // viewSmall = ImageViewer(single_pannable, {
-        //     maxZoom: 800
-        // });
-        let fileName = this_img.attr('filename');
-        single_pannable.attr('src', this_img.attr("dir") + '/' + fileName);
-
-        single_pannable.attr('data-high-res-src',
-            this_img.attr("dir_large") + '/' + fileName);
-
-        imageShowing = parseInt(this_img.attr('sequence')); // global, impacts arrow/tab handling
-
-        // containers for imageViewer and decorations for navigation
-        let out_single = $('<div id="out_single"/>'); // outer div to contain expand icon
-        let in_single = $('<div id="image-gallery" class="in_single cf"/>');
-
-        // expand decoration
-        let expand = $('<span id="expand"/>');
-        expand.html('<i class="fas fa-expand-arrows-alt fa-2x" style="color:yellow"></i>')
-            .on("click", fullscreenSingle);
-
-        // left decoration
-        let left = $('<span id="left" class="direction"/>');
-        left.html('<i class="fas fa-caret-left fa-4x"></i>')
-            .on("click", () => {
-                nextImage(-1);
-                return false;
-            });
-        left.css('top', "50%");
-
-        // right decoration
-        let right = $('<span id="right" class="direction"/>');
-        right.html('<i class="fas fa-caret-right fa-4x"></i>')
-            .on("click", () => {
-                nextImage(1);
-                return false;
-            });
-        right.css('top', "50%");
-
-        // down decoration
-        let down = $('<span id="down" class="direction"/>');
-        down.html('<i class="fas fa-caret-down fa-4x"></i>')
-            .on("click", () => {
-                moveToGroup('next');
-                return false;
-            });
-        down.css('left', "50%");
-
-        // up decoration
-        let up = $('<span id="up" class="direction"/>');
-        up.html('<i class="fas fa-caret-up fa-4x"></i>')
-            .on("click", () => {
-                moveToGroup('prev');
-                return false;
-            });
-        up.css('left', "50%");
-
-
-
-        // comment field
-        let commentP = $('<textarea class="comment">' +
-                this_img.attr("comment") + "</textarea>")
-            .on("click",
-                null, {
-                    img: this_img, // has _id, filename and dir
-                    collection: this_img.closest('.pic').attr('collection')
-                },
-                editComment);
-
-        // containers
-        in_single
-            .append(single_pannable);
-        out_single
-            .append(in_single);
-
-
-
-        if (this_img.height() > this_img.width()) {
-            // maintain row
-            $("singleflexr").append(out_single, commentP).css('display', 'flex');
-            $("singleflexc").remove();
-            commentP.css("margin-left", "30px");
-            single_pannable.height(($(window).height() * 0.85) + "px");
-
-        } else {
-            // maintain column
-            $("singleflexc").append(out_single, commentP).css('display', 'flex');
-            $("singleflexr").remove();
-            commentP.width(
-                    (($(window).height() * 0.80) * this_img.width() / this_img.height() - 4) +
-                    "px")
-                .height("40px");
-            single_pannable.height(($(window).height() * 0.80) + "px");
-        }
-        cleanViewSpecific(viewSmall);
-        viewSmall = ImageViewer(single_pannable, {
-            maxZoom: 800
-        });
-        // viewSmall.load(this_img.attr("dir") + '/' + fileName, this_img.attr("dir_large") + '/' + fileName);
-        $('single').show();
-        out_single
-            .append(expand)
-            .append(left)
-            .append(right)
-            .append(down)
-            .append(up);
-        if (!wideScreen()) {
-            $('html, body').scrollTop(0);
-        }
-        catchKeys("single"); // on for keydown
+        showSingleLargeImage($(this), prev); // show image in <single> container
     }
 }
 
+function showSingleLargeImage(this_img, prev) {
+
+    this_img.closest('.pic').addClass('highlight'); // visible mark for clicked image
+
+    let wrapper = this_img.closest('.img-wrap'); // wrapper for the clicked image
+
+    // flip showingsingle attribute in currently shown image wrapper 
+    let showingImg = $("pictures img[showingsingle='true']").attr('showingsingle', false);
+    // unhighlight wrapper of previous single image 
+    setImgWrapClass(showingImg.closest('.img-wrap'), 'transparent');
+
+    // set title information
+    $("#tsinfo")
+        .html("Turret" + SPACE + this_img.attr("turret") +
+            SPACE + SPACE + SPACE + "Spindle" +
+            SPACE + this_img.attr("spindle"));
+    let txt = "Tool " + this_img.attr("tag") + ") " + this_img.attr("alt");
+    $("#tsSection").html(txt);
+    if (prev !== txt) { // if changed, show orange background for 1 second
+        $("#tsSection").css("background", "orange");
+        setTimeout(
+            () => {
+                // remove temporary orange border
+                $("#tsSection").css("background", "transparent");
+            }, 1000);
+    }
+    setImgWrapClass(wrapper, "showing"); // mark wrapper as showing
+
+    this_img.attr("showingSingle", true); // mark image itself with showingSingle
+
+    let fileName = this_img.attr('filename');
+    // global, impacts arrow/tab handling
+    imageShowing = parseInt(this_img.attr('sequence'));
+
+    do_once(); // set up navigation and single display elements, and comment block
+    let narrowImage = this_img.height() > this_img.width();
+    if (narrowImage) {
+        $('#singlebreak').addClass('wide'); // hiding <br>
+    } else {
+        $('#singlebreak').removeClass('wide'); // showing <br>
+    }
+
+    $('#commentta').html(this_img.attr("comment"))
+        .on("click",
+            null, {
+                img: this_img, // has _id, filename and dir
+                collection: this_img.closest('.pic').attr('collection')
+            },
+            editComment);
+
+    let single_pannable = $('#pannable-image');
+    let shortened = $(window).height() * 0.85;
+    let commentP = $("single textArea");
+    if (narrowImage) { // comment shows next to image
+        $('#commentta').css("margin-left", "30px");
+        single_pannable.height(shortened + "px");
+        single_pannable.width(
+            ((shortened * this_img.width() / this_img.height() - 4) +
+                "px"));
+        commentP.width("250px").height(shortened / 2 + "px")
+            .css({
+                "position": "absolute",
+                "top": "25%",
+                "margin-left": 50
+            });
+    } else { // comment shows below image
+        let width = $(window).height() * 0.80 * this_img.width() / this_img.height();
+        commentP
+            .width((width - 4) + "px")
+            .height("40px")
+            .css({
+                "position": "inherit",
+                "margin-top": 25,
+                "margin-left": 0
+            });
+        shortened -= 40; // amke room for comment
+        single_pannable.width(width + "px");
+        single_pannable.height(shortened + "px");
+    }
+
+    let viewSmallH = getViewer('smallh', single_pannable);
+    let smallImg = ".." + this_img.attr("dir") + '/' + fileName;
+    let largeImg = ".." + this_img.attr("dir_large") + '/' + fileName;
+    // relative path to images -- fix this!  // RMA
+    // viewSmallH.load(smallImg, largeImg);
+    loadViewer(viewSmallH, smallImg, largeImg);
+    $('#expand').attr("small", smallImg).attr("large", largeImg);
+    $('single').show();
+
+    if (!wideScreen()) {
+        $('html, body').scrollTop(0);
+    }
+    catchKeys("single"); // on for keydown
+}
+
 function editComment(ev) {
-
-
 
     disableActionsNow();
 
@@ -901,147 +842,7 @@ function editComment(ev) {
     return false;
 }
 
-function delete1Image(wrapper, ximg) {
-    // remove from db
-    let turret, position, spindle, offset;
-    let link = ximg.attr('link');
-    [turret, position, spindle, offset] =
-    link.split('_').map(val => parseInt(val));
-    let query = {
-        "key4": getKey4id(),
-        "turret": turret, // need int for actual query, have to convert in router code
-        "spindle": spindle,
-        "position": position,
-        "offset": offset,
-        "tab": SECTION
-    };
 
-    let img = ximg; // wrapper.find('img');
-    let order = ximg.attr('order');
-    let filedata = {
-        "dir": ximg.attr('dir'),
-        "filename": ximg.attr('filename'),
-        "comment": ximg.attr('comment')
-    };
-    dbImagesDelete(query, filedata).then(
-        () => {
-
-            // remove single if showing this image
-            if (img.attr("showingSingle") === "true") {
-                wrapper.closest('.pic').css('background', '');
-                wrapper.find('img').css('border-color', '');
-                singleToEmpty();
-            }
-
-            let pic = $('#pic' + link);
-            deletedImages[link][order] = wrapper;
-            allImgWraps[parseInt(img.attr('sequence'))].deleted = true; // mark as deleted
-
-            pic.find("div > p > i").html(
-                    SPACE +
-                    deletedImages[link].filter(x => x !== null).length)
-                .show();
-
-            // adjust UI (hide imagewrap)
-
-            renderCheckAllButton(wrapper, 'hide');
-
-        },
-        failure => alert(
-            "Unable to perform database delete from images collection.\n" +
-            JSON.stringify(failure))
-    );
-}
-
-function deleteNImages(siblings, ximg) {
-    let wrappers = siblings.map(
-        (index, element) => {
-            return $(element).closest('.img-wrap');
-        }).get();
-    // remove from db
-    let turret, position, spindle, offset;
-    let link = ximg.attr('link');
-    [turret, position, spindle, offset] =
-    link.split('_').map(val => parseInt(val));
-    let query = {
-        "key4": getKey4id(),
-        "turret": turret, // need int for actual query, have to convert in router code
-        "spindle": spindle,
-        "position": position,
-        "offset": offset,
-        "tab": SECTION
-    };
-
-    $.makeArray(wrappers).forEach(
-        element => {
-            let wrapper = $(element);
-            let img = wrapper.find('img');
-            let order = img.attr('order');
-            let filedata = {
-                "dir": img.attr('dir'),
-                "filename": img.attr('filename'),
-                "comment": img.attr('comment')
-            };
-            dbImagesDelete(query, filedata).then(
-                () => {
-
-                    // remove single if showing this image
-                    if (img.attr("showingSingle") === "true") {
-                        wrapper.closest('.pic').css('background', '');
-                        wrapper.find('img').css('border-color', '');
-                        singleToEmpty();
-                    }
-
-                    let pic = $('#pic' + link);
-                    deletedImages[link][order] = wrapper;
-                    allImgWraps[parseInt(img.attr('sequence'))].deleted = true; // rma
-
-                    pic.find("div > p > i").html(
-                            SPACE +
-                            deletedImages[link].filter(x => x !== null).length)
-                        .show();
-
-                    // adjust UI (hide imagewrap)
-
-                    renderCheckAllButton(wrapper, 'hide');
-
-                },
-                failure => alert(
-                    "Unable to perform database delete from images collection.\n" +
-                    JSON.stringify(failure))
-            );
-        });
-}
-
-function countShowing(sibs) {
-    let count = 0;
-    sibs.each((index, element) => {
-        // console.log(index + " " + $(element).css('display'));
-        count += ($(element).css('display') !== 'none') ? 1 : 0;
-    });
-    return count;
-}
-
-function renderCheckAllButton(wrapper, action) {
-    let sibs = wrapper.closest('pitems').find('.img-wrap');
-    const delAllButtonClass = '.checkAllDel';
-
-    let button = wrapper.closest('.pic').find(delAllButtonClass);
-
-    if (action === 'hide') {
-        wrapper.hide();
-    } else {
-        wrapper.show();
-    }
-
-    let stillShowing = countShowing(sibs);
-
-    if (stillShowing === 0) {
-        button.hide();
-    } else {
-        button.show();
-    }
-}
 
 function updateComment(img) { //RMA INWORK
 
@@ -1067,17 +868,13 @@ function updateComment(img) { //RMA INWORK
 const dList = "pictures img, .w3-bar a, #floatMenu a"; //, #deleteButton, #floatButton";
 
 function disableActionsNow() {
-    // $("#Fullscreen").show();
-    // $("#Fullscreen img").hide();
-    // isFullPage = true;
+
     $(dList).css("pointer-events", "none");
 }
 
 function enableActionsNow() {
     $(dList).css("pointer-events", "auto");
-    // $("#Fullscreen img").show();
-    // $("#Fullscreen").hide();
-    // isFullPage = false;
+
 }
 
 function setImgWrapClass(wrapper, className) {
@@ -1085,27 +882,27 @@ function setImgWrapClass(wrapper, className) {
     wrapper.removeClass().addClass('img-wrap').addClass(className); // exclusive
 }
 
-function toggleAllUndos() {
-    if ($("#checkAll").text() === "Check All") {
-        toUnCheckAll();
-    } else {
-        toCheckAll();
-    }
+// function toggleAllUndos() {
+//     if ($("#checkAll").text() === "Check All") {
+//         toUnCheckAll();
+//     } else {
+//         toCheckAll();
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
-function toUnCheckAll() {
-    $("#checkAll").text("Uncheck All");
-    // $('#undoMenu form input[name=undoItems]').prop('checked', true);
-    // $('#undoMenu form input[value=Submit]').prop('disabled', false);
-}
+// function toUnCheckAll() {
+//     $("#checkAll").text("Uncheck All");
+//     // $('#undoMenu form input[name=undoItems]').prop('checked', true);
+//     // $('#undoMenu form input[value=Submit]').prop('disabled', false);
+// }
 
-function toCheckAll() {
-    $("#checkAll").text("Check All");
-    // $('#undoMenu form input[name=undoItems]').prop('checked', false);
-    // $('#undoMenu form input[value=Submit]').prop('disabled', true);
-}
+// function toCheckAll() {
+//     $("#checkAll").text("Check All");
+//     // $('#undoMenu form input[name=undoItems]').prop('checked', false);
+//     // $('#undoMenu form input[value=Submit]').prop('disabled', true);
+// }
 
 // function undoSubmit( /*ev*/ ) {
 //     let undo = $('#undoMenu');
@@ -1198,67 +995,67 @@ function dbUpdateImageComment(img) {
 }
 
 
-function dbImagesDelete(query, filedata) {
-    //console.log(JSON.stringify(query));
-    return new Promise((resolve, reject) => {
-        $.ajax({
-                url: "/deleteDbImages",
-                type: 'post',
-                data: {
-                    "query": query,
-                    "filedata": filedata
-                },
-                dataType: 'json'
-            })
-            .success((result) => {
+// function dbImagesDelete(query, filedata) {
+//     //console.log(JSON.stringify(query));
+//     return new Promise((resolve, reject) => {
+//         $.ajax({
+//                 url: "/deleteDbImages",
+//                 type: 'post',
+//                 data: {
+//                     "query": query,
+//                     "filedata": filedata
+//                 },
+//                 dataType: 'json'
+//             })
+//             .success((result) => {
 
-                //console.log("dbImagesDelete done " + JSON.stringify(result));
-                if (result.nModified === 1) {
-                    resolve(result);
-                } else {
-                    reject(result);
-                }
+//                 //console.log("dbImagesDelete done " + JSON.stringify(result));
+//                 if (result.nModified === 1) {
+//                     resolve(result);
+//                 } else {
+//                     reject(result);
+//                 }
 
-            })
-            .fail((request, status, error) => {
-                console.log("dbImagesDelete fail " + JSON.stringify(error));
-                reject(error);
-            });
-    });
-}
+//             })
+//             .fail((request, status, error) => {
+//                 console.log("dbImagesDelete fail " + JSON.stringify(error));
+//                 reject(error);
+//             });
+//     });
+// }
 
-function dbImagesRestore(query, filedata) {
-    //console.log(JSON.stringify(query));
-    return new Promise((resolve, reject) => {
-        $.ajax({
-                url: "/restoreDbImages",
-                type: 'post',
-                data: {
-                    "query": query,
-                    "filedata": filedata
-                },
-                dataType: 'json'
-            })
-            .success(
-                result => {
+// function dbImagesRestore(query, filedata) {
+//     //console.log(JSON.stringify(query));
+//     return new Promise((resolve, reject) => {
+//         $.ajax({
+//                 url: "/restoreDbImages",
+//                 type: 'post',
+//                 data: {
+//                     "query": query,
+//                     "filedata": filedata
+//                 },
+//                 dataType: 'json'
+//             })
+//             .success(
+//                 result => {
 
 
-                    if (result.nModified === 1) {
-                        resolve(result);
-                    } else {
+//                     if (result.nModified === 1) {
+//                         resolve(result);
+//                     } else {
 
-                        alert("result.nModified !== 1");
-                        //////////////////DEBUG
-                        reject(result);
-                    }
+//                         alert("result.nModified !== 1");
+//                         //////////////////DEBUG
+//                         reject(result);
+//                     }
 
-                })
-            .fail((request, status, error) => {
-                console.log("dbImagesRestore fail " + JSON.stringify(error));
-                reject(error);
-            });
-    });
-}
+//                 })
+//             .fail((request, status, error) => {
+//                 console.log("dbImagesRestore fail " + JSON.stringify(error));
+//                 reject(error);
+//             });
+//     });
+// }
 
 // function debugLogReport(q, r, f) {
 //     $.ajax({
@@ -1318,33 +1115,6 @@ function delayedFragmentTargetOffset() {
 
 
 
-function toggleDeleteMode() {
-    // if (isFullPage) { // prevent button action when in Fullscreen mode
-    //     return false;
-    // }
-    $("#deleteMenu p").text("Count: " + deleteCount);
-    if (deleteMode) { // currently in delete mode
-        $("#deleteMenu").hide();
-        $('.checkAllDel').hide();
-        if (deleteCount > 0) {
-            // undelete all deleted images
-            clearDeleteSelections();
-        }
-        deleteMode = !deleteMode;
-        spaceForDeleteMenu(false);
-        setDeleteButtons('init');
-    } else { // not currently in delete mode
-        deleteMode = !deleteMode;
-        closeSingle(); // also removes blue border on .img-wrap
-        $(".pic").removeClass('highlight');
-        $("#deleteMenu").show();
-        spaceForDeleteMenu(true);
-        $('.checkAllDel').show();
-        setDeleteButtons('running');
-    }
-
-}
-
 function spaceForDeleteMenu(deleting) {
     let ptop;
 
@@ -1358,12 +1128,6 @@ function spaceForDeleteMenu(deleting) {
     $("container").css("padding-top", ptop + "px");
 }
 
-function clearDeleteSelections() {
-    deleteCount = 0;
-    $(".img-wrap").removeClass("deleting showing").addClass("transparent");
-    $(".img-wrap img").removeClass("dim");
-    setDeleteButtons('init');
-}
 
 function setDeleteButtons(state) {
     $("#deleteMenu p").text('Count: ' + deleteCount);
@@ -1401,17 +1165,6 @@ function setDeleteButtons(state) {
             $("#undoDelete").css("display", "block");
             break;
     }
-}
-
-function deletionsComplete() {
-    $('#deleteMenu').hide();
-    setDeleteButtons('init');
-    clearDeleteSelections(); // also sets deleteCount to 0
-    $(".pic").removeClass('highlight');
-
-    spaceForDeleteMenu(false);
-    $('.checkAllDel').hide();
-    deleteMode = false;
 }
 
 function setArchiveForImages(list) {
@@ -1457,69 +1210,8 @@ function setArchiveForImages(list) {
     });
 }
 
-function unDeleteImages() {
-    reverseArchiveForImages().then(
-        success => {
-            $("#deleteMenu").hide();
-            $('.checkAllDel').hide();
-            clearDeleteSelections();
-            deleteMode = false;
-            spaceForDeleteMenu(false);
-            setDeleteButtons('init');
-        },
-        error => {
-            alert("reverseArchiveForImages error: " + JSON.stringify(error))
-        }
-    )
-}
 
-function reverseArchiveForImages() {
-    // toReverse, a list of images to be UNmarked as archived in db
-    let toReverse = $('pitems').find('.deleting').find('img');
-    let data = {};
-    toReverse.each(
-        (index, image) => {
-            image = $(image);
-            let allIW = allImgWraps[parseInt(image.attr('sequence'))];
-            allIW.deleted = false; // mark as not-deleted
-            allIW.wrap.css('display', 'block'); // make visible
 
-            let _id = image.closest('.pic').attr('collection');
-            let filename = image.attr('filename');
-
-            if (data[_id] === undefined) {
-                data[_id] = [];
-            }
-            data[_id].push(filename);
-        }
-    );
-    setDeleteButtons('init');
-    return new Promise((resolve, reject) => {
-        $.ajax({
-                url: "/unArchiveImages",
-                type: 'post',
-                data: {
-                    "fileinfo": data
-                },
-                dataType: 'json'
-            })
-            .done(result => {
-                toReverse.each(
-                    (index, img) => {
-                        let imgWrap = $(img).closest('.img-wrap');
-                        imgWrap.css("border-color", "orange");
-                        setTimeout(
-                            () => {
-                                // remove orange border
-                                imgWrap.css("border-color", "transparent");
-                            }, 1000);
-                    }
-                );
-                resolve(result);
-            })
-            .fail((request, status, error) => reject(error));
-    });
-}
 
 function deleteImages(evt) {
     evt.preventDefault();
@@ -1534,15 +1226,13 @@ function deleteImages(evt) {
         buttons: {
             confirm: function () {
                 setArchiveForImages(toDelete).then(
-                    (success) => {
+                    () => {
                         // no action
                     },
                     (error) => {
                         alert('Archive Images failure: ' + error);
                     }
                 );
-
-
             },
             cancel: function () {
                 // no action
