@@ -252,7 +252,6 @@ function catchKeys(state, code) {
 }
 
 function moveToGroup(direction) {
-    debugger;
     let myLG = lgp[imageShowing];
     // reset imageShowing for previous or next group
     if (direction === 'prev') {
@@ -547,6 +546,10 @@ function modeScroll(tag) {
     }
 }
 
+function hideShowFloat() {
+    $(floatName).toggleClass('showfloat');
+}
+
 function hideSingle() {
     $('single').hide();
 
@@ -562,6 +565,39 @@ function markImageDeletedForce(image, desiredState) {
     if ((desiredState && !alreadyDeleted) || (!desiredState && alreadyDeleted)) {
         flipImgDelState(image);
     }
+}
+
+function clearDeleteSelections() {
+    deleteCount = 0;
+    $(".img-wrap").removeClass("deleting showing").addClass("transparent");
+    $(".img-wrap img").removeClass("dim");
+    setDeleteButtons('init');
+}
+
+
+function toggleDeleteMode() {
+
+    $("#deleteMenu p").text("Count: " + deleteCount);
+    if (deleteMode) { // currently in delete mode
+        $("#deleteMenu").hide();
+        $('.checkAllDel').hide();
+        if (deleteCount > 0) {
+            // undelete all deleted images
+            clearDeleteSelections(); //RMANOW
+        }
+        deleteMode = !deleteMode;
+        spaceForDeleteMenu(false);
+        setDeleteButtons('init');
+    } else { // not currently in delete mode
+        deleteMode = !deleteMode;
+        closeSingle(); // also removes blue border on .img-wrap
+        $(".pic").removeClass('highlight');
+        $("#deleteMenu").show();
+        spaceForDeleteMenu(true);
+        $('.checkAllDel').show();
+        setDeleteButtons('running');
+    }
+
 }
 
 function flipImgDelState(image) {
@@ -675,12 +711,11 @@ function getViewer(id, container) {
     return viewers[id];
 }
 
-function loadViewer(viewer,small,large) {
+function loadViewer(viewer, small, large) {
     viewer.load(small, large);
 }
 
 function imgClick() { // when small image clicked to show larger image
-    debugger;
 
     let prev = hideSingle(); // prev holds the title string from last single image shown
     $(".pic").removeClass('highlight'); // un-highlight any previous image

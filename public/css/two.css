@@ -91,7 +91,6 @@ content {
     top: 70px;
     right: 30px;
     background: rgb(170, 194, 201);
-    ;
     padding-right: 10px;
 }
 
@@ -108,7 +107,7 @@ content {
 
 #floatMenu ul a:hover {
     background: rgb(2, 88, 2);
-    border: 1px solid yellow;
+    /* border: 1px solid yellow; */
 }
 
 #floatMenu li {
