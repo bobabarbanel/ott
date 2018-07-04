@@ -124,6 +124,7 @@ function scrollerAction() {
             scrollTop: target.offset().top - 100
         }, 500);
     }
+    // is next functionality wanted??
     if (!deleteMode) {
         if (this.hash.split('_').length === 4) {
             $('#pic' + this.hash.substr(1))
