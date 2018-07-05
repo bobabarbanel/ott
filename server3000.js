@@ -12,6 +12,7 @@ const app = express();
 var myArgs = process.argv.slice(2);
 var url;
 
+
 switch (myArgs[0]) {
   case 'remote':
     url = 'mongodb://rabarbanel:#17Mongo17@ottcluster0-shard-00-00-dor0p.mongodb.net:27017,ottcluster0-shard-00-01-dor0p.mongodb.net:27017,ottcluster0-shard-00-02-dor0p.mongodb.net:27017/parts?ssl=true&replicaSet=OttCluster0-shard-0&authSource=admin';
