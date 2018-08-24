@@ -79,3 +79,6 @@ single h2 {
 #floatMenu ul.menu1 li a:hover {
     border-color:#09f;
 }
+.floatButton, .deleteButton {
+    display: none;
+}

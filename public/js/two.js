@@ -31,6 +31,9 @@ let deleteCount = 0;
 let imageShowing = -1; // an integer, no image visible
 
 $(function () {
+    
+    $(".deleteButton").on('click', toggleDeleteMode);
+    $(".floatButton").on('click', hideShowFloat);
 
     function offsetAnchor() {
         if (location.hash.length !== 0) {
@@ -538,7 +541,7 @@ function modeScroll(tag) {
     }
 }
 
-function hideShowFloat() {
+function hideShowFloat() { // KEEP THIS! called frop HTML tabs.html
     $(floatName).toggleClass('showfloat');
 }
 
@@ -559,15 +562,15 @@ function markImageDeletedForce(image, desiredState) {
     }
 }
 
-// function clearDeleteSelections() {
-//     deleteCount = 0;
-//     $(".img-wrap").removeClass("deleting showing").addClass("transparent");
-//     $(".img-wrap img").removeClass("dim");
-//     setDeleteButtons('init');
-// }
+function clearDeleteSelections() {
+    deleteCount = 0;
+    $(".img-wrap").removeClass("deleting showing").addClass("transparent");
+    $(".img-wrap img").removeClass("dim");
+    setDeleteButtons('init');
+}
 
 
-function toggleDeleteMode() {
+function toggleDeleteMode() {  // KEEP THIS! called frop HTML tabs.html
 
     $("#deleteMenu p").text("Count: " + deleteCount);
     if (deleteMode) { // currently in delete mode
@@ -575,7 +578,7 @@ function toggleDeleteMode() {
         $('.checkAllDel').hide();
         if (deleteCount > 0) {
             // undelete all deleted images
-            clearDeleteSelections(); //RMANOW
+            clearDeleteSelections();
         }
         deleteMode = !deleteMode;
         spaceForDeleteMenu(false);

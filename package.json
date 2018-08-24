@@ -8,6 +8,7 @@
     "assert": "^1.4.1",
     "async": "^2.6.1",
     "body-parser": "^1.18.3",
+    "brace-expansion": "^1.1.11",
     "child_process": "^1.0.2",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.6.1",

@@ -5,7 +5,7 @@
 const SECTION = 'Tools';
 
 $(function () {
-
+    
     ////////////////////////////////////////////////////////////
     let common = new Common();
     var key5 = common.getParsedCookie();

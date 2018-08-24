@@ -73,7 +73,7 @@ td.left a:link {
     margin-left: 10px;
     border: 1px solid silver;
 }
-.floatButton {
+.floatButton, .deleteButton {
     display: none;
 }
 

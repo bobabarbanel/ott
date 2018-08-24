@@ -3,17 +3,17 @@
 // ftedits.js
 
 const common = new Common();
-const keys = common.getKeys();
+//const keys = common.getKeys();
 const SECTION = "Tools";
 let existingValues = {};
 
-var debug = false;
+// var debug = false;
 
-function debugLog(text) {
-    if (debug) {
-        console.log(text);
-    }
-}
+// function debugLog(text) {
+//     if (debug) {
+//         console.log(text);
+//     }
+// }
 
 $(function () {
     function disableButton(state) {
