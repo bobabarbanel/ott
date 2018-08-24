@@ -538,9 +538,9 @@ function modeScroll(tag) {
     }
 }
 
-// function hideShowFloat() {
-//     $(floatName).toggleClass('showfloat');
-// }
+function hideShowFloat() {
+    $(floatName).toggleClass('showfloat');
+}
 
 function hideSingle() {
     $('single').hide();
@@ -567,30 +567,30 @@ function markImageDeletedForce(image, desiredState) {
 // }
 
 
-// function toggleDeleteMode() {
+function toggleDeleteMode() {
 
-//     $("#deleteMenu p").text("Count: " + deleteCount);
-//     if (deleteMode) { // currently in delete mode
-//         $("#deleteMenu").hide();
-//         $('.checkAllDel').hide();
-//         if (deleteCount > 0) {
-//             // undelete all deleted images
-//             clearDeleteSelections(); //RMANOW
-//         }
-//         deleteMode = !deleteMode;
-//         spaceForDeleteMenu(false);
-//         setDeleteButtons('init');
-//     } else { // not currently in delete mode
-//         deleteMode = !deleteMode;
-//         closeSingle(); // also removes blue border on .img-wrap
-//         $(".pic").removeClass('highlight');
-//         $("#deleteMenu").show();
-//         spaceForDeleteMenu(true);
-//         $('.checkAllDel').show();
-//         setDeleteButtons('running');
-//     }
+    $("#deleteMenu p").text("Count: " + deleteCount);
+    if (deleteMode) { // currently in delete mode
+        $("#deleteMenu").hide();
+        $('.checkAllDel').hide();
+        if (deleteCount > 0) {
+            // undelete all deleted images
+            clearDeleteSelections(); //RMANOW
+        }
+        deleteMode = !deleteMode;
+        spaceForDeleteMenu(false);
+        setDeleteButtons('init');
+    } else { // not currently in delete mode
+        deleteMode = !deleteMode;
+        closeSingle(); // also removes blue border on .img-wrap
+        $(".pic").removeClass('highlight');
+        $("#deleteMenu").show();
+        spaceForDeleteMenu(true);
+        $('.checkAllDel').show();
+        setDeleteButtons('running');
+    }
 
-// }
+}
 
 function flipImgDelState(image) {
     image.toggleClass("dim");
