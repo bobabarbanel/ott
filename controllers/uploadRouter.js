@@ -61,6 +61,7 @@ module.exports = function (dir, app, db) {
         let ftdLarge = idirs[0],
             ftdMedium = idirs[1],
             ftdSmall = idirs[2];
+        let key4id = ['dept', 'partId', 'op', 'machine'].map(k => key4[k]).join("|"); // can we use common somehow??
         uploadCount = 0;
         myFiles.forEach(
             (aFile, index) => {
@@ -105,18 +106,44 @@ module.exports = function (dir, app, db) {
                             "files": fileRef(ftdMedium, ffn)
                         }
                     };
-
-                    let promise = db.collection("images")
-                        .findOneAndUpdate(query, updates);
+                    let key4query = {
+                        "_id": key4id
+                    };
+                    let promise = db.collection("images").findOneAndUpdate(query, updates);
                     promise.then(
                         () => {
                             if (++uploadCount === numberOfFiles) {
-                                res.json({
-                                    "count": uploadCount
-                                });
-                                return;
+                                // console.log("***uploadRouter " + uploadCount + " " + numberOfFiles + " : " + key4id);
+                                db.collection("progress").findOneAndUpdate(key4query, {
+                                    $set: {
+                                        progress: uploadCount,
+                                        total: numberOfFiles
+                                    }
+                                }, {
+                                    upsert: true
+                                }).then(
+                                    () => {
+                                        res.json({
+                                            "count": uploadCount
+                                        });
+                                        return;
+                                    }
+                                );
+
                             } else {
-                                console.log(uploadCount + " " + new Date());
+                                //console.log(uploadCount + " " + _id);
+
+                                // console.log("uploadRouter " + uploadCount + " " + numberOfFiles + " : " + key4id);
+                                db.collection("progress").findOneAndUpdate(key4query, {
+                                    $set: {
+                                        progress: uploadCount,
+                                        total: numberOfFiles
+                                    }
+                                }, {
+                                    upsert: true
+                                }).then(() => {
+                                    // console.log("router in progress " + uploadCount);
+                                });
                             }
                         },
 
@@ -130,32 +157,48 @@ module.exports = function (dir, app, db) {
             }
         );
     }
-    // const seen = {};
-    // function repeat(finfo) {
-    //     if(Object.keys(finfo).forEach(
-    //         (key) => seen[key] != undefined && 
-    //         JSON.stringify(seen[key]) === JSON.stringify(finfo[key])
-    //     ).length != 0) {
-    //         console.log("REPEAT!");
-    //         return false;
-    //     }
 
-    //     return true;
-    // }
+    app.get('/get_progress/:_id', (req, res) => {
+        //console.log("/get_progress " + req.params._id);
+        db.collection("progress").findOne(req.params).then(
+            (v) => {
+                // console.log(v);
+                // if(v.progress === v.total) {
+                //     next();
+                // } else {
+                res.json(v);
+                // }
 
-    // rma test
-    app.get('/progress/:id', (req, res) => {
-        // console.log("/progress " + req.params.id + " " + uploadCount);
-        res.json({
-            "progress": uploadCount,
-            "total": numberOfFiles,
-            "id": req.params.id,
-            "finished": uploadCount === numberOfFiles
-        });
-
+            },
+            (e) => {
+                res.json({
+                    error: e
+                });
+            }
+        );
+        return;
     });
 
-    app.post('/archiveImages', (req, res, next) => {
+    app.get('/clear_progress/:_id', (req, res) => {
+        //console.log("/get_progress " + req.params._id);
+        db.collection("progress").remove(req.params, {
+            justOne: true
+        }).then(
+            (v) => {
+
+                res.json(v);
+
+            },
+            (e) => {
+                res.json({
+                    error: e
+                });
+            }
+        );
+        return;
+    });
+
+    app.post('/archiveImages', (req, res) => {
         // console.log("/archiveImages");
         let col = db.collection('images');
         let promises =
@@ -188,7 +231,7 @@ module.exports = function (dir, app, db) {
                         return result;
                     });
                     p.catch(error => {
-                        return error
+                        return error;
                     });
                 });
         Promise.all(promises).then(
@@ -210,8 +253,7 @@ module.exports = function (dir, app, db) {
                 // res.end();
             }
         );
-        // console.log("all promises running");
-        // return;
+
     });
 
 
@@ -248,7 +290,7 @@ module.exports = function (dir, app, db) {
                         return result;
                     });
                     p.catch(error => {
-                        return error
+                        return error;
                     });
                 });
         Promise.all(promises).then(
@@ -270,53 +312,6 @@ module.exports = function (dir, app, db) {
         // console.log("all promises running");
         // return;
     });
-
-    // app.post('/deleteDbImages', (req, res) => {
-    //     // RMA - do this in bulk??
-    //     let query = req.body.query;
-    //     // convert the string attrs to integers
-    //     ["turret", "position", "spindle", "offset"].forEach(
-    //         term => query[term] = parseInt(query[term])
-    //     );
-
-    //     // copy chosen fileRef to archived slot; and dlete from files slot
-    //     let arch = Object.assign({}, req.body.filedata);
-    //     arch.when = new Date(); // add datetime 
-    //     let updates = {
-    //         "$pull": {
-    //             "files": req.body.filedata
-    //         },
-    //         "$push": {
-    //             "archived": arch
-    //         }
-    //     };
-
-    //     //////////////////DEBUG
-    //     //fs.appendFileSync('undoLog.txt', 'Delete ' + req.body.filedata.filename + "\n");
-    //     //////////////////DEBUG
-
-    //     db.collection("images").update(query, updates).then(
-    //         doc => {
-    //             res.json(doc);
-    //             return (doc);
-    //         },
-    //         err => {
-    //             console.log("deleteDbImages files out error " + JSON.stringify(err));
-    //             res.json(err);
-    //         });
-
-    // });
-
-    ///////////////////DEBUG
-    // app.post('/reportLog', (req, res) => {
-    //     fs.appendFileSync('undoLog.txt', '\n\nReport ' +
-    //         JSON.stringify(req.body.f) + "\n" +
-    //         JSON.stringify(req.body.q) + "\n" +
-    //         JSON.stringify(req.body.r) + "\n\n");
-    // });
-    //////////////////DEBUG
-
-
 
     app.post('/updateImageComment', (req, res) => {
         db.collection('images').updateOne({
@@ -358,13 +353,6 @@ module.exports = function (dir, app, db) {
         if (req.body.filedata.when !== undefined) {
             delete req.body.filedata.when;
         }
-        // let comment = req.body.filedata.comment;
-        // delete req.body.filedata.comment;
-        // let deleteItem = {
-        //     "$pull": {
-        //         "archived": req.body.filedata
-        //     }
-        // };
 
         let updates = {
             "$pull": {
@@ -379,10 +367,7 @@ module.exports = function (dir, app, db) {
                 }
             }
         };
-        ////////////////DEBUG
-        // fs.appendFileSync('undoLog.txt', 'Restore ' +
-        //     req.body.filedata.filename + "\n");
-        ////////////////DEBUG
+
         db.collection("images").update(query, updates).then(
             doc => {
                 res.json(doc);

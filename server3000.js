@@ -27,7 +27,7 @@ switch (myArgs[0]) {
 
 const port = process.env.port || 3000;
 const topRouter = require("./controllers/topRouter");
-const fs = require('fs-extra');
+// const fs = require('fs-extra');
 
 MongoClient.connect(url,
   (err, database) => {

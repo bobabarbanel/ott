@@ -28,7 +28,7 @@ $(function () {
             $("#cookie").text(getCookie());
             setThisTab(3);
             //var toolSpecs = null;
-            getSpec(getParsedCookie().machine)
+            Util.getMachineSpec(getParsedCookie().machine)
                 .then(machineSpecs => {
 
                     getImages("Tooling").then(toolingData => {

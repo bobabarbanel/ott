@@ -1,8 +1,9 @@
 "use strict";
+/* globals Common, Util */
 // ftedits.js
-const COOKIE = 'chosenCookie';
-var cookieValue = "not set";
-var key4;
+
+const common = new Common();
+const keys = common.getKeys();
 const SECTION = "Tools";
 let existingValues = {};
 
@@ -17,16 +18,18 @@ function debugLog(text) {
 $(function () {
     function disableButton(state) {
         if (state === true) { // disable button
-            $('#ftSubmit').prop('disabled', 'disabled').css('background', 'transparent');
+            $('.ftSubmit').prop('disabled', 'disabled').removeClass('submitOn');
 
         } else { // enable button
-            $('#ftSubmit').prop('disabled', false).css('background', 'yellow');
+            $('.ftSubmit').prop('disabled', false).addClass('submitOn');
         }
     }
 
     disableButton(true);
 
-    $('#ftSubmit').on('click', function (ev) {
+
+
+    function updateFieldsAndTypes(ev) {
         ev.preventDefault();
         // validate values !! no nulls
         let old = [];
@@ -60,8 +63,8 @@ $(function () {
         } else {
             let newPromises = nowNew.map(link => updateFT(evMod[link], true));
             let oldPromises = old.map(link => updateFT(evMod[link], false));
-            //alert("new " + newPromises.length);
-            //alert("old " + oldPromises.length);
+            alert("new " + newPromises.length);
+            alert("old " + oldPromises.length);
             Promise.all(newPromises.concat(oldPromises)).then(
                 complete => {
                     if (!complete[0].status) {
@@ -78,14 +81,14 @@ $(function () {
                 }
             );
         }
-    });
+    }
 
     function hasEmptyString(evMod, link) { // check evMod for empty values
         return evMod[link].function === '' || evMod[link].type === '';
     }
 
     function updateFT(fields, addFiles) {
-        fields.key4 = getKey4id();
+        fields.key4 = common.getKey4id();
         fields.addFiles = addFiles;
         fields.tab = SECTION;
         // alert("updateFT " + fields.key4 + " " + fields.function);
@@ -105,76 +108,47 @@ $(function () {
         });
     }
 
-    function getSheetTags(tab) {
+    ////////////////////////////////////////////////////////////
 
-        let key = JSON.parse(getCookie());
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                    url: "/sheetTags",
-                    type: 'post',
-                    data: {
-                        "key": key,
-                        "tab": tab,
-                        "files": false // **do** retrieve files/images list
-                    },
-                    dataType: 'json'
-                })
-                .done(
-                    result => {
-
-                        resolve(result);
-                    })
-                .fail((request, status, error) => reject(error));
-        });
-    }
-
-
-    $.getScript("/js/common.js")
-        .done(function ( /*script, textStatus*/ ) {
-
-            ////////////////////////////////////////////////////////////
-            cookieValue = unescape(readCookie(COOKIE));
-            key4 = getKey4();
-            var key5 = getParsedCookie();
-            $("#job").text(
-                [
-                    key5.partId, key5.pName, key5.dept, key5.op, key5.machine
-                ].join(" : ")
-            );
-
-            getSpec(getParsedCookie().machine)
-                .then(machineSpecs => {
-                    getSheetTags(SECTION).then(toolData => {
+    $("#job").text(common.getKey5DisplayText());
+    let parsedCookie = common.getParsedCookie();
+    Util.getMachineSpec(parsedCookie.machine)
+        .then(
+            machineSpecs => {
+                Util.getSheetTags(parsedCookie, SECTION).then(
+                    toolData => {
                         paintPage(machineSpecs, toolData);
+                        $('.ftSubmit').on('click', updateFieldsAndTypes);
                     });
-                });
+            });
 
 
-            ////////////////////////////////////////////////////////////
-        })
-        .fail(function ( /*jqxhr, settings, exception*/ ) {
-            debugLog("getScript " + "Triggered ajaxError handler.");
-        });
+    ////////////////////////////////////////////////////////////
+
+
 
 
     function paintPage(machineSpecs, toolData) {
         let table = $('<table class="inputTable" id="setup"/>');
-        let tr = $('<tr class="colnames"/>');
-
+        let thead = $('<thead></thead>');
+        let tr = '<tr id="#eftrow">' +
+            '<td colspan="2"><a class="backbutton" href="/tabs/upload.html">&#8592;&nbsp;Back to Uploads&nbsp;</a></td>' +
+            '<td id="submitTd" colspan="2"><button class="ftSubmit">Submit</button></td></tr>';
+        thead.append($(tr));
+        tr = $('<tr class="colnames"/>');
         let columns = [ // title and class
             ["Position<br/>#", "pCol"],
             ["Offset<br/>#", "oCol"],
             ["Function", "fCol"],
             ["Type", "tCol"]
-
         ];
         columns.forEach(head => {
             tr.append($('<th ' + 'class="' + head[1] + '"/>"').html(head[0]));
         });
 
-        table.append(tr);
-
-
+        thead.append(tr);
+        table.append(thead);
+        let tbody = $('<tbody></tbody>');
         toolData.forEach(tDoc => {
             existingValues[
                 [
@@ -186,46 +160,44 @@ $(function () {
             ] = tDoc;
         });
 
-        ["Turret1", "Turret2"].forEach(turretStr => {
-            if (machineSpecs[turretStr] !== undefined) {
-                doRows(machineSpecs, turretStr, "Spindle1", table);
-                if (machineSpecs[turretStr].Spindle2 !== undefined) {
-                    doRows(machineSpecs, turretStr, "Spindle2", table);
+        ["Turret1", "Turret2"].forEach(
+            turretStr => {
+                if (machineSpecs[turretStr] !== undefined) {
+                    doRows(machineSpecs, turretStr, "Spindle1", tbody);
+                    if (machineSpecs[turretStr].Spindle2 !== undefined) {
+                        doRows(machineSpecs, turretStr, "Spindle2", tbody);
+                    }
                 }
-            }
-        });
+            });
+        table.append(tbody);
         $("content").append(table);
+        $("tr#eftrow").css('background', 'green');
     }
 
 
     function groupSeparator(table) {
         let tr = $('<tr class="sep"/>');
-        tr.append($('<td class="digit"/>'));
-        tr.append($('<td class="digit"/>'));
-        for (var i = 0; i < 2; i++) {
-            tr.append($('<td/>'));
-        }
+        tr.append($('<td class="digit"/></td><td class="digit"/></td><td class="sep"></td><td class="sep"></td>'));
         table.append(tr);
     }
 
-    function doRows(specs, turretStr, spindleStr, table) {
+    function doRows(specs, turretStr, spindleStr, tbody) {
 
-        groupSeparator(table);
+        groupSeparator(tbody);
         let tr = $('<tr class="greyrow"/>');
-        tr.append($('<th class="digit "/>').text(turretStr));
-        tr.append($('<th class="digit "/>').text(spindleStr));
-        for (var i = 0; i < 2; i++) {
-            tr.append($('<th/>'));
-        }
+        tr.append(
+            $('<th class="digit "/>' + turretStr + '</th>'),
+            $('<th class="digit "/>' + spindleStr + '</th>')
+        );
 
-        table.append(tr);
+        tbody.append(tr);
 
 
         let lowT = specs[turretStr].range[0];
         let highT = specs[turretStr].range[1];
         let lowS = specs[turretStr][spindleStr][0];
-        let numT = numsOf(turretStr);
-        let numS = numsOf(spindleStr);
+        let numT = Util.numsOf(turretStr);
+        let numS = Util.numsOf(spindleStr);
         for (var t = lowT, s = lowS; t <= highT; t++, s++) {
 
             let link = [numT, t, numS, s].join("_");
@@ -233,86 +205,56 @@ $(function () {
                 existingValues[link] = {
                     "function": '',
                     "type": '',
-                    "turret": parseInt(numsOf(turretStr)),
+                    "turret": parseInt(Util.numsOf(turretStr)),
                     "position": t,
-                    "spindle": parseInt(numsOf(spindleStr)),
+                    "spindle": parseInt(Util.numsOf(spindleStr)),
                     "offset": s,
                     "f_change": false,
                     "t_change": false
-                    // "nextNum": NumberInt(1)
                 };
             } else {
                 existingValues[link].f_change = false;
                 existingValues[link].t_change = false;
             }
-            let trClass = "spaced";
-            let tr = $('<tr class="' + trClass + '"/>');
+            // a row
+            let tr = $('<tr class="spaces"/>');
             tr.attr("id", [
                 [turretStr, t, spindleStr, s].join("_")
             ]);
 
-            // Turret
+            // Turret column
             let td = $('<td class="digit"/>');
             td.text(t);
             tr.append(td);
 
-            // Spindle
+            // Spindle column
             td = $('<td class="digit"/>');
             td.text(s);
             tr.append(td);
 
-            // Function Name
+            // Function Name column
             td = $('<td/>');
             let f_input = $('<input class="finput" name="function" type="text"/>');
-            f_input.attr("id", idStr(link, "function"));
-            f_input.val(existingValues[link].function);
-            f_input.on("input", null, 'f_change', inputChanges); //function (ev) {
-            // let now = $(this).val();
-            // ev.preventDefault();
+            f_input
+                .attr("id", idStr(link, "function"))
+                .val(existingValues[link].function)
+                .on("input", null, 'f_change', inputChanges);
 
-            // let ids = $(this).attr('id').split('_');
-            // let inputId = ids.shift();
-            // let link = ids.join('_');
-            // if (existingValues[link][inputId] !== now) {
-            //     disableButton('false');
-            //     $(this).parent().addClass('changed');
-            //     existingValues[link].f_change = true;
-            // } else {
-            //     $(this).parent().removeClass('changed');
-            //     existingValues[link].f_change = false;
-            // }
-            // checkForChanges();
-
-            //});
             td.append(f_input);
             tr.append(td);
 
-            // Type Name
+            // Type Name column
             td = $('<td/>');
             let t_input = $('<input class="tinput" name="type" type="text"/>');
-            t_input.attr("id", idStr(link, "type"));
-            t_input.val(existingValues[link].type);
-            t_input.on("input", null, 't_change', inputChanges);
-            // t_input.on("input", function (ev) {
-            //     let now = $(this).val();
-            //     ev.preventDefault();
+            t_input
+                .attr("id", idStr(link, "type"))
+                .val(existingValues[link].type)
+                .on("input", null, 't_change', inputChanges);
 
-            //     let ids = $(this).attr('id').split('_');
-            //     let inputId = ids.shift();
-            //     let link = ids.join('_');
-            //     if (existingValues[link][inputId] !== now) {
-            //         disableButton('false');
-            //         $(this).parent().addClass('changed');
-            //         existingValues[link].t_change = true;
-            //     } else {
-            //         $(this).parent().removeClass('changed');
-            //         existingValues[link].t_change = false;
-            //     }
-            //     checkForChanges();
-            // });
             td.append(t_input);
             tr.append(td);
-            table.append(tr);
+
+            tbody.append(tr);
         }
     }
 
@@ -324,7 +266,7 @@ $(function () {
         let inputId = ids.shift();
         let link = ids.join('_');
         if (existingValues[link][inputId] !== now) {
-            disableButton('false');
+            //disableButton('false'); // enables button
             $(this).parent().addClass('changed');
             existingValues[link][ev.data] = true;
         } else {
@@ -339,6 +281,7 @@ $(function () {
         Object.keys(existingValues).forEach(
             link => {
                 if (existingValues[link].f_change || existingValues.t_change) {
+
                     change = true;
                 }
             }
@@ -349,7 +292,7 @@ $(function () {
     function idStr(idFields, tag) {
         // returns input element id for a given turret, spindle, tnum, snum, and type(tag)
         let arr;
-        if (isString(idFields)) {
+        if (Util.isString(idFields)) {
             arr = idFields.split('_');
         } else {
             arr = idFields.slice(); // copies array at top level

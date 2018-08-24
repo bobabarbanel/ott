@@ -1,10 +1,58 @@
 "use strict";
-const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
+/* globals Common */
 const ENTER = 13;
 const TAB = 9;
 let multiButtons; // RMA
-$(function () {
+(function ($) {
+    var prop = 'VisibilityState';
+    var evt = 'visibilitychange';
 
+    var vendors = ['webkit', 'ms'];
+    var vendor;
+
+    function set_state(state) {
+        
+        $(window).trigger('visibilitychange', state);
+
+        $.visibilityState = state;
+    }
+
+    // detect property, if available
+    for (var i = 0; vendor = vendors[i]; i++) {
+        if (vendors[i] + prop in document) {
+            vendor = vendors[i];
+            prop = vendor + prop;
+
+            break;
+        }
+    }
+
+    // setup event handlers
+    if (vendor) {
+        $(document).on(vendor + evt, function () {
+            set_state(document[prop]);
+        });
+    } else {
+        // not as cool failback -- this is functionally different than the visibilitychange event
+        // it's recommended you understand what makes the two different before using this code
+        $(window).on('focus', function () {
+            set_state('visible');
+
+        }).on('blur', function () {
+            set_state('hidden');
+        });
+
+        // TODO handle mobile browsers where we dont have either visibility API or focusin. setup
+        // interval to check document.hasFocus()
+    }
+
+    // set initial state
+    $.visibilityState = document[prop] || 'visible';
+}(jQuery));
+let common;
+
+$(function () {
+    common = new Common();
     setUpTable();
     refreshFromDB();
 
@@ -25,19 +73,16 @@ $(function () {
     });
 
     $("#run").on("click", function () {
-        if (existingWindow !== undefined && existingWindow !== null) {
-            existingWindow.close();
-            existingWindow = null;
-        }
-        handleChoice().then(
-            () => {
-                //console.log("run plus " + signal);
-                openInNewTab("/tabs/1.html");
-            },
-            error => console.log("handleChoice Error: " + error));
+        useNewTab("/tabs/1.html");
     });
 
-
+    $(window).on('visibilitychange',
+        () => {
+            if(document.visibilityState === 'visible') {
+                //("reset");
+                $('#reset').trigger('click');
+            }
+        });
     $('body').on('keydown', (e) => {
         switch (e.which) {
             case ENTER: // Enter
@@ -64,98 +109,110 @@ $(function () {
                     $('#' + button_ids[buttonActiveNum]).toggleClass("active").focus();
                     break;
                 }
+                break;
             default:
                 break;
         }
     });
 
     $("#upload_action").on("click", function () {
+        useNewTab("/tabs/upload.html");
+    });
 
+    $("#tabs_action").on("click", function () {
+        useNewTab("/tabs/tabsedit.html");
+    });
+
+    function useNewTab(destination) {
         if (existingWindow !== undefined && existingWindow !== null) {
             existingWindow.close();
             existingWindow = null;
         }
-        uploadChoice().then(
+        handleChoice().then(
             () => {
-                //console.log("upload plus " + signal);
-                openInNewTab("/tabs/upload.html");
+                //console.log("run plus " + signal);
+                openInNewTab(destination);
             },
-            error => console.log("uploadChoice Error: " + error));
-    });
+            error => console.log("handleChoice Error: " + error));
+    }
+
+
 
     $("#delete_action").on("click", function () {
-        let key4 = [QUERY.dept, QUERY.partId, QUERY.op, QUERY.machine].join("|");
-        countImages(key4).then(
-            r => {
-                //debugger;
-                let fileCount = r.fileCount;
-                $.confirm({
-                    closeIcon: true,
-                    icon: 'fa fa-exclamation fa-3x',
-                    boxWidth: '700px',
-                    useBootstrap: false,
-                    /*type: 'red',*/
-                    animation: 'right',
-                    title: showVals(fileCount),
-                    content: '<span class="qmsg"><b>Please choose a button.</b></span>',
-                    buttons: {
-                        "YES, Delete This Job!": {
-                            btnClass: 'btn-red',
-                            action: () => {
-                                let key5 = [QUERY.dept, QUERY.machine,
-                                    QUERY.op, QUERY.pName, QUERY.partId
-                                ].join("|");
-                                jobArchive(key4, key5);
-                                location.reload();
-                            }
-                        },
-                        "No, Do Not Delete": {
-                            btnClass: 'btn-blue cancelButtonClass'
-                        }
-                    }
+        alert("Not Implemented");
+        return;
+        // let key4 = [QUERY.dept, QUERY.partId, QUERY.op, QUERY.machine].join("|");
+        // countImages(key4).then(
+        //     r => {
+        //         //debugger;
+        //         let fileCount = r.fileCount;
+        //         $.confirm({
+        //             closeIcon: true,
+        //             icon: 'fa fa-exclamation fa-3x',
+        //             boxWidth: '700px',
+        //             useBootstrap: false,
+        //             /*type: 'red',*/
+        //             animation: 'right',
+        //             title: showVals(fileCount),
+        //             content: '<span class="qmsg"><b>Please choose a button.</b></span>',
+        //             buttons: {
+        //                 "YES, Delete This Job!": {
+        //                     btnClass: 'btn-red',
+        //                     action: () => {
+        //                         let key5 = [QUERY.dept, QUERY.machine,
+        //                             QUERY.op, QUERY.pName, QUERY.partId
+        //                         ].join("|");
+        //                         jobArchive(key4, key5);
+        //                         location.reload();
+        //                     }
+        //                 },
+        //                 "No, Do Not Delete": {
+        //                     btnClass: 'btn-blue cancelButtonClass'
+        //                 }
+        //             }
 
 
-                });
-            },
-            err => console.log("err " + err)
-        );
+        //         });
+        //     },
+        //     err => console.log("err " + err)
+        // );
     });
 
 
 
-    function showVals(fileCount) { // used in confirmation for job Archive
-        // include number of images for this job
-        let spaces4 = "&nbsp;&nbsp;&nbsp;&nbsp;";
-        let str = '<table class="qtable" frame="box">';
-        str += '<tr><th/><td/></td></tr>';
-        Object.keys(QUERY).forEach(
-            (key, idx) => {
-                if (idx === 0) {
-                    str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
-                        '<td colspan="2" class="qvalue">' + spaces4 + QUERY[key] +
-                        '</td><td/></tr>';
-                } else if (idx === 1) {
-                    str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
-                        '<td class="qvalue">' + spaces4 + QUERY[key] +
-                        '</td><td rowspan="4"><img class="shiftd" ' +
-                        'src="/img/trashfull_sm.jpg"/></td></tr>';
-                } else {
-                    str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
-                        '<td class="qvalue">' + spaces4 + QUERY[key] +
-                        "</td><td/></tr>";
-                }
-            }
-        );
+    // function showVals(fileCount) { // used in confirmation for job Archive
+    //     // include number of images for this job
+    //     let spaces4 = "&nbsp;&nbsp;&nbsp;&nbsp;";
+    //     let str = '<table class="qtable" frame="box">';
+    //     str += '<tr><th/><td/></td></tr>';
+    //     Object.keys(QUERY).forEach(
+    //         (key, idx) => {
+    //             if (idx === 0) {
+    //                 str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
+    //                     '<td colspan="2" class="qvalue">' + spaces4 + QUERY[key] +
+    //                     '</td><td/></tr>';
+    //             } else if (idx === 1) {
+    //                 str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
+    //                     '<td class="qvalue">' + spaces4 + QUERY[key] +
+    //                     '</td><td rowspan="4"><img class="shiftd" ' +
+    //                     'src="/img/trashfull_sm.jpg"/></td></tr>';
+    //             } else {
+    //                 str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
+    //                     '<td class="qvalue">' + spaces4 + QUERY[key] +
+    //                     "</td><td/></tr>";
+    //             }
+    //         }
+    //     );
 
-        str += '</table><br/>This job currently has ';
-        if (fileCount === 0) {
-            str += "no images.";
-        } else {
-            str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
-        }
-        str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
-        return str;
-    }
+    //     str += '</table><br/>This job currently has ';
+    //     if (fileCount === 0) {
+    //         str += "no images.";
+    //     } else {
+    //         str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
+    //     }
+    //     str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
+    //     return str;
+    // }
 
     // handle changes in choosers - that is, selection of a particular item
     $(".chooser", "#container").on("change", function () {
@@ -204,12 +261,13 @@ function refreshFromDB() {
             $("#run").hide();
             $("#upload_action").hide();
             $("#delete_action").hide();
+            $("#tabs_action").hide();
         },
         error => console.log("getData error " + error)
     );
 }
 let existingWindow;
-let TABNAME = "Tools";
+// let TABNAME = "Tools";
 
 // function jobArchive(key4, key5) {
 //     return new Promise((resolve, reject) => {
@@ -228,20 +286,20 @@ let TABNAME = "Tools";
 //     });
 // }
 
-function countImages(key4) {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-                url: "/countImages",
-                type: 'post',
-                data: {
-                    "key4": key4,
-                    "tab": TABNAME
-                }
-            })
-            .success(result => resolve(result[0]))
-            .fail((request, status, error) => reject(error));
-    });
-}
+// function countImages(key4) {
+//     return new Promise((resolve, reject) => {
+//         $.ajax({
+//                 url: "/countImages",
+//                 type: 'post',
+//                 data: {
+//                     "key4": key4,
+//                     "tab": TABNAME
+//                 }
+//             })
+//             .success(result => resolve(result[0]))
+//             .fail((request, status, error) => reject(error));
+//     });
+// }
 
 function handleChoice() {
     //console.log("handleChoice " + QUERY.partId);
@@ -257,19 +315,19 @@ function handleChoice() {
     });
 }
 
-function uploadChoice() {
-    //console.log("uploadChoice " + JSON.stringify(QUERY));
-    return new Promise((resolve, reject) => {
-        $.ajax({
-                url: "/go_parts",
-                type: 'post',
-                data: QUERY
-            })
-            .done((result) => resolve(result))
-            .fail((request, status, error) => reject(error));
-        //.always(() => console.log("handlechoice complete"));
-    });
-}
+// function uploadChoice() {
+//     //console.log("uploadChoice " + JSON.stringify(QUERY));
+//     return new Promise((resolve, reject) => {
+//         $.ajax({
+//                 url: "/go_parts",
+//                 type: 'post',
+//                 data: QUERY
+//             })
+//             .done((result) => resolve(result))
+//             .fail((request, status, error) => reject(error));
+//         //.always(() => console.log("handlechoice complete"));
+//     });
+// }
 
 function resetVars() {
     //console.log("resetVars existingWindow = " + existingWindow);
@@ -330,13 +388,13 @@ function refreshFilterTable() { // set new (reduced) jsonData in table, uses QUE
     updateTable(jsonData.filter((row) => rowMatchesQuery(row)));
 }
 
-let idToText = {
-    "partId": "Part Number",
-    "pName": "Part Name",
-    "dept": "Department",
-    "op": "Operation",
-    "machine": "Machine"
-};
+// let idToText = {
+//     "partId": "Part Number",
+//     "pName": "Part Name",
+//     "dept": "Department",
+//     "op": "Operation",
+//     "machine": "Machine"
+// };
 
 
 
@@ -480,9 +538,29 @@ function pageComplete() {
     $("#run").show();
     $("#upload_action").show();
     $("#delete_action").show();
+    jobHasTabs().then(
+        (numDocs) => {
+            $("#tabs_action").html((numDocs !== 0) ? "<u>Edit</u> " + numDocs + " Tabs" : "<u>Create</u> Tabs").show();
+        },
+        (err) => {
+            alert("jobHasTabs error " + err);
+        }
+    );
+    
     multiButtons = true;
 }
 
+function jobHasTabs() {
+    let _id = common.getKey4_ORDER().map( key => QUERY[key] ).join("|"); // create key4 string
+    return new Promise((resolve, reject) => {
+        $.post({
+                url: "/has_tabs",
+                data: {"_id" : _id}
+            })
+            .done((result) => resolve(result))
+            .fail((request, status, error) => reject(error));
+        });
+}
 
 function cellSingleClick(e, cell, value, data) {
     //e - the click event object

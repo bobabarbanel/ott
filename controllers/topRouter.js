@@ -1,9 +1,9 @@
 "use strict";
 // File: controllers/topRouter.js
 const assert = require('assert');
-const path = require('path');
-const express = require('express');
-const bodyParser = require('body-parser');
+// const path = require('path');
+// const express = require('express');
+// const bodyParser = require('body-parser');
 
 const COOKIE = 'chosenCookie';
 module.exports = function (dir, app, db) {
@@ -155,12 +155,13 @@ module.exports = function (dir, app, db) {
 				});
 
 	});
+	
 	app.post('/sheetTags', (req, res) => {
 		let key4 = [req.body.key.dept, req.body.key.partId,
 			req.body.key.op, req.body.key.machine
 		].join("|");
 		let includeFiles = req.body.files;
-		
+
 		let col = db.collection('images');
 		let query = {
 			"key4": key4,
@@ -187,7 +188,7 @@ module.exports = function (dir, app, db) {
 		if (includeFiles !== "true") {
 			delete project.files;
 		}
-		
+
 
 		let myPromise = col.aggregate([{
 				$match: query
@@ -280,11 +281,123 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.get('/reset', (req, res) => {
-
 		data = null;
 		res.clearCookie(COOKIE);
 		res.send("variables reset");
 	});
+
+
+	app.post('/has_tabs',
+		(req, res) => {
+
+			let query = req.body;
+			const tabsCollection = db.collection('tabs');
+			//let myPromise = tabsCollection.find(query, {"_id": 1});
+			let myPromise = tabsCollection.aggregate(
+				// Pipeline
+				[
+					// Stage 1
+					{
+						$match: query
+					},
+			
+					// Stage 2
+					{
+						$unwind: {
+							path : "$tabs"
+						}
+					},
+			
+					// Stage 3
+					{
+						$count: "count"
+					},
+			
+				]
+			).toArray();
+			
+			
+			
+			myPromise.then(
+				(r) => {
+					
+					if(r.length === 0) {
+						res.json(0);
+					} else {
+						res.json(r[0].count);
+					}
+					
+				},
+				(err) => {
+					console.log("has_tabs error: " + err);
+					res.json({
+						"error": err
+					});
+				}
+			);
+			return;
+		}
+	);
+
+	app.post('/get_tabs',
+		(req, res) => {
+
+			let query = {
+				"_id": req.body._id
+			};
+			const tabsCollection = db.collection('tabs');
+			let myPromise = tabsCollection.find(query).toArray();
+
+			myPromise.then(
+				(r) => {
+					if (r.length > 0) {
+						// console.log("tabs count = " + r[0].tabs.length);
+						res.json(r[0]);
+					} else {
+						// console.log("no job match");
+						res.json({});
+					}
+
+				},
+				(err) => {
+					console.log("tabs error: " + err);
+					res.json({
+						"error": err
+					});
+				}
+			);
+			return;
+		}
+	);
+
+	app.post('/set_tabs',
+		(req, res) => {
+			//console.log("set_tabs " + JSON.stringify(req.body.doc));
+
+			let query = {
+				"_id": req.body._id
+			};
+
+			const tabsCollection = db.collection('tabs');
+			let myPromise = tabsCollection.replaceOne(query,
+				JSON.parse(req.body.doc), {
+					upsert: true
+				});
+			myPromise.then(
+				(r) => {
+					res.json(r);
+
+				},
+				(err) => {
+					res.json({
+						"error": err
+					});
+				}
+			);
+
+			return;
+		}
+	);
 
 
 };

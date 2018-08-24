@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="utf-8">
-    
+    <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/img/favicon.ico" type="image/x-icon">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -17,7 +18,8 @@
         crossorigin="anonymous"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
         crossorigin="anonymous"></script>
-
+    <script type="application/javascript" src="/js/utilClass.js"></script>
+    <script type="application/javascript" src="/js/commonClass.js"></script>
 </head>
 
 <body>
@@ -26,34 +28,16 @@
             <p id="spin" class="rotating">
                 <i class="fas fa-spinner fa-pulse"></i>
             </p>
-            <!-- <img id="spin" src="/img/loader.gif" /> -->
             <table id="header">
                 <tr>
                     <td id="title">Upload Images</td>
                     <td id="job"></td>
-                    <td></td>
-                </tr>
-                <tr id="eftrow">
-                    <td colspan="2">
-                        <button id="edit_func_type">Edit Functions and Types</button>
-                    </td>
-                    <td>
-                        <div id="progress">
-                            <div id="progress_bar">
-                                <div class="percent"></div>
-                            </div>
-                        </div>
-                    </td>
                 </tr>
             </table>
             <!-- input table goes here -->
 
         </content>
     </div>
-    <!-- HIDDEN / POP-UP DIV -->
-    <div id="pop-up" />
-
-
     <script src="/js/upload.js"></script>
 </body>
 

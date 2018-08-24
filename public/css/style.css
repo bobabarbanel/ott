@@ -171,6 +171,7 @@ li.horiz p {
 }
 .active {
 	box-shadow: 2px 3px 0px 0px red;
+	background: lightblue;
 }
 
 #delete_action {

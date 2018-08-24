@@ -1,8 +1,8 @@
 "use strict";
-/* globals ImageViewer */
+/* globals ImageViewer, Common, Util */
 // two.js
-const COOKIE = 'chosenCookie';
-var cookieValue = "not set";
+
+
 const floatName = "#floatMenu";
 const SPACE = "&nbsp;";
 const deletedImages = {}; // tracks list of deleted images for each link
@@ -31,11 +31,6 @@ let deleteCount = 0;
 let imageShowing = -1; // an integer, no image visible
 
 $(function () {
-    // $(window).unload(function () {
-    //     cleanViews();
-    // });
-
-
 
     function offsetAnchor() {
         if (location.hash.length !== 0) {
@@ -54,37 +49,33 @@ $(function () {
     });
     $('#doDelete').on('click', deleteImages);
     $(floatName).removeClass().addClass('showfloat'); // start with menu not showing
-    $.getScript("/js/common.js")
-        .done(function ( /*script, textStatus*/ ) {
 
-            ////////////////////////////////////////////////////////////
-            cookieValue = unescape(readCookie(COOKIE));
-            let key5 = getParsedCookie();
-            $("title").text("Part " + getParsedCookie().partId);
+    let cookie = new Common(); // cookies and utilites
+    ////////////////////////////////////////////////////////////
 
-            setThisTab(2);
-            $('job').text(
-                [
-                    key5.partId, key5.pName, key5.dept, key5.op, key5.machine
-                ].join(" : ")
-            );
+    let key5 = cookie.getParsedCookie(); // an object
+    $("title").text("Part " + key5.partId);
 
-            getSpec(getParsedCookie().machine)
-                .then(machineSpecs => {
-                    getImages(SECTION, false).then((toolData) => {
-                        if (toolData.length === 0) {
-                            alert("No images available.");
-                        } else {
-                            paintPage(machineSpecs, toolData);
-                            startUp();
-                        }
-                    });
-                });
-        })
-        .fail(function ( /*jqxhr, settings, exception*/ ) {
-            console.log("getScript " + "Triggered ajaxError handler.");
+    Util.setThisTab(2);
+    $('job').text(
+        [
+            key5.partId, key5.pName, key5.dept, key5.op, key5.machine
+        ].join(" : ")
+    );
+
+    Util.getMachineSpec(cookie.getParsedCookie().machine)
+        .then(machineSpecs => {
+            getImages(cookie, SECTION, false).then((toolData) => {
+                if (toolData.length === 0) {
+                    alert("No images available.");
+                } else {
+                    paintPage(machineSpecs, toolData);
+                    startUp();
+                }
+            });
         });
 });
+
 
 function startUp() {
     $("#tab-menu-trigger").on('click',
@@ -547,9 +538,9 @@ function modeScroll(tag) {
     }
 }
 
-function hideShowFloat() {
-    $(floatName).toggleClass('showfloat');
-}
+// function hideShowFloat() {
+//     $(floatName).toggleClass('showfloat');
+// }
 
 function hideSingle() {
     $('single').hide();
@@ -568,38 +559,38 @@ function markImageDeletedForce(image, desiredState) {
     }
 }
 
-function clearDeleteSelections() {
-    deleteCount = 0;
-    $(".img-wrap").removeClass("deleting showing").addClass("transparent");
-    $(".img-wrap img").removeClass("dim");
-    setDeleteButtons('init');
-}
+// function clearDeleteSelections() {
+//     deleteCount = 0;
+//     $(".img-wrap").removeClass("deleting showing").addClass("transparent");
+//     $(".img-wrap img").removeClass("dim");
+//     setDeleteButtons('init');
+// }
 
 
-function toggleDeleteMode() {
+// function toggleDeleteMode() {
 
-    $("#deleteMenu p").text("Count: " + deleteCount);
-    if (deleteMode) { // currently in delete mode
-        $("#deleteMenu").hide();
-        $('.checkAllDel').hide();
-        if (deleteCount > 0) {
-            // undelete all deleted images
-            clearDeleteSelections(); //RMANOW
-        }
-        deleteMode = !deleteMode;
-        spaceForDeleteMenu(false);
-        setDeleteButtons('init');
-    } else { // not currently in delete mode
-        deleteMode = !deleteMode;
-        closeSingle(); // also removes blue border on .img-wrap
-        $(".pic").removeClass('highlight');
-        $("#deleteMenu").show();
-        spaceForDeleteMenu(true);
-        $('.checkAllDel').show();
-        setDeleteButtons('running');
-    }
+//     $("#deleteMenu p").text("Count: " + deleteCount);
+//     if (deleteMode) { // currently in delete mode
+//         $("#deleteMenu").hide();
+//         $('.checkAllDel').hide();
+//         if (deleteCount > 0) {
+//             // undelete all deleted images
+//             clearDeleteSelections(); //RMANOW
+//         }
+//         deleteMode = !deleteMode;
+//         spaceForDeleteMenu(false);
+//         setDeleteButtons('init');
+//     } else { // not currently in delete mode
+//         deleteMode = !deleteMode;
+//         closeSingle(); // also removes blue border on .img-wrap
+//         $(".pic").removeClass('highlight');
+//         $("#deleteMenu").show();
+//         spaceForDeleteMenu(true);
+//         $('.checkAllDel').show();
+//         setDeleteButtons('running');
+//     }
 
-}
+// }
 
 function flipImgDelState(image) {
     image.toggleClass("dim");
@@ -1106,8 +1097,8 @@ function dbUpdateImageComment(img) {
 //     });
 // }
 
-function getImages(tab, archived) {
-    var key = getParsedCookie();
+function getImages(cookie, tab, archived) {
+    var key = cookie.getParsedCookie();
     let data = {
         "key": key,
         "tab": tab,

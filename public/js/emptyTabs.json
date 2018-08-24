@@ -1,0 +1,17 @@
+{
+    "_id": "TBD",
+    "user": "unknown",
+    "tabs": [{
+            "tabname": "A New Tab",
+            "sections": [{
+                "sectionName": "New Tab 1st Section",
+                "steps": [
+                    "A New 1st Step"
+                ]
+
+            }]
+
+        }
+
+    ]
+}
