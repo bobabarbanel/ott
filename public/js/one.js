@@ -5,7 +5,7 @@
 const SECTION = 'Tools';
 
 $(function () {
-    
+
     ////////////////////////////////////////////////////////////
     let common = new Common();
     var key5 = common.getParsedCookie();
@@ -19,20 +19,28 @@ $(function () {
             key5.partId, key5.pName, key5.dept, key5.op, key5.machine
         ].join(" : ")
     );
-    $(".floatButton").hide();
-    $("#tab-menu-trigger").on('click',
-        () => $("#topbar-menu").show()
-    );
+
+
     Util.getMachineSpec(key5.machine)
         .then(machineSpecs => {
             Util.getSheetTags(common.getParsedCookie(), SECTION).then((toolData) => {
                 paintPage(machineSpecs, toolData);
+                startUp();
             });
         });
+
     ////////////////////////////////////////////////////////////
 });
 
+function startUp() {
+    $("#tab-menu-trigger").on('click',
+                    () => $("#topbar-menu").show()
+                );
+}
 
+function hideShowFloat() { // KEEP THIS! called frop HTML tabs.html
+    $('.floatButton').toggleClass('showfloat');
+}
 
 function genLinkObj(tDoc) {
     return [tDoc.turret, tDoc.position, tDoc.spindle, tDoc.offset].join('_');
@@ -123,7 +131,7 @@ function doRows(specs, turret, spindle, table, haves) {
 }
 
 // function getSheetTags(keyObj, tab) {
-   
+
 //     return new Promise((resolve, reject) => {
 //         $.ajax({
 //                 url: "/sheetTags",

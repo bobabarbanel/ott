@@ -32,8 +32,6 @@ let imageShowing = -1; // an integer, no image visible
 
 $(function () {
     
-    $(".deleteButton").on('click', toggleDeleteMode);
-    $(".floatButton").on('click', hideShowFloat);
 
     function offsetAnchor() {
         if (location.hash.length !== 0) {
@@ -99,6 +97,10 @@ function startUp() {
         return false;
     });
 
+    
+    $(".deleteButton").on('click', toggleDeleteMode);
+    $(".floatButton").on('click', hideShowFloat);
+
     spaceForDeleteMenu(false);
 }
 
@@ -113,21 +115,21 @@ function scrollerAction() {
     } else {
         target = $('html');
     }
-    if (deleteMode || wideScreen()) {
+    //if (deleteMode || wideScreen()) {
         $('html, body').animate({
             scrollTop: target.offset().top - 100
         }, 500);
-    }
+    //}
     // is next functionality wanted??
-    if (!deleteMode) {
-        if (this.hash.split('_').length === 4) {
-            $('#pic' + this.hash.substr(1))
-                .find('pitems > div')
-                .first()
-                .find('img')
-                .trigger('click');
-        }
-    }
+    // if (!deleteMode) {
+    //     if (this.hash.split('_').length === 4) {
+    //         $('#pic' + this.hash.substr(1))
+    //             .find('pitems > div')
+    //             .first()
+    //             .find('img')
+    //             .trigger('click');
+    //     }
+    // }
     return false;
 }
 
@@ -460,6 +462,7 @@ function paintPage(toolSpecs, toolData) {
     let dash = /-/;
     let prev = '';
     let icon = '<span><i class="fab fa-steam-symbol" style="color:yellow"></i>&nbsp;&nbsp;</span>';
+    
     links.forEach(
         link => {
             if (dash.test(link[0])) { // start (possibly end) ul
