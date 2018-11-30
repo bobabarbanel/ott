@@ -2,15 +2,20 @@
 /* globals Common, Util */
 // upload.js
 
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///// WARNING - concurrency -- adding files to Tools for a job needs to be made to allow multiple users to update in parallel !!!
+Currently - a single user effectively holds onto the entire tols file set during this page's lifetime. No check on that.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
 const SECTION = "Tools";
 
-var debug = false;
+// var debug = false;
 
-function debugLog(text) {
-    if (debug) {
-        console.log(text);
-    }
-}
+// function debugLog(text) {
+//     if (debug) {
+//         console.log(text);
+//     }
+// }
 const common = new Common();
 const key4id = common.getKey4id();
 
@@ -132,7 +137,7 @@ function paintPage(machineSpecs, toolData) {
 
     function doRows(specs, turretStr, spindleStr, table, haves) {
 
-        debugLog([turretStr, spindleStr].join(" : "));
+        //debugLog([turretStr, spindleStr].join(" : "));
         groupSeparator(table);
         let tr = $('<tr class="greyrow"/>');
         tr.append($('<th class="digit"/>').text(turretStr));
@@ -187,7 +192,7 @@ function paintPage(machineSpecs, toolData) {
             }
 
             // Files Uploading Actuator
-            let u_input = $('<input class="fileUpload" type="file" name="uploads[]" multiple/>');
+            let u_input = $('<input class="fileUpload" type="file" name="uploads[]" accept="image/jpg" multiple/>');
 
             u_input.attr("id", idStr(link, "upload"));
 
@@ -241,14 +246,6 @@ function paintPage(machineSpecs, toolData) {
         }
     }
 
-    // function sleep(milliseconds) {
-    //     var start = new Date().getTime();
-    //     for (var i = 0; i < 1e7; i++) {
-    //       if ((new Date().getTime() - start) > milliseconds){
-    //         break;
-    //       }
-    //     }
-    //   }
 
     let polling;
 
@@ -280,8 +277,7 @@ function paintPage(machineSpecs, toolData) {
                     }
                 })
             .fail((request, status, error) => {
-                debugger;
-                alert("checkProgress failure: " + error)
+                alert("checkProgress failure: " + error);
             });
     }
 
@@ -292,7 +288,7 @@ function paintPage(machineSpecs, toolData) {
             $('#progress').css('background', '#33B8FF').html("Uploading:&nbsp;Complete");
             setTimeout(() => {
                 $('#progress').html("Now Processing Images");
-                checkProgress();
+                checkProgress(key4id);
                 polling = setInterval(checkProgress, 500, key4id);
             }, 700);
 
@@ -315,6 +311,7 @@ function paintPage(machineSpecs, toolData) {
 
 
     function fileUpload() {
+        
         let cell = $(this).parent();
 
         $('#spin').show();

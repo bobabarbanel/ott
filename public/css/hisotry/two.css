@@ -1,0 +1,422 @@
+container {
+    width: 100%;
+    /* padding-top: 30px; */
+    padding-right: 20px;
+    padding-bottom: 0;
+    padding-left: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+}
+
+one {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 1em;
+    width: 40%;
+    
+    justify-content: flex-start;
+    flex-direction: column;
+    /* background: pink; */
+}
+
+.headtext {
+    background: rgb(240, 220, 194);
+}
+
+job {
+    font-size: 1em;
+    font-weight: bold;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    margin-top: 25px;
+}
+
+content {
+    width: 100%;
+}
+
+/* #undoMenu, #Fullscreen {
+    display: none;
+} */
+
+/* #Fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(70,70,70,0.7);
+    justify-content: center;
+    cursor: zoom-out;
+} */
+
+#tadiv {
+    display: none;
+}
+
+#deleteMenu {
+    position: fixed;
+    top: 70px;
+    right: 100px;
+    display: none;
+    background: tan;
+    border-radius: 25px;
+    padding: 20px
+}
+
+#deleteMenu p {
+    font-weight: bold;
+    text-align: center;
+    border-radius: 25px;
+}
+
+#deleteMenu button {
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1px solid black;
+    /* background: grey; */
+}
+
+#undoDelete {
+    background: rgb(159, 217, 235);
+    color: rgb(31, 3, 95);
+    font-weight: bold;
+}
+
+#floatMenu {
+    position: fixed;
+    top: 70px;
+    right: 30px;
+    background: rgb(170, 194, 201);
+    padding-right: 10px;
+}
+
+#floatMenu ul {
+    margin-left: -20px;
+    list-style-type: none;
+    color: white;
+}
+
+#floatMenu ul a {
+    color: white;
+    background: rgb(52, 76, 83);
+}
+
+#floatMenu ul a:hover {
+    background: rgb(2, 88, 2);
+    /* border: 1px solid yellow; */
+}
+
+#floatMenu li {
+    color: white;
+    background: rgb(52, 76, 83);
+    border: 1px solid black;
+    padding-bottom: 2px;
+}
+
+#floatMenu li:hover {
+    background: green;
+    border: 1px solid yellow;
+}
+
+#floatMenu a:link {
+    text-decoration: none;
+}
+
+.showfloat {
+    display: none;
+}
+
+#floatMenu ul>a.floathead {
+    background: rgb(22, 97, 22);
+}
+
+single {
+    position: fixed;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    width: 100%;
+}
+
+single tsHead {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin: 25px 0 10px 0;
+    align-items: center;
+    flex-flow: row nowrap;
+}
+
+#tsSection {
+    text-overflow: ellipsis;
+    font-weight: bold;
+    font-size: 120%;
+    margin-left: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+singleFlexR {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+singleFlexC {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+#out-single.comment {
+    border: 1px solid blue;
+    height: 500px;
+    width: 300px;
+}
+
+pictures {
+    width: 100%;
+}
+
+div.img-wrap {
+    text-align: center;
+}
+
+.delList {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background: rgb(250, 250, 207);
+    margin-bottom: 20px;
+}
+
+.taedit {
+    width: 80%;
+}
+
+.delList img {
+    padding: 5px;
+}
+
+.close {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 128px;
+    transform: translate(-50%, -50%);
+}
+
+.red {
+    border: 1px inset red;
+}
+
+pitems {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    /* max-width:40%; */
+    flex-direction: row;
+    border-bottom: 1px solid black;
+}
+
+.pic {
+    border: 20px;
+    background: white;
+    color: #222;
+}
+
+.highlight {
+    background: rgb(240, 240, 131);
+}
+
+.ckbx {
+    position: relative;
+    top: -39px;
+    right: -16px;
+    cursor: pointer;
+    transform: scale(1.2);
+    z-index: 500;
+}
+
+.transparent {
+    border: 3px solid transparent;
+}
+
+.deleting {
+    border: 3px solid red;
+}
+
+.showing {
+    border: 3px solid blue;
+}
+
+two {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+    margin-top: 10px;
+    /* background: yellow; */
+}
+
+single {
+    margin-left: 3em;
+}
+
+#img-gallery {
+    margin-top: 1em;
+}
+
+#tab-menu-trigger {
+    display: none;
+}
+
+#topbar-menu {
+    padding: 10px;
+    width: 20%;
+    list-style: none;
+    display: none;
+    background: #F1F1F1;
+    position: fixed;
+    z-index: 900;
+    top: 10px;
+    left: 10px;
+    border: 2px solid black;
+}
+
+#topbar-menu li {
+    margin-left: 10px;
+    border: 1px solid silver;
+}
+
+buttons {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 900;
+}
+
+button.floatButton {
+    background: blue;
+    color: white;
+}
+
+div.img-wrap.redborder {
+    border-color: red;
+}
+
+.dim {
+    opacity: 0.3
+}
+
+#delButtons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.img-wrap img {
+    cursor: pointer;
+}
+
+.scroller {
+    display: block;
+}
+#out_single {
+    position: relative;
+    top: 25px;
+}
+#out_single span {
+    position: absolute;
+    z-index: 99;
+}
+.direction {
+    cursor: pointer;
+    color:rgba(252, 252, 252, 0.8);;
+}
+#expand {
+    top: 0px;
+    left: 2px;
+    cursor: zoom-in;
+    color: yellow;
+}
+
+#left {  
+    left: -2px;
+}
+#right {
+    right: -2px;  
+}
+#up {
+    top: -18px;
+}
+#down {
+    bottom: -10px;
+}
+
+#out_single {
+    margin-top: -32px;
+    display: inline-block;
+}
+.wide {
+    display: none;
+}
+
+#taedit {
+    height: 200px;
+}
+#edit-popup {
+    position: absolute;
+    top: 500;
+    left: 400;
+    z-index: 300;
+}
+.floatlink {
+    display:flex;
+    /* justify-content: space-between; */
+    
+}
+.floattag {
+    width: 4.5ecommentm;
+}
+
+
+
+@media screen and (max-width: 1225px) {
+
+    #tab-menu-trigger {
+        display: block;
+    }
+    #topbar {
+        display: none;
+    }
+    single {
+        position: relative;
+    }
+    container {
+        flex-direction: column;
+    }
+    two {
+        order: 0;
+        margin-top: 30px;
+    }
+    one {
+        order: 1;
+        width: 100%;
+    }
+    #deleteMenu {
+        position: fixed;
+        top: 20px;
+        left: 100px;
+        width: 340px;
+    }
+}

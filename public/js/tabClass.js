@@ -1,4 +1,4 @@
-"use stict";
+"use strict";
 /*exported Job, Tab, Section, Step */
 
 class Job {
@@ -125,11 +125,16 @@ class Section {
 }
 
 class Step {
-    constructor(stepName) {
-        this.stepName = stepName + "";
+    constructor(stepObj) {
+        this.stepName = stepObj.stepName + ""; // make sure it's a string
+        this.images_id = stepObj.images_id;
     }
+    
     getStepName() {
         return this.stepName;
+    }
+    getImagesId() {
+        return this.images_id;
     }
     toString(lead) {
         lead = (lead === undefined) ? "" : lead;

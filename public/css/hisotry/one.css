@@ -1,0 +1,132 @@
+body {
+    background: rgb(138, 170, 172);
+}
+container {
+    position: absolute;
+    width: 100%;
+    left: 1em;
+    top: 2.8em;
+}
+
+content {
+    width: 80%;
+}
+.caret {
+    color: rgb(175, 111, 14);
+    font-size: 30px;
+    cursor: ns-resize;
+}
+.tabouter{
+    display: flex;
+    align-items: flex-start;
+    margin-top: 20px;
+    border-top: 4px solid green;
+    margin-left: 2em;
+    width: 60%;
+}
+.tabdiv{
+    display: flex;
+    align-items: baseline;
+}
+.toolouter {
+    display: flex;
+    align-items: flex-start;
+    border-top: 4px solid green;
+    margin-left: 2em;
+    width: 60%;
+}
+.tooldiv {
+    display: flex;
+    align-items: baseline;
+}
+
+.left {
+    text-align: center;
+    width: 20px;
+}
+
+.digit {
+    text-align: center;
+    width: 70px;
+}
+.stepcol {
+    text-align: left;
+    width: 70px;
+}
+
+/* toolTable */
+.toolTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-left: 2em;
+    margin-top: 1em;
+    border: 2px solid lightgreen;
+}
+
+.toolTable, .toolTable th, .toolTable td {
+    border: 1px solid black;
+    text-align: center;
+}
+
+.toolTable tr.colnames {
+    background-color: lightgreen;
+}
+
+.toolTable tr.greyrow {
+    background-color: grey;
+}
+
+.toolTable tr.greyrow th {
+    color: white;
+    width: 100px;
+}
+
+.toolTable tr.slightgrey {
+    background-color: #EEEEEE;
+}
+
+.toolTable tr.nogrey {
+    background-color: white;
+}
+
+.toolTable td.left a:link {
+    text-decoration: none;
+}
+
+
+
+/* tabUL */
+
+.tabUL {
+    background: white;
+    width: 60%;
+    margin-left: 2em;
+    border: 2px solid lightgreen;
+}
+.sectionRow {
+    background-color: #EEEEEE;
+}
+.stepRow {
+    background: #CCCCCC;
+}
+
+/*********/
+
+pageheader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 60%;
+}
+
+
+.floatButton, .deleteButton {
+    display: none;
+}
+
+.jobTitle {
+    margin-left: 2em;
+}
+.tablink, .sectionlink, .steplink {
+    cursor: pointer;
+}

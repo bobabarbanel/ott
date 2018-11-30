@@ -63,8 +63,8 @@ $(function () {
         } else {
             let newPromises = nowNew.map(link => updateFT(evMod[link], true));
             let oldPromises = old.map(link => updateFT(evMod[link], false));
-            alert("new " + newPromises.length);
-            alert("old " + oldPromises.length);
+            // alert("new " + newPromises.length);
+            // alert("old " + oldPromises.length);
             Promise.all(newPromises.concat(oldPromises)).then(
                 complete => {
                     if (!complete[0].status) {

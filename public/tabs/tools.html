@@ -1,0 +1,88 @@
+<!doctype html>
+<!-- 2.html -->
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>General</title>
+    <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+        crossorigin="anonymous"></script>
+    <link href="/ImageViewer-master/imageviewer.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+        crossorigin="anonymous"></script>
+
+    <script src="/ImageViewer-master/imageviewer_load_fix_113.js"></script>
+    <!-- <script src="/ImageViewer-master/imageviewer.js"></script> -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+
+    <script type="application/javascript" src="/js/utilClass.js"></script>
+    <script type="application/javascript" src="/js/commonClass.js"></script>
+    <script type="application/javascript" src="/js/linkGroupClass.js"></script>
+    <script type="application/javascript" src="/js/tabValuesClass.js"></script>
+
+    <link rel="stylesheet" href="/css/tools.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+    <div class="navDropDownButton"></div>
+    <navDropDown></navDropDown>
+    <div class="topnav" id="myTopnav"></div>
+    <container>
+        <one>
+            <div id="deleteMenu" class="showFloat">
+                <div id="delInfo">
+                    <img src="/img/notdeleting.jpg" width="20px" />
+                    <span>Click Image to Mark for Deletion</span>
+                    <img src="/img/deleting.jpg" width="20px" />
+                </div>
+                <p id="delCount"></p>
+                <div id="delButtons">
+                    <button id="doDone">Done</button>
+                    <button id="doClear">Clear</button>
+                    <button id="doDelete">Delete Images</button>
+                    <button id="undoDelete">
+                        <i class="fas fa-undo" style="color:red"></i>&nbsp;Undo Delete
+                    </button>
+                </div>
+            </div>
+            <job>
+            </job>
+            <content>
+                <pictures></pictures>
+            </content>
+        </one>
+        <two>
+            <single>
+                <tshead>
+                    <div id="tsinfo"></div>
+                    <div id="tsSection">
+                    </div>
+                </tshead>
+                <singleImg></singleImg>
+
+            </single>
+        </two>
+        <!-- <three></three> -->
+    </container>
+
+    <div id="floatMenu">
+
+    </div>
+
+
+    <script src="/js/tools.js"></script>
+
+    </div>
+</body>
+
+</html>

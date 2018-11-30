@@ -81,7 +81,6 @@ td.disabled {
     display: none;
 }
 
-
 span.popup {
     font-size: 80%;
     color: blue;
@@ -90,9 +89,7 @@ span.popup {
 }
 
 .stripes {
-    background: repeating-linear-gradient( 45deg, #ae60bc, 
-    #ae60bc 5px, #5d3364 5px, 
-    #5d3364 10px);
+    background: repeating-linear-gradient( 45deg, #ae60bc, #ae60bc 5px, #5d3364 5px, #5d3364 10px);
     background-size: 200% 200%;
     animation: barberpole 4s linear infinite;
 }
@@ -146,7 +143,6 @@ span.popup {
     color: red;
 }
 
-
 #percent {
     font-weight: bold;
     text-align: center;
@@ -197,9 +193,9 @@ tr.colnames th {
 table #eftrow {
     height: 0.5em;
     border-bottom: 0.5em;
-    
 }
-table #eftrow > td {
+
+table #eftrow>td {
     border-color: transparent;
 }
 
@@ -229,6 +225,7 @@ table #eftrow > td {
     background: transparent;
     width: 100px;
 }
+
 tr.eftrow {
     border: none;
 }

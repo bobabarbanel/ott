@@ -2,14 +2,14 @@ body {
     background: lightblue;
 }
 
-#job, #top {
+
+
+
+#job,
+#top {
     display: block;
-    /* width: 500px; */
     font-size: 1.17em;
-    margin-top: 1em;
-    margin-bottom: 2em;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 1em;
     font-weight: bold;
     border: 30px;
 }
@@ -20,12 +20,17 @@ body {
 }
 
 .jobul {
-    padding: 30px;
-    margin-left: 30px;
+    padding: 20px;
+    width: 500px;
+    background: rgb(245, 241, 241);
+}
+input {
+    width: 225px;
 }
 
 #top {
-    width: 700px;
+    display: flex;
+    align-items: center;
 }
 
 ul {
@@ -33,17 +38,15 @@ ul {
     background: white;
 }
 
+.tabsep {
+    height: 15px;
+}
+
 .ui-state-default {
-    background: white;
     border: 0 solid transparent;
 }
 
-.jobul {
-    width: 450px;
-}
-
-li.tabname {
-    border: 2px solid grey;
+li.tabame {
     width: 90%;
     position: relative;
     left: 0.3em;
@@ -54,42 +57,50 @@ li.tabname {
 .sectionul {
     background: #eeeeee;
 }
+
 li.sectionname {
     background: #eeeeee;
 }
 
-
 li.sectionname {
-    border: 2px solid grey;
     width: 80%;
 }
 
 li.stepname {
-    border: 2px solid grey;
     width: 95%;
 }
 
-li.tabname.ui-sortable-helper, li.sectionname.ui-sortable-helper, li.stepname.ui-sortable-helper {
-    border: 2px solid red;
-    background: pink;
+li.ui-sortable-handle {
+    border: 2px solid rgb(128, 128, 128);
+    margin: 3px 0 3px 0;
 }
 
-
+li.tabname.ui-sortable-handle {
+    border: 5px solid #33B8FF;
+    margin: 8px 0 3px 0;
+}
 
 .dflex {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: rgb(224, 222, 222);
 }
+
 .dflexempty {
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
 
-.tabname, .stepname, .sectionname {
-    margin: 3px 0 3px 0;
+.dflexnull {
+    /* Todo: do we need this ?? */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
+
+
 
 .sectionname {
     margin-bottom: 10px;
@@ -99,9 +110,7 @@ li.tabname.ui-sortable-helper, li.sectionname.ui-sortable-helper, li.stepname.ui
     margin-top: 10px;
 }
 
-li {
-    background: yellow;
-}
+
 
 .trash {
     font-size: 14px;
@@ -123,104 +132,50 @@ li {
     border: none;
     margin-right: 10px;
 }
+
 .adddiv {
     width: 15%;
     text-align: center;
 }
+
 .addcircle {
     position: relative;
     z-index: 200;
     font-size: 16px;
     cursor: pointer;
-    /* text-align: center; */
     text-decoration: none;
     outline: none;
     color: yellow;
     border: none;
-    /* margin-left: 10px; */
 }
-
 
 li.deleted {
     display: none;
 }
 
-.button {
+#save_button {
     margin-left: 30px;
-    /* display: inline-block; */
     text-decoration: none;
     color: #fff;
-    font-weight: bold;
     background-color: #538fbe;
     padding: 10px 20px;
     font-size: 16px;
-    border: 1px solid #2d6898;
-    /* background-image: linear-gradient(bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
-    background-image: -o-linear-gradient(bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
-    background-image: -moz-linear-gradient(bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
-    background-image: -webkit-linear-gradient(bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
-    background-image: -ms-linear-gradient(bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%); */
-    /* background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, rgb(73,132,180)),
-		color-stop(1, rgb(97,155,203))
-	); */
-    /* -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    text-shadow: 0px -1px 0px rgba(0, 0, 0, .5);
-    -webkit-box-shadow: 0px 6px 0px #2b638f, 0px 3px 15px rgba(0, 0, 0, .4), inset 0px 1px 0px rgba(255, 255, 255, .3), inset 0px 0px 3px rgba(255, 255, 255, .5);
-    -moz-box-shadow: 0px 6px 0px #2b638f, 0px 3px 15px rgba(0, 0, 0, .4), inset 0px 1px 0px rgba(255, 255, 255, .3), inset 0px 0px 3px rgba(255, 255, 255, .5);
-    box-shadow: 0px 6px 0px #2b638f, 0px 3px 15px rgba(0, 0, 0, .4), inset 0px 1px 0px rgba(255, 255, 255, .3), inset 0px 0px 3px rgba(255, 255, 255, .5);
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
-    -webkit-transform: rotateX(20deg); */
+    border: 1px solid #163853;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.button:hover {
-    /* background-image: linear-gradient(bottom, rgb(79, 142, 191) 0%, rgb(102, 166, 214) 100%);
-    background-image: -o-linear-gradient(bottom, rgb(79, 142, 191) 0%, rgb(102, 166, 214) 100%);
-    background-image: -moz-linear-gradient(bottom, rgb(79, 142, 191) 0%, rgb(102, 166, 214) 100%);
-    background-image: -webkit-linear-gradient(bottom, rgb(79, 142, 191) 0%, rgb(102, 166, 214) 100%);
-    background-image: -ms-linear-gradient(bottom, rgb(79, 142, 191) 0%, rgb(102, 166, 214) 100%); */
-    /* background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, rgb(79,142,191)),
-		color-stop(1, rgb(102,166,214))
-    ); */
+#save_button:hover,
+#save_button:active {
     background: blue;
 }
 
-/* .button:active {
-    -webkit-box-shadow: 0px 2px 0px #2b638f, 0px 1px 6px rgba(0, 0, 0, .4), inset 0px 1px 0px rgba(255, 255, 255, .3), inset 0px 0px 3px rgba(255, 255, 255, .5);
-    -moz-box-shadow: 0px 2px 0px #2b638f, 0px 1px 6px rgba(0, 0, 0, .4), inset 0px 1px 0px rgba(255, 255, 255, .3), inset 0px 0px 3px rgba(255, 255, 255, .5);
-    box-shadow: 0px 2px 0px #2b638f, 0px 1px 6px rgba(0, 0, 0, .4), inset 0px 1px 0px rgba(255, 255, 255, .3), inset 0px 0px 3px rgba(255, 255, 255, .5);
-    background-image: linear-gradient(bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
-    background-image: -o-linear-gradient(bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
-    background-image: -moz-linear-gradient(bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
-    background-image: -webkit-linear-gradient(bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
-    background-image: -ms-linear-gradient(bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
-    background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, rgb(88,154,204)),
-		color-stop(1, rgb(90,150,199))
-	); 
-    -webkit-transform: translate(0, 4px) rotateX(20deg);
-    -moz-transform: translate(0, 4px);
-    transform: translate(0, 4px);
-} */
-
-.empty { /* for add a tab, and add a step */
+.empty {
+    /* for add a tab, and add a step */
     background: grey;
 }
-li.sectionname.empty { /* for add a section */
+
+li.sectionname.empty {
+    /* for add a section */
     background: grey;
 }
 
@@ -229,21 +184,18 @@ input.tabstyle {
     font-size: 18px;
     color: red;
     margin-left: -50px;
-    /* width: 250px; */
 }
 
 input.sectionstyle {
     font-weight: bold;
     font-size: 16px;
     color: rgb(35, 110, 103);
-    /* width: 150px; */
     margin-left: -20px;
 }
 
 input.stepstyle {
     font-weight: bold;
     font-size: 14px;
-    /* width: 100px; */
     color: blue;
 }
 
@@ -251,8 +203,120 @@ input.stepstyle {
     width: 85%;
 }
 
-.newJob { 
+.newJob {
     color: red;
     font-weight: bold;
     font-size: 24px;
 }
+
+::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: red;
+    opacity: 1;
+    /* Firefox */
+}
+
+:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: red;
+}
+
+::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: red;
+}
+
+.indent {
+    margin-left: 1.5em;
+}
+
+
+.text {
+    background-color: rgb(0, 255, 21);
+    font-size: 12px;
+    padding: 4px;
+}
+
+.pagetitle {
+    font-size: 24px;
+    margin-right: 1em;
+}
+
+#job {
+    margin-left: 2em;
+}
+hr {
+    width: 92%;
+    padding: 0 1em 0 1em;
+}
+start {
+    display: flex;
+    margin-bottom: 1em;
+    align-items: center;
+    align-content: flex-start;
+}
+spin {
+    font-size: 54px;
+    color: red;
+}
+
+/* navigation */
+nav {
+    display: flex;
+    align-items: center;
+    align-content: flex-start;
+    margin-left: 1.5em;
+    width: 700px;
+    height: 40px;
+    background: tan;
+}
+
+.nav.anchor img {
+    height: 28px;
+}
+
+.navCell {
+    position: relative;
+    width: 25%;
+}
+
+
+.navButton {
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+    cursor: pointer;
+    height: 30px;
+}
+
+
+#home_button img {
+    height: 30px;
+    vertical-align: middle;
+}
+
+
+#home_button {
+    /* uses image */
+    background: transparent;
+    border: transparent;
+}
+
+#tabupload_button {
+    background: white;
+}
+
+#tabupload_button:hover {
+    background: rgb(0, 255, 21);
+}
+
+#run {
+    background: white;
+    color: black;
+}
+
+#run:hover {
+    background: blue;
+    color: white;
+}
+

@@ -5,6 +5,7 @@
 
 const floatName = "#floatMenu";
 const SPACE = "&nbsp;";
+const SPACE2 = SPACE + SPACE;
 const deletedImages = {}; // tracks list of deleted images for each link
 const allImgWraps = []; // array of objects, {wrap: the imgWrap jq object, deleted: boolean}
 const lgp = [];
@@ -31,7 +32,7 @@ let deleteCount = 0;
 let imageShowing = -1; // an integer, no image visible
 
 $(function () {
-    
+
 
     function offsetAnchor() {
         if (location.hash.length !== 0) {
@@ -57,7 +58,7 @@ $(function () {
     let key5 = cookie.getParsedCookie(); // an object
     $("title").text("Part " + key5.partId);
 
-    Util.setThisTab(2);
+    //Util.setThisTab(2);
     $('job').text(
         [
             key5.partId, key5.pName, key5.dept, key5.op, key5.machine
@@ -97,7 +98,7 @@ function startUp() {
         return false;
     });
 
-    
+
     $(".deleteButton").on('click', toggleDeleteMode);
     $(".floatButton").on('click', hideShowFloat);
 
@@ -116,9 +117,9 @@ function scrollerAction() {
         target = $('html');
     }
     //if (deleteMode || wideScreen()) {
-        $('html, body').animate({
-            scrollTop: target.offset().top - 100
-        }, 500);
+    $('html, body').animate({
+        scrollTop: target.offset().top - 100
+    }, 500);
     //}
     // is next functionality wanted??
     // if (!deleteMode) {
@@ -346,8 +347,8 @@ function paintPage(toolSpecs, toolData) {
 
             let text = item.position + '-' + item.offset + ") " +
                 item.function+":  " + item.type;
-            let linkText = item.position + '-' + item.offset + ") " +
-                item.function;
+            let tag = item.position + '-' + item.offset;
+
 
             if (currentTurret !== item.turret || currentSpindle !== item.spindle) {
                 let headText = "Turret" + item.turret + " " + "Spindle" + item.spindle;
@@ -355,9 +356,7 @@ function paintPage(toolSpecs, toolData) {
 
                 let anchor = $('<a class="anchor head" id="' + headLink + '"/>');
                 pictures.append(anchor);
-                pictures.append(
-                    $('<div class="headtext"/>').text(headText)
-                );
+                pictures.append($('<div class="headtext"/>').text(headText));
 
                 links.push(['#' + headLink, headText]);
                 // set current values so can detect need for next UL on change
@@ -365,7 +364,7 @@ function paintPage(toolSpecs, toolData) {
                 currentSpindle = item.spindle;
             }
 
-            links.push(['#' + link, linkText]); // -- Jeff request to drop type
+            links.push(['#' + link, item.function, tag]); // -- Jeff request to drop type
             let anchor = $('<a class="anchor" id="' + link + '"/>');
             pictures.append(anchor);
             let pic = $('<div class="pic" id="pic' + link + '" collection="' + _id + '">');
@@ -376,12 +375,12 @@ function paintPage(toolSpecs, toolData) {
                 '<button class="checkAllDel" type="button">' +
                 '&#10004; All</button>';
 
-            p.html(buttonHTML + " &nbsp;&nbsp;" + text);
+            p.html(buttonHTML + " " + SPACE2 + text);
 
 
             div.append(p);
             let pItems = $('<pItems/>');
-            let count = 0;
+            //let count = 0;
             if (item.files.length > 0) {
                 item.files.forEach(
                     (path, index) => {
@@ -421,7 +420,7 @@ function paintPage(toolSpecs, toolData) {
                         };
                         maxImageShowing++;
 
-                        count = index + 1;
+                        //count = index + 1;
                         idiv.append(img);
                         // img.mouseover((e) =>
                         //     console.log($(e.target).attr('sequence')));
@@ -440,7 +439,7 @@ function paintPage(toolSpecs, toolData) {
                 div.append(pItems);
                 pictures.append(pic);
             } else {
-                div.append($("<p>&nbsp;&nbsp;No Images</p>"));
+                div.append($("<p>" + SPACE2 + "No Images</p>"));
                 pictures.append(div);
             }
 
@@ -458,11 +457,12 @@ function paintPage(toolSpecs, toolData) {
     $("pictures img").on("click", imgClick);
 
     // build floating menu
-    let float = $(floatName);
+    let float = $(floatName).empty();
     let dash = /-/;
     let prev = '';
-    let icon = '<span><i class="fab fa-steam-symbol" style="color:yellow"></i>&nbsp;&nbsp;</span>';
-    
+    let icon = '<span><i class="fab fa-steam-symbol" style="color:yellow"></i>' + SPACE2 + '</span>';
+
+    // contruct flotmenu - links to sections of page
     links.forEach(
         link => {
             if (dash.test(link[0])) { // start (possibly end) ul
@@ -470,12 +470,14 @@ function paintPage(toolSpecs, toolData) {
                     let endUl = $('</ul>');
                     float.append(endUl);
                 }
+
                 let a1 = $('<a class="floathead scroller" href="' + link[0] + '">').html(icon + link[1]);
-                prev = $('<ul />').append(a1);
+                prev = $('<ul class="floatgroup"/>').append(a1);
                 a1.on('click', scrollerAction);
                 float.append(prev);
             } else {
-                let a2 = $('<a class="scroller" href="' + link[0] + '">').text(link[1]);
+                let line = '<div class="floatlink"><div class="floattag">' + SPACE + link[2] + SPACE2 + '</div><div>' + link[1] + SPACE2 + '</div></div>';
+                let a2 = $('<a class="scroller" href="' + link[0] + '">').html(line);
                 a2.on('click', scrollerAction);
                 prev.append($('<li/>').append(a2));
             }
@@ -489,7 +491,7 @@ function delSelectAll(e) {
     // let boxes = $('#pic' + link).find('.ckbx');
     let html = '';
     if ($(this).html().includes('un')) {
-        html = ' &nbsp;&nbsp;';
+        html = ' ' + SPACE2;
         markGroup(link, false); // undelete group
     } else {
         html = 'un';
@@ -573,7 +575,7 @@ function clearDeleteSelections() {
 }
 
 
-function toggleDeleteMode() {  // KEEP THIS! called frop HTML tabs.html
+function toggleDeleteMode() { // KEEP THIS! called frop HTML tabs.html
 
     $("#deleteMenu p").text("Count: " + deleteCount);
     if (deleteMode) { // currently in delete mode
@@ -672,20 +674,16 @@ function do_once() {
     up.css('left', "50%");
 
     // comment field
-    let commentP = $('<textarea id="commentta" class="comment"></textarea>');
+    let commentP = $('<textarea id="commentta" class="comment"></textarea>'); // <button id="editcomment">Edit Comment</button></div>');
 
     let single_pannable = $('<img id="pannable-image"></img>');
     // containers
     in_single
         .append(single_pannable);
+
     out_single
-        .append(in_single);
-    out_single
-        .append(expand)
-        .append(left)
-        .append(right)
-        .append(down)
-        .append(up);
+        .append(in_single, expand, left, right, down, up);
+
     // <br> will be displayed OR not depending on orientation of image
     let br = $('<br id="singlebreak"/>');
     $("singleImg").append(out_single, br, commentP).css('display', 'block');
@@ -714,7 +712,7 @@ function loadViewer(viewer, small, large) {
 }
 
 function imgClick() { // when small image clicked to show larger image
-
+    $('single textarea').off('click');
     let prev = hideSingle(); // prev holds the title string from last single image shown
     $(".pic").removeClass('highlight'); // un-highlight any previous image
 
@@ -739,8 +737,9 @@ function showSingleLargeImage(this_img, prev) {
     // set title information
     $("#tsinfo")
         .html("Turret" + SPACE + this_img.attr("turret") +
-            SPACE + SPACE + SPACE + "Spindle" +
+            SPACE2 + SPACE + "Spindle" +
             SPACE + this_img.attr("spindle"));
+
     let txt = "Tool " + this_img.attr("tag") + ") " + this_img.attr("alt");
     $("#tsSection").html(txt);
     if (prev !== txt) { // if changed, show orange background for 1 second
@@ -767,19 +766,17 @@ function showSingleLargeImage(this_img, prev) {
         $('#singlebreak').removeClass('wide'); // showing <br>
     }
 
-    $('#commentta').html(this_img.attr("comment"))
+    let single_pannable = $('#pannable-image');
+    let shortened = $(window).height() * 0.85;
+    let commentP = $("single textArea").html(this_img.attr("comment"))
         .on("click",
             null, {
                 img: this_img, // has _id, filename and dir
                 collection: this_img.closest('.pic').attr('collection')
             },
             editComment);
-
-    let single_pannable = $('#pannable-image');
-    let shortened = $(window).height() * 0.85;
-    let commentP = $("single textArea");
     if (narrowImage) { // comment shows next to image
-        $('#commentta').css("margin-left", "30px");
+        commentP.css("margin-left", "30px");
         single_pannable.height(shortened + "px");
         single_pannable.width(
             ((shortened * this_img.width() / this_img.height() - 4) +
@@ -821,7 +818,6 @@ function showSingleLargeImage(this_img, prev) {
 }
 
 function editComment(ev) {
-
     disableActionsNow();
 
     catchKeys("off", "keydown");

@@ -11,18 +11,18 @@ let multiButtons; // RMA
     var vendor;
 
     function set_state(state) {
-        
+
         $(window).trigger('visibilitychange', state);
 
         $.visibilityState = state;
     }
 
     // detect property, if available
-    for (var i = 0; vendor = vendors[i]; i++) {
+    for (var i = 0; i < vendors.length; i++) {
+        vendor = vendors[i];
         if (vendors[i] + prop in document) {
             vendor = vendors[i];
             prop = vendor + prop;
-
             break;
         }
     }
@@ -73,12 +73,12 @@ $(function () {
     });
 
     $("#run").on("click", function () {
-        useNewTab("/tabs/1.html");
+        useNewTab("/tabs/main.html");
     });
 
     $(window).on('visibilitychange',
         () => {
-            if(document.visibilityState === 'visible') {
+            if (document.visibilityState === 'visible') {
                 //("reset");
                 $('#reset').trigger('click');
             }
@@ -113,6 +113,10 @@ $(function () {
             default:
                 break;
         }
+    });
+
+    $("#tabs_upload").on("click", function () {
+        useNewTab("/tabs/tab_upload.html");
     });
 
     $("#upload_action").on("click", function () {
@@ -261,7 +265,9 @@ function refreshFromDB() {
             $("#run").hide();
             $("#upload_action").hide();
             $("#delete_action").hide();
+
             $("#tabs_action").hide();
+            $("#tabs_upload").hide();
         },
         error => console.log("getData error " + error)
     );
@@ -540,26 +546,38 @@ function pageComplete() {
     $("#delete_action").show();
     jobHasTabs().then(
         (numDocs) => {
-            $("#tabs_action").html((numDocs !== 0) ? "<u>Edit</u> " + numDocs + " Tabs" : "<u>Create</u> Tabs").show();
+            let tabText = "<u>Tab" + ((numDocs > 1) ? "s" : "");
+            let tabs_action_button = $("#tabs_action");
+            if (numDocs === 0) {
+                tabs_action_button.html("<u>Tabs Create</u>");
+            } else {
+                tabs_action_button.html(tabText + " Edit</u> (" + numDocs + ")");
+            }
+            tabs_action_button.show();
+            if (numDocs > 0) {
+                $("#tabs_upload").html(`<u>${tabText} Upload</u>`).show();
+            }
         },
         (err) => {
             alert("jobHasTabs error " + err);
         }
     );
-    
+
     multiButtons = true;
 }
 
 function jobHasTabs() {
-    let _id = common.getKey4_ORDER().map( key => QUERY[key] ).join("|"); // create key4 string
+    let _id = common.getKey4_ORDER().map(key => QUERY[key]).join("|"); // create key4 string
     return new Promise((resolve, reject) => {
         $.post({
                 url: "/has_tabs",
-                data: {"_id" : _id}
+                data: {
+                    "_id": _id
+                }
             })
             .done((result) => resolve(result))
             .fail((request, status, error) => reject(error));
-        });
+    });
 }
 
 function cellSingleClick(e, cell, value, data) {

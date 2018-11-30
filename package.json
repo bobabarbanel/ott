@@ -21,7 +21,7 @@
     "jimp": "^0.3.5",
     "jshint": "^2.9.6",
     "lint": "^1.1.2",
-    "mongodb": "^3.0.8",
+    "mongodb": "^3.1.8",
     "path": "^0.12.7",
     "readline": "^1.3.0",
     "sshpk": "^1.14.2",
@@ -34,8 +34,7 @@
     "test": "node server3000.js",
     "remote": "node server3000.js remote",
     "debug": "node --inspect server3000.js",
-    "dev": "nodemon -e html,css,js --watch . --watch controllers --watch public/js server3000.js",
-    "tabs": "nodemon -e html,css,js --watch expt/tabstry --watch expt/tabstry/views expt/tabstry/server3100.js"
+    "dev": "nodemon -e html,css,js --watch . --watch controllers --watch public/js server3000.js"
   },
   "author": "abarbanel",
   "license": "ISC"

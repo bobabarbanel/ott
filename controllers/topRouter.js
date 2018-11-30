@@ -1,21 +1,20 @@
 "use strict";
 // File: controllers/topRouter.js
-const assert = require('assert');
-// const path = require('path');
-// const express = require('express');
-// const bodyParser = require('body-parser');
+// const assert = require('assert');
 
+let data;
 const COOKIE = 'chosenCookie';
+
 module.exports = function (dir, app, db) {
 	require('./uploadRouter')(dir, app, db);
-	var data;
+
 
 	// main page 
 	app.get('/', (req, res) => {
 		// get parts data to start
 		//var count = 0;
 		data = [];
-		var cursor = db.collection('main')
+		var promise = db.collection('main')
 			.find({}, {
 				'_id': 0,
 				dept: 1,
@@ -25,22 +24,23 @@ module.exports = function (dir, app, db) {
 				pName: 1
 			}).sort({
 				partId: 1
-			});
-		cursor.each(function (err, doc) {
-			assert.equal(err, null);
-			if (doc !== null) {
-				data.push(doc);
-			}
-		});
-		// then show main search front end index.html file
+			}).toArray();
 
+
+		promise.then(
+			(results) => {
+				data = results;
+			}
+		);
+		// TODO: catch errors??
+		// then show main search front end index.html file
 		res.render('index.html', {});
 	});
 
 	app.get('/insert', (req, res) => {
 		// get parts data to start
 		data = [];
-		var cursor = db.collection('main')
+		var promise = db.collection('main')
 			.find({}, {
 				'_id': 0,
 				dept: 1,
@@ -50,13 +50,14 @@ module.exports = function (dir, app, db) {
 				pName: 1
 			}).sort({
 				partId: 1
-			});
-		cursor.each(function (err, doc) {
-			assert.equal(err, null);
-			if (doc !== null) {
-				data.push(doc);
+			}).toArray();
+		promise.then(
+			(results) => {
+				data = results;
 			}
-		});
+
+		);
+		// TODO: catch errors??
 
 		res.sendFile(dir + '/insert.html');
 	});
@@ -80,7 +81,7 @@ module.exports = function (dir, app, db) {
 
 	});
 
-	app.post('/images', (req, res) => {
+	app.post('/tool_images', (req, res) => {
 		var key4 = [req.body.key.dept, req.body.key.partId,
 			req.body.key.op, req.body.key.machine
 		].join("|");
@@ -93,7 +94,6 @@ module.exports = function (dir, app, db) {
 		};
 		let col = db.collection('images');
 		// want ONLY those docs which have active images
-		//console.log(query);
 		var myPromise = col.aggregate([{
 				$match: query
 			},
@@ -133,7 +133,6 @@ module.exports = function (dir, app, db) {
 
 		myPromise.then(
 			r => {
-				// console.log(r);
 				res.json(r);
 			},
 			() => res.json([])
@@ -155,7 +154,7 @@ module.exports = function (dir, app, db) {
 				});
 
 	});
-	
+
 	app.post('/sheetTags', (req, res) => {
 		let key4 = [req.body.key.dept, req.body.key.partId,
 			req.body.key.op, req.body.key.machine
@@ -233,20 +232,21 @@ module.exports = function (dir, app, db) {
 
 		data = [];
 		// project out the ids
-		var cursor = db.collection('main').find({}, {
+		var promise = db.collection('main').find({}, {
 			'_id': 0,
 			dept: 1,
 			op: 1,
 			partId: 1,
 			machine: 1,
 			pName: 1
-		});
-		cursor.each(function (err, doc) {
-			assert.equal(err, null);
-			if (doc !== null) {
-				data.push(doc);
+		}).toArray();
+		promise.then(
+			(results) => {
+				data = results;
 			}
-		});
+
+		);
+		// TODO: catch errors??
 		res.redirect('/noget');
 	});
 
@@ -300,33 +300,33 @@ module.exports = function (dir, app, db) {
 					{
 						$match: query
 					},
-			
+
 					// Stage 2
 					{
 						$unwind: {
-							path : "$tabs"
+							path: "$tabs"
 						}
 					},
-			
+
 					// Stage 3
 					{
 						$count: "count"
 					},
-			
+
 				]
 			).toArray();
-			
-			
-			
+
+
+
 			myPromise.then(
 				(r) => {
-					
-					if(r.length === 0) {
+
+					if (r.length === 0) {
 						res.json(0);
 					} else {
 						res.json(r[0].count);
 					}
-					
+
 				},
 				(err) => {
 					console.log("has_tabs error: " + err);
@@ -351,10 +351,14 @@ module.exports = function (dir, app, db) {
 			myPromise.then(
 				(r) => {
 					if (r.length > 0) {
-						// console.log("tabs count = " + r[0].tabs.length);
+						if (req.body.index !== undefined) {
+							// limit to a single element
+							r[0].tabs = r[0].tabs.slice(req.body.index, req.body.index + 1);
+						}
 						res.json(r[0]);
+
+
 					} else {
-						// console.log("no job match");
 						res.json({});
 					}
 
@@ -370,34 +374,63 @@ module.exports = function (dir, app, db) {
 		}
 	);
 
-	app.post('/set_tabs',
-		(req, res) => {
-			//console.log("set_tabs " + JSON.stringify(req.body.doc));
+	app.get('/showtab/:tabnum/:tabname', (req, res) => {
 
-			let query = {
-				"_id": req.body._id
-			};
+		res.render('showtab.html', {
+			"tabnum": req.params.tabnum,
+			"tabname": req.params.tabname
+		});
 
-			const tabsCollection = db.collection('tabs');
-			let myPromise = tabsCollection.replaceOne(query,
-				JSON.parse(req.body.doc), {
-					upsert: true
-				});
-			myPromise.then(
-				(r) => {
-					res.json(r);
+	});
 
-				},
-				(err) => {
-					res.json({
-						"error": err
-					});
+	app.post('/tab_images', (req, res) => {
+		let col = db.collection('tab_images');
+		// want ONLY those docs which have active images
+		var myPromise = col.aggregate(
+
+			[{
+				$match: /** * query - The query in MQL. */ {
+					_id: req.body.key4id,
 				}
-			);
-
-			return;
-		}
-	);
-
-
+			}, {
+				$project: /** * specifications - The fields to *   include or exclude. */ {
+					nextStepNum: 0,
+					_id: 0
+				}
+			}, {
+				$project: /** * specifications - The fields to *   include or exclude. */ {
+					stepFiles: {
+						$filter: {
+							input: '$stepFiles',
+							as: 'item',
+							cond: {
+								$eq: ['$$item.archived', false]
+							}
+						}
+					}
+				}
+			}, {
+				$unwind: /** * path - Path to the array field. * includeArrayIndex - Optional name for index. * preserveNullAndEmptyArrays - Optional *   toggle to unwind null and empty values. */ {
+					path: "$stepFiles",
+				}
+			}, {
+				$group: /** * _id - The id of the group. * field1 - The first field name. */ {
+					_id: "$stepFiles.images_id",
+					entry: {
+						$push: {
+							filename: "$stepFiles.filename",
+							dir: "$stepFiles.dir",
+							comment: "$stepFiles.comment"
+						}
+					}
+				}
+			}]).toArray();
+		myPromise.then(
+			r => {
+				res.json(r);
+			},
+			() => res.json([])
+		);
+		return;
+	});
 };

@@ -1,0 +1,274 @@
+body {
+    background: rgb(159, 190, 231);
+}
+
+content {
+    position: absolute;
+    left: 20px;
+    /* top: 20px; */
+    padding: 15px;
+    width: 800px;
+}
+
+
+
+header {
+    margin-left: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 700px;
+}
+
+header>div {
+    font-size: 1.45em;
+    font-weight: bold;
+}
+
+job {
+    font-size: 1.17em;
+    margin-left: 0.5em;
+    font-weight: bold;
+}
+
+.tabname {
+    font-size: 24px;
+    font-weight: bold;
+    list-style-position: inside;
+}
+
+.sectionname {
+    font-size: 18px;
+    font-weight: bold;
+    list-style-type: square;
+}
+
+.sectionname table {
+    margin-left: 3em;
+    font-size: 16px;
+    border-collapse: collapse;
+    border: 1px solid black;
+    width: 40em;
+}
+
+.sectionname td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.sectionname tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.sectionname tr:nth-child(odd) {
+    background-color: #d1cfcf;
+}
+
+.sectionname tr:hover {
+    background-color: rgb(143, 140, 140);
+}
+
+#outer {
+    list-style: none;
+    counter-reset: my-awesome-counter;
+}
+
+#outer>li {
+    counter-increment: my-awesome-counter;
+}
+
+#outer>li ul {
+    margin-top: -30px;
+}
+
+#outer>li {
+    margin-bottom: 15px;
+}
+
+#outer>li::before {
+    content: counter(my-awesome-counter) ". ";
+    color: blue;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.tabname>span {
+    color: blue;
+}
+
+.emptytab {
+    color: blue;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+#progress {
+    float: right;
+    font-weight: bold;
+    text-align: center;
+    width: 200px;
+    height: 30px;
+    color: black;
+    /* border: 2px solid red; */
+}
+
+#checkmenu {
+    float: right;
+}
+
+tabs {
+    clear: both;
+}
+
+input[type=checkbox] {
+    /* Double-sized Checkboxes */
+    -ms-transform: scale(2);
+    /* IE */
+    -moz-transform: scale(2);
+    /* FF */
+    -webkit-transform: scale(2);
+    /* Safari and Chrome */
+    -o-transform: scale(2);
+    /* Opera */
+    transform: scale(2);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+hr {
+    width: 100%;
+}
+
+.checkboxtext {
+    /* Checkbox text */
+    font-size: 110%;
+    display: inline;
+}
+
+.sname {
+    width: 60%;
+}
+
+.sname .text {
+    margin-left: 1em;
+}
+
+.numimages {
+    width: 10%;
+    text-align: center;
+}
+
+.bcolumn {
+    width: 30%;
+}
+
+.tabsep {
+    height: 5px;
+    background-color: #63aa5a;
+    color: #63aa5a;
+    border: 0 none;
+}
+
+.hidebuttons {
+    display: none;
+}
+
+.stripes {
+    background: repeating-linear-gradient(45deg, #ae60bc, #ae60bc 5px, #5d3364 5px, #5d3364 10px);
+    background-size: 200% 200%;
+    animation: barberpole 4s linear infinite;
+}
+
+@keyframes barberpole {
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+.steptable {
+    margin-top: 0.5em;
+    table-layout: fixed;
+}
+
+.container {
+    position: relative;
+}
+
+start {
+    display: flex;
+    margin-bottom: 1em;
+    align-items: center;
+    align-content: flex-start;
+}
+
+spin {
+    font-size: 54px;
+    color: red;
+}
+
+/* navigation */
+nav {
+    display: flex;
+    align-items: center;
+    align-content: flex-start;
+    margin-left: 1.5em;
+
+    width: 700px;
+    height: 40px;
+    background: tan;
+}
+
+.nav.anchor img {
+    height: 28px;
+}
+
+.navCell {
+    position: relative;
+    width: 25%;
+}
+
+/* .navCell:hover {
+    background: pink;
+} */
+
+.navButton {
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+    cursor: pointer;
+    height: 30px;
+}
+
+
+#home_button img {
+    height: 30px;
+    vertical-align: middle;
+}
+
+/* #home_button:hover {
+    background: rgb(0, 255, 21);
+} */
+
+#home_button {
+    /* uses image */
+    background: transparent;
+    border: transparent;
+}
+
+#tabedit_button {
+    background: white;
+}
+
+#tabedit_button:hover {
+    background: rgb(0, 255, 21);
+}
+
+#run {
+    background: white;
+    color: black;
+}
+
+#run:hover {
+    background: blue;
+    color: white;
+}

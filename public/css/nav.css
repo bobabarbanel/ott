@@ -1,0 +1,208 @@
+/* Style the links inside the navigation bar */
+
+.topnav {
+    background-color: #333;
+    overflow: hidden;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 99;
+}
+
+.topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.home {
+    width: 4em;
+    margin-left: -1em;
+}
+
+
+/* Change the color of links on hover */
+
+.topnav a:hover, navDropDown a:hover{
+    background-color: #ddd;
+    color: black;
+}
+
+/* Add an active class to highlight the current page */
+
+.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Hide the link that should open and close the topnav on small screens */
+
+.topnav .icon {
+    display: none;
+}
+
+
+#home_button {
+    color: red;
+    padding-right: 0;
+}
+
+
+/* .navButton {
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+    
+    height: 30px;
+} */
+
+
+
+
+#navButtonDiv {
+    position: fixed;
+    top: 0px;
+    right: 20px;
+    z-index: 900;
+    width: 86px;
+    height: 50px;
+    background-color: #333;
+}
+
+
+.navButtons {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.navButtons button {
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+}
+
+#home_button img {
+    height: 30px;
+    vertical-align: middle;
+}
+
+
+#home_button {
+    /* uses image */
+    background: transparent;
+    border: transparent;
+}
+
+/* #navButtonDiv {
+    display: block;
+} */
+
+.navButtons {
+    display: flex;
+}
+.tabaccess {
+    text-decoration: none;
+}
+.tabaccess_here {
+    background: green;
+}
+
+
+/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
+
+/* @media screen and (max-width: 768px) {
+    .topnav a:not(:first-child) {
+        display: none;
+    }
+
+    .topnav a.icon {
+        float: right;
+        display: block;
+    }
+
+} */
+
+/* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */
+
+/* @media screen and (max-width: 768px) {
+    .topnav.responsive {
+        position: relative;
+    }
+
+    .topnav.responsive a.icon {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .topnav.responsive a {
+        float: none;
+        display: block;
+        text-align: left;
+    }
+
+} */
+
+navDropDown {
+    display: none;
+}
+
+.navDropDownButton {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    background: #333;
+    color: white;
+    height: 50px;
+    width: 50px;
+    font-size: 30px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+@media screen and (max-width: 1225px) {
+
+    .topnav {
+        display: none;
+    }
+    #navButtonDiv {
+        display: block;
+    }
+
+    navDropDown {
+        position: fixed;
+        top: 50px;
+        left: 50px;
+        z-index: 900;
+        width: 86px;
+        background-color: #333;
+        color: #f2f2f2;
+        padding: 10px;
+        border: 2px solid black;
+        flex-direction: column;
+        font-size: 20px;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+    navDropDown > * {
+        padding: 3px;
+    }
+    navDropDown .home_link {
+        color: red;
+    }
+    .navDropDownButton {
+        display: block;
+    }
+
+}

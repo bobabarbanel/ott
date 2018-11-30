@@ -146,13 +146,17 @@ const KEY5 = {};
 
 
 function getData(message) {
+    console.log('app_insert: getData');
     return new Promise((resolve, reject) => {
         $.ajax({
             url: "/data",
             type: 'get',
             dataType: 'json'
         })
-            .done(result => resolve(result))
+            .done(result => {
+                console.log(JSON.stringify(result, null, 4));
+                resolve(result);
+            }
 
             .fail((request, status, error) => reject(error))
 
@@ -169,8 +173,8 @@ function putKey5() {
             type: 'post',
             data: KEY5
         })
-            .success(result => resolve(result))
-            .error((request, status, error) => reject(error));
+            .done(result => resolve(result))
+            .fail((request, status, error) => reject(error));
     });
 }
 

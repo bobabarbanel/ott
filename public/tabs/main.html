@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- 1.html -->
+<!-- main.html -->
 <html lang="en">
 
 <head>
@@ -7,10 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>General</title>
     <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
-	<link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
 
     <link rel="stylesheet" href="/css/jquery-ui-1.12.1.custom/jquery-ui.min.css">
-    <link rel="stylesheet" href="/css/one.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+        crossorigin="anonymous"></script>
+
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
         crossorigin="anonymous"></script>
     <script src="/css/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
@@ -19,29 +21,27 @@
     <script type="application/javascript" src="/js/commonClass.js"></script>
 
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/nav.css">
 </head>
 
 <body>
-    <div w3-include-html="./tabs.html"></div>
-    <div>
+    <div class="navDropDownButton"></div>
+    <navDropDown></navDropDown>
+    <div class="topnav" id="myTopnav">
+    </div>
+    <container>
+        <pageheader>
+        </pageheader>
         <content>
-            <table id="header">
-                <tr>
-                    <td id="title">
-                        <h1>Setup Sheet</h1>
-                    </td>
-                    <td id="job"></td>
-                </tr>
-            </table>
             <tools>
             </tools>
+            <tab_outlines>
+            </tab_outlines>
         </content>
-        <script src="https://www.w3schools.com/lib/w3.js"></script>
-        <script>
-            w3.includeHTML();
-        </script>
-        <script src="/js/one.js"></script>
-    </div>
+    </container>
+
+    <script type="application/javascript" src="/js/main.js"></script>
 </body>
 
 </html>

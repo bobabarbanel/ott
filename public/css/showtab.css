@@ -1,0 +1,376 @@
+/* showtab.css */
+body>title {
+    font-size: 32px;
+    color: black;
+    font-weight: bold;
+    display: block;
+}
+
+container {
+    width: 100%;
+    padding-top: 40px;
+    padding-right: 20px;
+    padding-bottom: 0;
+    padding-left: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+}
+
+one {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 1em;
+    width: 40%;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+job {
+    font-size: 1.3em;
+    font-weight: bold;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+content {
+    width: 100%;
+}
+
+pictures {
+    width: 100%;
+}
+
+#floatMenu {
+    position: fixed;
+    top: 70px;
+    right: 30px;
+    background: rgb(170, 194, 201);
+    padding-right: 10px;
+}
+
+#floatMenu ul {
+    margin-left: -20px;
+    list-style-type: none;
+    color: white;
+}
+
+#floatMenu ul a {
+    color: white;
+    background: rgb(52, 76, 83);
+}
+
+#floatMenu ul a:hover {
+    background: rgb(2, 88, 2);
+    /* border: 1px solid yellow; */
+}
+
+#floatMenu li {
+    color: white;
+    background: rgb(52, 76, 83);
+    border: 1px solid black;
+    padding-bottom: 2px;
+}
+
+#floatMenu li:hover {
+    background: green;
+    border: 1px solid yellow;
+}
+
+#floatMenu a:link {
+    text-decoration: none;
+}
+
+.headtext {
+    background: rgb(240, 220, 194);
+    margin-top: 1em;
+    font-size: 1.3em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+.showfloat {
+    display: none;
+}
+
+pitems {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    /* max-width:40%; */
+    flex-direction: row;
+    border-bottom: 1px solid black;
+}
+
+.pic {
+    border: 20px;
+    background: white;
+    color: #222;
+}
+
+.step {
+    margin: 0.5em 0 0.5em 1.5em;
+    /* border: 20px; */
+    background: white;
+    color: #222;
+    font-size: 1.0em;
+    font-weight: bold;
+}
+
+div.img-wrap.redborder {
+    border-color: red;
+}
+
+div.img-wrap img {
+    cursor: pointer;
+}
+
+div.img-wrap {
+    text-align: center;
+}
+
+.dim {
+    opacity: 0.3
+}
+
+.transparent {
+    border: 3px solid transparent;
+}
+
+.deleting {
+    border: 3px solid red;
+}
+
+.orange {
+    border: 3px solid orange;
+}
+
+.showing {
+    border: 3px solid blue;
+}
+
+button.floatButton {
+    background: blue;
+    color: white;
+}
+
+.sectionlabel {
+    color: #333;
+    font-size: 50%;
+}
+
+.highlight {
+    background: rgb(240, 240, 131);
+}
+.wide {
+    display: none;
+}
+
+two {
+    /* width: 100%; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-top: 20px;
+    /* background: yellow; */
+}
+
+single {
+    position: fixed;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    width: 100%;
+}
+
+single tsHead {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin: 25px 0 10px 0;
+    align-items: center;
+    flex-flow: row nowrap;
+}
+
+#tsSection {
+    text-overflow: ellipsis;
+    font-weight: bold;
+    font-size: 120%;
+    margin-left: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+singleFlexR {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+singleFlexC {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+.comment {
+    border: 2px solid blue;
+    height: 500px;
+    width: 300px;
+}
+
+#out_single {
+    position: relative;
+    top: 25px;
+}
+#out_single span {
+    position: absolute;
+    z-index: 99;
+}
+.direction {
+    cursor: pointer;
+    color:rgba(252, 252, 252, 0.8);;
+}
+#expand {
+    top: 0px;
+    left: 2px;
+    cursor: zoom-in;
+    color: yellow;
+}
+
+#left {  
+    left: -2px;
+}
+#right {
+    right: -2px;  
+}
+#up {
+    top: -18px;
+}
+#down {
+    bottom: -10px;
+}
+
+#out_single {
+    margin-top: -32px;
+    display: inline-block;
+}
+.wide {
+    display: none;
+}
+
+.delList {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background: rgb(250, 250, 207);
+    margin-bottom: 20px;
+}
+
+.taedit {
+    width: 80%;
+}
+
+.delList img {
+    padding: 5px;
+}
+
+#edit-popup {
+    position: absolute;
+    top: 500;
+    left: 400;
+    z-index: 300;
+}
+.floathead {
+    padding-right: 1em;
+}
+.floattag {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+#floatMenu ul>a.floathead {
+    background: rgb(22, 97, 22);
+}
+
+.deleting {
+    border: 3px solid red;
+}
+#delButtons {
+    display: flex;
+    justify-content: space-around;
+}
+
+#deleteMenu {
+    position: fixed;
+    top: 65px;
+    right: 100px;
+    display: none;
+    background: tan;
+    border-radius: 25px;
+    padding: 20px
+}
+
+#deleteMenu p {
+    font-weight: bold;
+    text-align: center;
+    border-radius: 25px;
+}
+
+#deleteMenu button {
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1px solid black;
+    /* background: grey; */
+}
+
+#undoDelete {
+    background: rgb(159, 217, 235);
+    color: rgb(31, 3, 95);
+    font-weight: bold;
+}
+
+
+@media screen and (max-width: 1225px) {
+
+    single {
+        position: relative;
+    }
+
+    container {
+        flex-direction: column;
+        padding-top: 80px;
+    }
+
+    two {
+        order: 0;
+        margin-top: 30px;
+    }
+
+    one {
+        order: 1;
+        width: 100%;
+    }
+
+    #deleteMenu {
+        position: fixed;
+        top: 20px;
+        left: 100px;
+        width: 340px;
+    }
+
+    .navDropDownButton {
+        display: block;
+    }
+}

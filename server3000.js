@@ -25,14 +25,15 @@ switch (myArgs[0]) {
 }
 
 
-const port = process.env.port || 3000;
+const port = process.env.port || 3100;
 const topRouter = require("./controllers/topRouter");
 // const fs = require('fs-extra');
 
-MongoClient.connect(url,
+MongoClient.connect(url, {useNewUrlParser: true}, 
   (err, database) => {
     if (err) { return console.log("Mongo Error: " + err); }
     let dir = __dirname;
+
     const db = database.db('parts');
     app.engine('html', require('ejs').renderFile);
     app.set('view engine', 'ejs');
@@ -61,9 +62,3 @@ MongoClient.connect(url,
     });
 
   });
-
-
-
-
-
-
