@@ -156,7 +156,7 @@ function getData(message) {
             .done(result => {
                 console.log(JSON.stringify(result, null, 4));
                 resolve(result);
-            }
+            })
 
             .fail((request, status, error) => reject(error))
 
