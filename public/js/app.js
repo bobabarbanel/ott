@@ -1,8 +1,9 @@
 "use strict";
-/* globals Common */
+
 const ENTER = 13;
 const TAB = 9;
 let multiButtons; // RMA
+const COMMON = new Common();
 (function ($) {
     var prop = 'VisibilityState';
     var evt = 'visibilitychange';
@@ -11,9 +12,7 @@ let multiButtons; // RMA
     var vendor;
 
     function set_state(state) {
-
         $(window).trigger('visibilitychange', state);
-
         $.visibilityState = state;
     }
 
@@ -49,10 +48,10 @@ let multiButtons; // RMA
     // set initial state
     $.visibilityState = document[prop] || 'visible';
 }(jQuery));
-let common;
+
 
 $(function () {
-    common = new Common();
+
     setUpTable();
     refreshFromDB();
 
@@ -76,18 +75,20 @@ $(function () {
         useNewTab("/tabs/main.html");
     });
 
-    $(window).on('visibilitychange',
-        () => {
-            if (document.visibilityState === 'visible') {
-                //("reset");
-                $('#reset').trigger('click');
-            }
-        });
+    // $(window).on('visibilitychange',
+    //     () => {
+    //         if (document.visibilityState === 'visible') {
+    //             //("reset");
+    //             $('#reset').trigger('click');
+    //         }
+    //     });
     $('body').on('keydown', (e) => {
         switch (e.which) {
-            case ENTER: // Enter
-                $("#buttons button.active").trigger('click');
-                break;
+            /////////// Removed 12/13/18 -- CR in data entry fields is getting here. Too early for page submit.
+            // case ENTER: // Enter
+            //     $("#buttons button.active").trigger('click');
+            //     break;
+            ///////////
 
             case TAB: // use TAB to select next active button
                 if (multiButtons) {
@@ -133,8 +134,8 @@ $(function () {
             existingWindow = null;
         }
         handleChoice().then(
-            () => {
-                //console.log("run plus " + signal);
+            (result) => {
+                //console.log('destination', COMMON.getParsedCookie());
                 openInNewTab(destination);
             },
             error => console.log("handleChoice Error: " + error));
@@ -273,39 +274,6 @@ function refreshFromDB() {
     );
 }
 let existingWindow;
-// let TABNAME = "Tools";
-
-// function jobArchive(key4, key5) {
-//     return new Promise((resolve, reject) => {
-//         $.ajax({
-//             url: "/jobArchive",
-//             type: 'post',
-//             data: {
-//                 "key4": key4,
-//                 "key5": key5,
-//                 "tab": TABNAME,
-//                 "idOrderedKeys": idOrderedKeys
-//             }
-//         })
-//             .success(result => resolve(result))
-//             .fail((request, status, error) => reject(error));
-//     });
-// }
-
-// function countImages(key4) {
-//     return new Promise((resolve, reject) => {
-//         $.ajax({
-//                 url: "/countImages",
-//                 type: 'post',
-//                 data: {
-//                     "key4": key4,
-//                     "tab": TABNAME
-//                 }
-//             })
-//             .success(result => resolve(result[0]))
-//             .fail((request, status, error) => reject(error));
-//     });
-// }
 
 function handleChoice() {
     //console.log("handleChoice " + QUERY.partId);
@@ -315,7 +283,12 @@ function handleChoice() {
                 type: 'post',
                 data: QUERY
             })
-            .done((result) => resolve(result))
+            .done((result) => {
+                // cookie now set ??
+                // console.log("existing", COMMON.getParsedCookie());
+                // console.log("new cookie", result);
+                resolve(result);
+            })
             .fail((request, status, error) => reject(error));
         //.always(() => console.log("handlechoice complete"));
     });
@@ -393,16 +366,6 @@ function updateTable(rows) {
 function refreshFilterTable() { // set new (reduced) jsonData in table, uses QUERY
     updateTable(jsonData.filter((row) => rowMatchesQuery(row)));
 }
-
-// let idToText = {
-//     "partId": "Part Number",
-//     "pName": "Part Name",
-//     "dept": "Department",
-//     "op": "Operation",
-//     "machine": "Machine"
-// };
-
-
 
 function setUpTable() {
     $("#dataTable").tabulator({
@@ -567,7 +530,8 @@ function pageComplete() {
 }
 
 function jobHasTabs() {
-    let _id = common.getKey4_ORDER().map(key => QUERY[key]).join("|"); // create key4 string
+    //const common = new Common();
+    const _id = COMMON.getKey4_ORDER().map(key => QUERY[key]).join("|"); // create key4 string
     return new Promise((resolve, reject) => {
         $.post({
                 url: "/has_tabs",

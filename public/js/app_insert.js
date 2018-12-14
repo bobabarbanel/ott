@@ -133,17 +133,18 @@ function isMachineSpecKnown(mname) {
 var jsonData;
 const FIELDS = ["partId", "pName", "dept", "op", "machine"];
 const FIELDSORTER = {
-    "partId": "alphaCompare",
-    "pName": "alphaCompare",
-    "dept": "alphaCompare",
+    "partId": alphaCompare,
+    "pName": alphaCompare,
+    "dept": alphaCompare,
     "op": (a, b) => a - b,
-    "machine": "alphaCompare"
+    "machine": alphaCompare
 };
 
 const FWIDTH = "180px";
 const STATUS = {};
 const KEY5 = {};
 
+function alphaCompare(a,b) { return (a<b) ? -1 : (a===b) ? 0 : 1;}
 
 function getData(message) {
     console.log('app_insert: getData');

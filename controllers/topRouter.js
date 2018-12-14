@@ -254,7 +254,7 @@ module.exports = function (dir, app, db) {
 	app.post('/go_parts', (req, res) => {
 		var cookie_value = JSON.stringify(req.body);
 		res.cookie(COOKIE, cookie_value);
-		res.send("chosen set to " + cookie_value);
+		res.send(cookie_value);
 	});
 
 	app.post('/pname', (req, res) => {

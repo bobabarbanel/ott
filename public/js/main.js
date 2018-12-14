@@ -14,7 +14,7 @@ const right_caret = '<span class="caret">' + openMark + '</span>';
 $(function () {
 
     ////////////////////////////////////////////////////////////
-
+    //alert(JSON.stringify(key5,null,4));
     var title = "Main | Job: <b>" + key5.partId + '</b>';
     $("title").html(title); // browser tab title
 
