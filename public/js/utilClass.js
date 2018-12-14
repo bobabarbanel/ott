@@ -48,6 +48,11 @@ class Util {
         });
     }
 
+    static goHome() {
+            window.close();
+            window.open('/');
+    }
+
     static setUpTabs(key4id, here) {
         here = here.trim();
         return new Promise((resolve, reject) => {
@@ -57,8 +62,12 @@ class Util {
                     let navDropDown = $('navDropDown');
 
                     let topnav = $('.topnav');
-                    topnav.append($('<a class="home" id="home_button" href="/"><i class="fas fa-home fa-lg"></i></a>'));
-                    navDropDown.append($('<a href="/" class="home_link"><i class="fas fa-home"></a>'));
+                    let home_button = $('<a class="home" id="home_button"><i class="fas fa-home fa-lg"></i></a>');
+                    home_button.on('click', Util.goHome);
+                    topnav.append(home_button);
+                    let home_link = $('<a href="/" class="home_link"><i class="fas fa-home"></a>');
+                    home_link.on('click', Util.goHome);
+                    navDropDown.append(home_link);
 
                     let nextTab;
                     // Main
