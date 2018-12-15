@@ -23,18 +23,20 @@ module.exports = function (dir, app, db) {
 				machine: 1,
 				pName: 1
 			}).sort({
-				partId: 1
+				partId: -1
 			}).toArray();
 
-
+			
 		promise.then(
 			(results) => {
+				// console.log(JSON.stringify(results, null, 4));
 				data = results;
+				res.render('index.html', {});
 			}
 		);
 		// TODO: catch errors??
 		// then show main search front end index.html file
-		res.render('index.html', {});
+		
 	});
 
 	app.get('/insert', (req, res) => {

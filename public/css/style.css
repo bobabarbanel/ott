@@ -225,4 +225,10 @@ li.horiz p {
 	text-decoration: underline;
 }
 
+.rowChosen {
 
+	font-weight: bold;
+}
+.rowChosen .tabulator-cell {
+	background: orange;
+}

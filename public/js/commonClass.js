@@ -1,4 +1,3 @@
-"use strict";
 /*exported Common */
 // common.js
 
@@ -58,6 +57,10 @@ class Common {
     getKey5DisplayText() {
         let key5 = this.getParsedCookie();
         return this.getKeys().map(key => key5[key]).join(' : ');
+    }
+
+    getCookieName() {
+        return this.COOKIE;
     }
     
 }
