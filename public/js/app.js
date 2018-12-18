@@ -64,19 +64,25 @@ $(function() {
 	const existing_cookie = COMMON.getParsedCookie();
 	if (existing_cookie !== null) {
 		// set up display for this job
-        Object.keys(STATUS).filter((key) => STATUS[key] !== 1).forEach((fName) => {
-            var val = rowData[fName];
-            QUERY[fName] = val;
-            var selector = "#" + fName + "_select";
-            $(selector, "#container").empty();
-            setNum(fName, 1);
-    
-            var option = $("<option>").val(val).text(val);
-            $(selector, "#container").append(option);
-            STATUS[fName] = 1;
-            //console.log("rowSelected " + fName);
-            $(selector, "#container").prop('disabled', true).trigger("chosen:updated");
-        });	
+		Object.keys(STATUS)
+			.filter(key => STATUS[key] !== 1)
+			.forEach(fName => {
+				var val = rowData[fName];
+				QUERY[fName] = val;
+				var selector = "#" + fName + "_select";
+				$(selector, "#container").empty();
+				setNum(fName, 1);
+
+				var option = $("<option>")
+					.val(val)
+					.text(val);
+				$(selector, "#container").append(option);
+				STATUS[fName] = 1;
+				//console.log("rowSelected " + fName);
+				$(selector, "#container")
+					.prop("disabled", true)
+					.trigger("chosen:updated");
+			});
 	}
 
 	$("#run").on("click", function() {
@@ -190,40 +196,6 @@ $(function() {
 		// );
 	});
 
-	// function showVals(fileCount) { // used in confirmation for job Archive
-	//     // include number of images for this job
-	//     let spaces4 = "&nbsp;&nbsp;&nbsp;&nbsp;";
-	//     let str = '<table class="qtable" frame="box">';
-	//     str += '<tr><th/><td/></td></tr>';
-	//     Object.keys(QUERY).forEach(
-	//         (key, idx) => {
-	//             if (idx === 0) {
-	//                 str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
-	//                     '<td colspan="2" class="qvalue">' + spaces4 + QUERY[key] +
-	//                     '</td><td/></tr>';
-	//             } else if (idx === 1) {
-	//                 str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
-	//                     '<td class="qvalue">' + spaces4 + QUERY[key] +
-	//                     '</td><td rowspan="4"><img class="shiftd" ' +
-	//                     'src="/img/trashfull_sm.jpg"/></td></tr>';
-	//             } else {
-	//                 str += '<tr><th class="qname">' + idToText[key] + ":</th>" +
-	//                     '<td class="qvalue">' + spaces4 + QUERY[key] +
-	//                     "</td><td/></tr>";
-	//             }
-	//         }
-	//     );
-
-	//     str += '</table><br/>This job currently has ';
-	//     if (fileCount === 0) {
-	//         str += "no images.";
-	//     } else {
-	//         str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
-	//     }
-	//     str += fileCount + " image" + ((fileCount === 1) ? '' : 's') + '.';
-	//     return str;
-	// }
-
 	// handle changes in choosers - that is, selection of a particular item
 	$(".chooser", "#container").on("change", function() {
 		var chooser = $(this);
@@ -304,19 +276,6 @@ function handleChoice() {
 	});
 }
 
-// function uploadChoice() {
-//     //console.log("uploadChoice " + JSON.stringify(QUERY));
-//     return new Promise((resolve, reject) => {
-//         $.ajax({
-//                 url: "/go_parts",
-//                 type: 'post',
-//                 data: QUERY
-//             })
-//             .done((result) => resolve(result))
-//             .fail((request, status, error) => reject(error));
-//         //.always(() => console.log("handlechoice complete"));
-//     });
-// }
 function resetPage() {
 	resetVars().then(
 		() => {
@@ -402,7 +361,7 @@ function setUpTable() {
 				onClick: cellSingleClick,
 				sortable: false,
 				formatter: function(/*value, data, cell, row, options, formatterParams*/) {
-					return '<div><input type="radio"></div>';
+					return '<div><input name="firstcol_radio" type="radio"></div>';
 				}
 			},
 			{
@@ -504,8 +463,10 @@ function isFullySelected() {
 }
 
 function rowSelected(e, rowData) {
+	let fullySelected = isFullySelected();
+
 	Object.keys(STATUS)
-		.filter(key => STATUS[key] !== 1)
+		.filter(key => (!fullySelected ? STATUS[key] !== 1 : true)) // if fully selected, replace all values
 		.forEach(fName => {
 			var val = rowData[fName];
 			QUERY[fName] = val;
@@ -522,11 +483,22 @@ function rowSelected(e, rowData) {
 			$(selector, "#container")
 				.prop("disabled", true)
 				.trigger("chosen:updated");
-			/// RMA highlight row
 		});
+	// show change in selected values using background class flash = orange (12/18/18)
+	$(".chosen-single")
+		.closest(".chosen-container")
+		.addClass("flash");
+	$(".tabulator-row").removeClass("rowChosen");
+	// remove radio button set if any
 	$(e.target)
 		.closest(".tabulator-row")
 		.addClass("rowChosen");
+	setTimeout(() => {
+		// show change in selected values using background back to normal
+		$(".chosen-single")
+			.closest(".chosen-container")
+			.removeClass("flash");
+	}, 500);
 	pageComplete();
 }
 

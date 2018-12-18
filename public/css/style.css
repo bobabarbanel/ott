@@ -229,6 +229,6 @@ li.horiz p {
 
 	font-weight: bold;
 }
-.rowChosen .tabulator-cell {
-	background: orange;
+.rowChosen .tabulator-cell, .flash {
+	background: orange !important;
 }
