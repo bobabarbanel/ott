@@ -31,6 +31,7 @@ module.exports = function (dir, app, db) {
 			(results) => {
 				// console.log(JSON.stringify(results, null, 4));
 				data = results;
+				res.clearCookie(COOKIE);
 				res.render('index.html', {});
 			}
 		);

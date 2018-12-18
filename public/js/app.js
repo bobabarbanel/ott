@@ -67,7 +67,7 @@ $(function() {
 		Object.keys(STATUS)
 			.filter(key => STATUS[key] !== 1)
 			.forEach(fName => {
-				var val = rowData[fName];
+				var val = existing_cookie[fName];
 				QUERY[fName] = val;
 				var selector = "#" + fName + "_select";
 				$(selector, "#container").empty();
