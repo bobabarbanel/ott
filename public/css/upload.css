@@ -4,8 +4,8 @@ body {
 
 content {
     position: absolute;
-    left: 20px;
-    top: 20px;
+    left: 40px;
+    top: 60px;
 }
 
 #setup {
@@ -19,8 +19,13 @@ th,
 td {
     border: 1px solid black;
     text-align: center;
+    
 }
-
+#edit_func_type {
+    font-size: 14px;
+    border-radius: 2mm;
+    margin-top: 1em;
+}
 .digit {
     text-align: center;
     padding-left: 10px;
@@ -86,6 +91,7 @@ span.popup {
     color: blue;
     font: courier;
     margin-left: 10px;
+    border-radius: 2mm;
 }
 
 .stripes {
@@ -135,9 +141,12 @@ span.popup {
     -o-animation: rotating 1s linear infinite;
     animation: rotating 1s linear infinite;
 }
-
+input, button {
+    font-size: 14px;
+}
 #spin {
     position: absolute;
+    left: 950px;
     top: -1em;
     font-size: 54px;
     color: red;
@@ -234,4 +243,8 @@ tr.eftrow {
     font-weight: bold;
     text-align: center;
     width: 100%;
+    margin-top: 1em;
+}
+.fileUpload {
+    margin-left: 1em;
 }

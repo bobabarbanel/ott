@@ -49,7 +49,7 @@ class Util {
 		window.location.href = "/";
 	}
 
-	static setUpTabs(key4id, here) {
+	static setUpTabs(key4id, here, showTabNames) {
 		here = here.trim();
 		return new Promise((resolve, reject) => {
 			Util.getTabsData(key4id).then(
@@ -98,7 +98,7 @@ class Util {
 					topnav.append(nextTab);
 
 					let width = 150;
-					if ("tabs" in data)
+					if (showTabNames && "tabs" in data) {
 						data.tabs.forEach((tab, index) => {
 							let navItem = $(Util.definePageTab(index, tab, true));
 							let possible = tab.tabName.length * 14;
@@ -112,18 +112,22 @@ class Util {
 							}
 							topnav.append(navItem);
 						});
+					}
 
 					navDropDown.css("width", width + "px");
+					if (showTabNames) {
+						let buttons = $('<buttons class="navButtons"></buttons>');
+						buttons.append(
+							$(
+								'<button class="deleteButton"><i class="far fa-trash-alt" style="font-size:20px"></i></button>'
+							),
+							$(
+								'<button class="floatButton"><i class="fa fa-bars"></i></button>'
+							)
+						);
 
-					let buttons = $('<buttons class="navButtons"></buttons>');
-					buttons.append(
-						$(
-							'<button class="deleteButton"><i class="far fa-trash-alt" style="font-size:20px"></i></button>'
-						),
-						$('<button class="floatButton"><i class="fa fa-bars"></i></button>')
-					);
-
-					$("body").append($('<div id="navButtonDiv"/>').append(buttons));
+						$("body").append($('<div id="navButtonDiv"/>').append(buttons));
+					}
 
 					resolve(data.tabs);
 				},

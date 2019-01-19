@@ -98,14 +98,19 @@ $(function() {
 	} else {
 		refreshFromDB();
 	}
-	$("#main_action").on("click", () => useNewTab("main.html"));
+	$("#main_action").on("click", (e) => useSameTab(e, "main.html"));
 
-	$("#tools_action").on("click", () => useNewTab("tools.html"));
+	$("#tools_action").on("click", (e) => useSameTab(e, "tools.html"));
 
-	$("#tools_action_display").on("click", () => useNewTab("tools.html"));
+	$("#tools_action_display").on("click", (e) => useSameTab(e, "tools.html"));
 
-	$("#tab_action_edit").on("click", () => useNewTab("tabsedit.html"));
-	$("#tab_action_upload").on("click", () => useNewTab("tab_upload.html"));
+	$("#tools_action_edit").on('click', (e) => useSameTab(e, "ftedits.html"));
+
+	$("#tools_action_upload").on('click', (e) => useSameTab(e, "upload.html"));
+
+	$("#tab_action_edit").on("click", (e) => useSameTab(e, "tabsedit.html"));
+
+	$("#tab_action_upload").on("click", (e) => useSameTab(e, "tab_upload.html"));
 
 	// $(window).on('visibilitychange',
 	//     () => {
@@ -150,24 +155,25 @@ $(function() {
 	// });
 
 	// $("#tabs_upload").on("click", function() {
-	// 	useNewTab("tab_upload.html");
+	// 	useSameTab("tab_upload.html");
 	// });
 
 	// $("#upload_action").on("click", function() {
-	// 	useNewTab("upload.html");
+	// 	useSameTab("upload.html");
 	// });
 
 	// $("#tabs_action").on("click", function() {
-	// 	useNewTab("tabsedit.html");
+	// 	useSameTab("tabsedit.html");
 	// });
 
-	function useNewTab(destination) {
-		if (existingWindow !== undefined && existingWindow !== null) {
-			existingWindow.close();
-			existingWindow = null;
-		}
+	function useSameTab(event, destination) {
+		// if (existingWindow !== undefined && existingWindow !== null) {
+		// 	existingWindow.close();
+		// 	existingWindow = null;
+		// }
+		event.preventDefault();
 		cookieSetter();
-		// alert("useNewTab " + COMMON.getParsedCookie());
+		// alert("useSameTab " + COMMON.getParsedCookie());
 		openInSameTab("/tabs/" + destination);
 	}
 
@@ -263,7 +269,7 @@ async function refreshFromDB() {
 		error => console.log("getData error " + error)
 	);
 }
-let existingWindow;
+// let existingWindow;
 
 function cookieSetter() {
 	QUERY.page = TABLE.getPage();
@@ -281,11 +287,11 @@ function resetPage() {
 }
 function resetVars() {
 	//console.log("resetVars existingWindow = " + existingWindow);
-	if (existingWindow !== undefined && existingWindow !== null) {
-		//console.log("closing existing resetVars");
-		existingWindow.close();
-		existingWindow = null;
-	}
+	// if (existingWindow !== undefined && existingWindow !== null) {
+	// 	//console.log("closing existing resetVars");
+	// 	existingWindow.close();
+	// 	existingWindow = null;
+	// }
 	$.removeCookie(COMMON.getCookieName(), { path: "/" });
 	return new Promise((resolve, reject) => {
 		$.ajax({
@@ -301,12 +307,7 @@ function resetVars() {
 }
 
 function openInSameTab(url) {
-	if (existingWindow !== undefined && existingWindow !== null) {
-		//console.log("closing existing openInSameTab");
-		existingWindow.close();
-	}
-	existingWindow = window.open(url, "_self");
-	existingWindow.focus();
+	window.open(url, "_self");
 }
 var jsonData;
 const FIELDS = ["partId", "pName", "dept", "op", "machine"];

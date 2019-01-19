@@ -4,8 +4,8 @@ body {
 
 content {
     position: absolute;
-    left: 20px;
-    top: 20px;
+    left: 40px;
+    top: 60px;
 }
 
 #setup {
@@ -19,6 +19,7 @@ th,
 td :not(.ftSubmit) {
     border: 1px solid black;
     text-align: center;
+    font-size: 14px;
 }
 
 .digit {
@@ -45,19 +46,19 @@ tr.greyrow th {
 tr.spaced {
     background-color: white;
 }
-
+/* 
 input.noval {
     background-color: lightyellow;
-}
+} */
 
 input {
     margin-top: .5em;
     margin-bottom: .5em;
 }
-
+/* 
 .ibutton {
     margin: .5em;
-}
+} */
 
 td.enabled {
     /* will be flashed to show change */
@@ -74,16 +75,16 @@ td.disabled {
     width: 200px;
 } */
 
-.hidebuttons {
+/* .hidebuttons {
     display: none;
-}
+} */
 
-span.popup {
+/* span.popup {
     font-size: 80%;
     color: blue;
     font: courier;
     margin-left: 10px;
-}
+} */
 
 .stripes {
     background: repeating-linear-gradient( 45deg, #ae60bc, #ae60bc 5px, #5d3364 5px, #5d3364 10px);
@@ -211,15 +212,18 @@ tr.colnames th {
 }
 
 .ftSubmit { /* the ft change submit  button */
-    background: transparent;
+    background: grey;
+    color: white;
     width: 300px;
     border: 1px solid black;
     margin: 5px;
     font-weight: bold;
+    border-radius: 2mm;
+    font-size: 16px;
 }
 .submitOn {
     box-shadow: 2px 3px 3px #888888;
-    background: yellow;
+    background: green;
     cursor: pointer;
 }
 
