@@ -2,10 +2,10 @@
 /* globals Common, Util */
 // main.js :: MAIN Page
 
-const pageName = "Main";
-const common = new Common();
-const key4id = common.getKey4id();
-const key5 = common.getParsedCookie();
+window.name = "MAIN";
+const COMMON = new Common();
+const key4id = COMMON.getKey4id();
+const key5 = COMMON.getParsedCookie();
 
 const openMark = '&#9658;';
 const closeMark = '&#9660;';
@@ -18,11 +18,11 @@ $(function () {
     var title = "Main | Job: <b>" + key5.partId + '</b>';
     $("title").html(title); // browser tab title
 
-    Util.setUpTabs(key4id, pageName).then(
+    Util.setUpTabs(key4id, window.name).then(
         (tabs) => {
             Util.getMachineSpec(key5.machine)
                 .then(machineSpecs => {
-                    Util.getSheetTags(common.getParsedCookie(), "Tools").then((toolData) => {
+                    Util.getSheetTags(key5, "Tools").then((toolData) => {
                         paintPage(machineSpecs, toolData, tabs);
                         startUp();
                     });
@@ -60,7 +60,7 @@ function genLinkList(aList) {
 function paintPage(machineSpecs, toolData, tabs) {
     // page header
     let jobTitle = [key5.partId, key5.pName, key5.dept, key5.op, key5.machine].join(" : ");
-    $('pageheader').append($(`<h1 class="pageTitle">${pageName}</h1><h4 class="jobTitle">${jobTitle}</h4>`));
+    $('pageheader').append($(`<h1 class="pageTitle">${window.name}</h1><h4 class="jobTitle">${jobTitle}</h4>`));
 
     // tools
     toolsTable(machineSpecs, toolData);
@@ -138,7 +138,7 @@ function doRows(specs, turret, spindle, table, haves) {
         var td = $('<td class="left"/>');
         if (haves[link] !== undefined) {
             // white circle symbol in first column
-            var a = '<a target="_blank" href="/tabs/2.html#' + link + '">' + "&#9675;" + '</a>';
+            var a = '<a target="_self" href="/tabs/2.html#' + link + '">' + "&#9675;" + '</a>';
             td.html(a);
         }
 
@@ -175,11 +175,14 @@ function doRows(specs, turret, spindle, table, haves) {
 
 function tabsOutline(tabs) {
     // draw outline view of tab content
-    tabs.forEach(
-        (tab, index) => {
-            drawMainTab(tab, index);
-        }
-    );
+    if(tabs !== undefined) {
+        tabs.forEach(
+            (tab, index) => {
+                drawMainTab(tab, index);
+            }
+        );
+    }
+    
 
 }
 

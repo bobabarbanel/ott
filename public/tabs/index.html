@@ -1,126 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<!--meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+	<head>
+		<meta charset="UTF-8" />
+		<!--meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 	<meta http-equiv="Pragma" content="no-cache"/>
 	<meta http-equiv="Expires" content="0"/-->
 
-	<link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
-	<link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
+		<link rel="icon" href="/img/favicon.ico" type="image/x-icon" />
+		<!-- Latest compiled and minified CSS -->
+		<link
+			rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+			integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+			crossorigin="anonymous"
+		/>
 
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		<!-- Optional theme -->
+		<link
+			rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+			integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+			crossorigin="anonymous"
+		/>
 
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
-	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-	 crossorigin="anonymous"></script>
-	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-	<link rel="stylesheet" href="/css/jquery-confirm.css">
-	<script src="/js/jquery-confirm.js"></script>
+		<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+        crossorigin="anonymous"></script>
 
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js'></script>
+		<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
+		<!-- <link rel="stylesheet" href="/css/jquery-ui-base.css"> -->
+		<script
+			src="https://code.jquery.com/jquery-3.3.1.min.js"
+			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			crossorigin="anonymous"
+		></script>
+		<!-- Latest compiled and minified JavaScript -->
+		<script
+			src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+			integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+			crossorigin="anonymous"
+		></script>
+		<link
+			rel="stylesheet"
+			href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+		/>
+		<!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+		<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<link rel="stylesheet" href="/css/jquery-confirm.css" />
+		<script src="/js/jquery-confirm.js"></script>
 
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.css" rel="stylesheet">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.js"></script>
+		<!-- <link
+			href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.css"
+			rel="stylesheet"
+		/> -->
 
-	<script src="/js/chosen.jquery.js"></script>
-	<link rel="stylesheet" type="text/css" href="/css/chosen.css">
-	<link rel="stylesheet" type="text/css" href="/css/style.css">
-	<script type="application/javascript" src="/js/commonClass.js"></script>
+		<!-- <script
+			type="text/javascript"
+			src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.js"
+		></script> -->
+		<link
+			href="https://unpkg.com/tabulator-tables@4.1.4/dist/css/tabulator.min.css"
+			rel="stylesheet"
+		/>
+		<script
+			type="text/javascript"
+			src="https://unpkg.com/tabulator-tables@4.1.4/dist/js/tabulator.min.js"
+		></script>
+		<script type="text/javascript" src="/js/jquery_wrapper.min.js"></script>
 
-	<title>Parts and More Parts</title>
-</head>
+		<script src="/js/chosen.jquery.js"></script>
 
-<body>
-	<a tabindex="-1" href="#">
-		<img tabindex="-1" src="/img/Ott.jpg">
-	</a>
-	<ul tabindex="-1" id="container" class="wrap">
-		<!-- partId -->
-		<li tabindex="-1" class="horiz">
+		<link rel="stylesheet" type="text/css" href="/css/chosen.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script type="application/javascript" src="/js/commonClass.js"></script>
 
-			<label for="partId_select">Part Number</label>
-			<select id="partId_select" data-placeholder="Select a Part..." class="chooser chosen-partId">
-				<option value=""></option>
-			</select>
-			<p id="partId_num"></p>
+		<title>Parts and More Parts</title>
+	</head>
 
-			<!-- <div>
+	<body>
+		<div class="pageheader">
+			<a tabindex="-1" href="#"> <img tabindex="-1" src="/img/Ott.jpg" /> </a>
+			<button id="insert_action" class="btn-default">Add New Job</button>
+			<button id="delete_job_action" class="btn-warning">Delete Job</button>
+		</div>
+
+		<ul tabindex="-1" id="container" class="wrap">
+			<!-- partId -->
+			<li tabindex="-1" class="horiz">
+				<label for="partId_select">Part Number</label>
+				<select
+					id="partId_select"
+					data-placeholder="Select a Part..."
+					class="chooser chosen-partId"
+				>
+					<option value=""></option>
+				</select>
+				<p id="partId_num"></p>
+
+				<!-- <div>
 				
 			</div> -->
-		</li>
+			</li>
 
-		<!-- pName -->
-		<li tabindex="-1" class="horiz">
+			<!-- pName -->
+			<li tabindex="-1" class="horiz">
+				<label for="pName_select">Part Name</label>
+				<select
+					id="pName_select"
+					data-placeholder="Select a Name..."
+					class="chooser chosen-pName"
+				>
+					<option value=""></option>
+				</select>
+				<p id="pName_num"></p>
 
-			<label for="pName_select">Part Name</label>
-			<select id="pName_select" data-placeholder="Select a Name..." class="chooser chosen-pName">
-				<option value=""></option>
-			</select>
-			<p id="pName_num"></p>
-
-			<!-- <div>
+				<!-- <div>
 				
 			</div> -->
-		</li>
+			</li>
 
-		<!-- dept -->
-		<li tabindex="-1" class="horiz">
+			<!-- dept -->
+			<li tabindex="-1" class="horiz">
+				<label for="dept_select">Dept</label>
+				<select
+					id="dept_select"
+					data-placeholder="Select a Department..."
+					class="chooser chosen-dept"
+				>
+					<option value=""></option>
+				</select>
+				<p id="dept_num"></p>
 
-
-			<label for="dept_select">Dept</label>
-			<select id="dept_select" data-placeholder="Select a Department..." class="chooser chosen-dept">
-				<option value=""></option>
-			</select>
-			<p id="dept_num"></p>
-
-			<!-- <div>
+				<!-- <div>
 				
 			</div> -->
-		</li>
+			</li>
 
-		<!-- op -->
-		<li tabindex="-1" class="horiz">
+			<!-- op -->
+			<li tabindex="-1" class="horiz">
+				<label for="op_select">Op</label>
+				<select
+					id="op_select"
+					data-placeholder="Select an Operation..."
+					class="chooser chosen-op"
+				>
+					<option value=""></option>
+				</select>
+				<p id="op_num"></p>
 
-			<label for="op_select">Op</label>
-			<select id="op_select" data-placeholder="Select an Operation..." class="chooser chosen-op">
-				<option value=""></option>
-			</select>
-			<p id="op_num"></p>
-
-			<!-- <div>
+				<!-- <div>
 				
 			</div> -->
-		</li>
+			</li>
 
-		<!-- machine -->
-		<li tabindex="-1" class="horiz">
+			<!-- machine -->
+			<li tabindex="-1" class="horiz">
+				<label for="machine_select">Machine</label>
+				<select
+					id="machine_select"
+					data-placeholder="Select a Machine..."
+					class="chooser chosen-machine"
+				>
+					<option value=""></option>
+				</select>
 
-			<label for="machine_select">Machine</label>
-			<select id="machine_select" data-placeholder="Select a Machine..." class="chooser chosen-machine">
-				<option value=""></option>
-			</select>
+				<p id="machine_num"></p>
+			</li>
+		</ul>
+		<div class="horiz_menu">
+			<div id="controls" class="vert_menu">
+				<button id="reset" class="btn-primary" type="button">Reset</button>
 
-			<p id="machine_num"></p>
+				<div id="this_job">
+					<div class="menutitle">Actions</div>
+					<ul id="this_job_menu">
+						<li><div id="main_action">Main</div></li>
+						<li>
+							<div id="tools_action">Tools</div>
+							<ul>
+								<li><div id="tools_action_display">Images</div></li>
+								<li><div id="tools_action_edit">Edit</div></li>
+								<li><div id="tools_action_upload">Upload</div></li>
+							</ul>
+						</li>
+						<li>
+							<div id="hand_tools_action">Hand Tools</div>
+							<ul>
+								<li><div id="hand_tools_action_display">Images</div></li>
+								<li><div id="hand_tools_action_edit">Edit</div></li>
+								<li><div id="hand_tools_action_upload">Upload</div></li>
+							</ul>
+						</li>
+						<li>
+							<div id="inspection_tools_action">Inspection Tools</div>
+							<ul>
+								<li><div id="inspection_tools_action_display">Images</div></li>
+								<li><div id="inspection_tools_action_edit">Edit</div></li>
+								<li><div id="inspection_tools_action_upload">Upload</div></li>
+							</ul>
+						</li>
 
+						<li>
+							<div id="tab_action">Tabs</div>
+							<ul>
+								<li id="tab_action_display_li">
+									<div id="tab_action_display">Display</div>
+									<ul id="tabNames"></ul>
+								</li>
+								<li><div id="tab_action_edit">Edit</div></li>
+								<li><div id="tab_action_upload">Upload</div></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div tabindex="-1" id="dataTable"></div>
+		</div>
 
-		</li>
-	</ul>
-	<div id="buttons">
-		<button id="reset" tabindex="5" class="action" type="button">Reset</button>
-		<button id="run" tabindex="1" class="action active" type="button">&nbsp;&nbsp;Main&nbsp;&nbsp;</button>
-		<button id="upload_action" tabindex="2" class="action" type="button">&nbsp;&nbsp;Tool Image Uploads&nbsp;&nbsp;</button>
-		<button id="tabs_action" tabindex="3" class="action" type="button">&nbsp;&nbsp;Tabs Edit&nbsp;&nbsp;</button>
-		<button id="tabs_upload" tabindex="4" class="action" type="button">&nbsp;&nbsp;Tabs Image Uploads&nbsp;&nbsp;</button>
-		<button id="delete_action" tabindex="5" class="action" type="button">&nbsp;&nbsp;Delete Job&nbsp;&nbsp;</button>
-	</div>
-	<div tabindex="-1" id="dataTable"></div>
-
-
-	<script src="/js/app.js"></script>
-
-</body>
-
+		<script src="/js/app.js"></script>
+	</body>
 </html>

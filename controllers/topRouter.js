@@ -31,7 +31,7 @@ module.exports = function (dir, app, db) {
 			(results) => {
 				// console.log(JSON.stringify(results, null, 4));
 				data = results;
-				res.clearCookie(COOKIE);
+				//res.clearCookie(COOKIE);
 				res.render('index.html', {});
 			}
 		);
@@ -62,7 +62,7 @@ module.exports = function (dir, app, db) {
 		);
 		// TODO: catch errors??
 
-		res.sendFile(dir + '/insert.html');
+		res.render('insert.html', {});
 	});
 
 	app.get('/machine/:mnum', (req, res) => {
@@ -254,11 +254,11 @@ module.exports = function (dir, app, db) {
 	});
 
 
-	app.post('/go_parts', (req, res) => {
-		var cookie_value = JSON.stringify(req.body);
-		res.cookie(COOKIE, cookie_value);
-		res.send(cookie_value);
-	});
+	// app.post('/setCookie', (req, res) => {
+	// 	var cookie_value = JSON.stringify(req.body);
+	// 	res.cookie(COOKIE, cookie_value,{ maxAge: 600 * 1000 });
+	// 	res.send(cookie_value);
+	// });
 
 	app.post('/pname', (req, res) => {
 

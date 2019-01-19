@@ -1,9 +1,6 @@
 body {
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-	background-position: center;
+	margin: 8px;
 }
-
 #error {
 	font-size: 32px;
 	color: blueviolet;
@@ -43,8 +40,8 @@ a.chosen-single:not(.chosen-default) span {
 
 #container {
 	padding: 0;
-	margin: 0;
-	width: 100%;
+	margin: 20px;
+	width: auto;
 	list-style: none;
 	border: 1px solid silver;
 	-ms-box-orient: horizontal;
@@ -62,10 +59,8 @@ a.chosen-single:not(.chosen-default) span {
 }
 
 li.horiz {
-	/* background: tomato; */
 	padding: 5px;
-	/* width: 100px; */
-	/* height: 100px; */
+	
 	margin: 10px;
 	border: 1px solid silver;
 }
@@ -80,7 +75,6 @@ li label {
 }
 
 li.horiz {
-	/* width: 180px; */
 	display: flex;
 	justify-content: space-between;
 	flex-direction: row;
@@ -94,7 +88,7 @@ li.horiz p {
 
 #dataTable {
 	width: 900px;
-	margin: 70px auto;
+	margin: 30px 0 0 200px;
 	font-size: 16px;
 }
 
@@ -137,49 +131,49 @@ li.horiz p {
 	color: red;
 }
 
-#buttons {
+/* #buttons {
 	margin-top: 20px;
 	display: inline-block;
+} */
+#controls {
+	margin-left: 30px;
+	margin-top: 30px;
 }
-#buttons button {
+#reset {
 	border-radius: 6px;
 	cursor: pointer;
+	font-size: 20px;
+	align-self: center;
+	margin: -37px 0 30px 30px;
 }
-
-.action {
+#delete_job_action {
+	margin-left: 1em;
+}
+/* .action {
 	margin-left: 40px;
-}
+} */
 
-#run {
+/* #run {
 	background: blue;
 	color: white;
-}
+} */
 
-#buttons {
+/* #buttons {
 	width: 80%;
-}
+} */
 
-#buttons button {
-	margin-left: 4em;
-	cursor:pointer;
-	font-family:Arial;
-	font-size:15px;
-	font-weight:bold;
-	padding:6px 24px;
-	text-decoration:none;
-	outline: none;
-}
+/* 
 .active {
 	box-shadow: 2px 3px 0px 0px red;
 	background: lightblue;
-}
+} */
 
-#delete_action {
+/* #delete_action {
 	float: right;
 	background: rgb(146, 123, 8);
 	color: white;
 	font-weight: bold;
-}
+} */
 
 .qtable {
 	margin-left: 10px;
@@ -226,9 +220,50 @@ li.horiz p {
 }
 
 .rowChosen {
-
 	font-weight: bold;
 }
+
 .rowChosen .tabulator-cell, .flash {
-	background: orange !important;
+	background: rgb(145, 255, 0) !important;
+}
+
+#this_job_menu, #job_menu {
+	align-self: center;
+	margin-left: 30px;
+	font-size: 20px;
+}
+#job_menu {
+	margin-top: 1em;
+}
+#this_job_menu {
+	margin-top: 0.5em;
+	width:190px;
+}
+.truncate {
+	width: 150px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+  }
+
+.horiz_menu {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: row;
+}
+
+.vert_menu {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: column;
+	align-items: center;
+}
+
+div.menutitle {
+	margin: 30px 0 0 15px;
+	font-size: 20px;
+	background: grey;
+	color: white;
+	width: 100%;
+	text-align: center;
 }

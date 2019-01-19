@@ -1,93 +1,111 @@
 "use strict";
 
+// Character ASCII Codes
 const ENTER = 13;
 const TAB = 9;
-let multiButtons; // RMA
+window.name = "HOME";
 const COMMON = new Common();
-(function($) {
-	var prop = "VisibilityState";
-	var evt = "visibilitychange";
+jQuery.fn.visible = function() {
+	return this.css("visibility", "visible");
+};
 
-	var vendors = ["webkit", "ms"];
-	var vendor;
+jQuery.fn.invisible = function() {
+	return this.css("visibility", "hidden");
+};
+let TABLE;
+// (function($) {
+// 	var prop = "VisibilityState";
+// 	var evt = "visibilitychange";
 
-	function set_state(state) {
-		$(window).trigger("visibilitychange", state);
-		$.visibilityState = state;
-	}
+// 	var vendors = ["webkit", "ms"];
+// 	var vendor;
 
-	// detect property, if available
-	for (var i = 0; i < vendors.length; i++) {
-		vendor = vendors[i];
-		if (vendors[i] + prop in document) {
-			vendor = vendors[i];
-			prop = vendor + prop;
-			break;
-		}
-	}
+// 	function set_state(state) {
+// 		$(window).trigger("visibilitychange", state);
+// 		$.visibilityState = state;
+// 	}
 
-	// setup event handlers
-	if (vendor) {
-		$(document).on(vendor + evt, function() {
-			set_state(document[prop]);
-		});
-	} else {
-		// not as cool failback -- this is functionally different than the visibilitychange event
-		// it's recommended you understand what makes the two different before using this code
-		$(window)
-			.on("focus", function() {
-				set_state("visible");
-			})
-			.on("blur", function() {
-				set_state("hidden");
-			});
+// 	// detect property, if available
+// 	for (var i = 0; i < vendors.length; i++) {
+// 		vendor = vendors[i];
+// 		if (vendors[i] + prop in document) {
+// 			vendor = vendors[i];
+// 			prop = vendor + prop;
+// 			break;
+// 		}
+// 	}
 
-		// TODO handle mobile browsers where we dont have either visibility API or focusin. setup
-		// interval to check document.hasFocus()
-	}
+// 	// setup event handlers
+// 	if (vendor) {
+// 		$(document).on(vendor + evt, function() {
+// 			set_state(document[prop]);
+// 		});
+// 	} else {
+// 		// not as cool failback -- this is functionally different than the visibilitychange event
+// 		// it's recommended you understand what makes the two different before using this code
+// 		$(window)
+// 			.on("focus", function() {
+// 				set_state("visible");
+// 			})
+// 			.on("blur", function() {
+// 				set_state("hidden");
+// 			});
 
-	// set initial state
-	$.visibilityState = document[prop] || "visible";
-})(jQuery);
+// 		// TODO handle mobile browsers where we dont have either visibility API or focusin. setup
+// 		// interval to check document.hasFocus()
+// 	}
+
+// 	// set initial state
+// 	$.visibilityState = document[prop] || "visible";
+// })(jQuery);
 
 $(function() {
-	setUpTable();
-	refreshFromDB();
+	window.name = "HOME";
+	// $(window).on("visibilitychange", () => {
+	// 	alert("vischange", COMMON.getParsedCookie());
+	// });
+	TABLE = setUpTable();
 
-	let button_ids = [];
-	let buttons = $("#buttons > button");
-	buttons.each((i, ele) => (button_ids[i] = ele.id));
-	let buttonActiveNum = button_ids.indexOf("run");
-	let maxTabIndex = button_ids.length;
-	multiButtons = false;
+	$("#this_job").invisible();
+	$("#delete_job_action").hide();
+
+	$("#this_job_menu").menu({});
+
+	$("#this_job_menu > li").addClass("ui-state-disabled");
+
 	$("#reset").on("click", resetPage);
-	const existing_cookie = COMMON.getParsedCookie();
-	if (existing_cookie !== null) {
-		// set up display for this job
-		Object.keys(STATUS)
-			.filter(key => STATUS[key] !== 1)
-			.forEach(fName => {
-				var val = existing_cookie[fName];
-				QUERY[fName] = val;
-				var selector = "#" + fName + "_select";
-				$(selector, "#container").empty();
-				setNum(fName, 1);
-
-				var option = $("<option>")
-					.val(val)
-					.text(val);
-				$(selector, "#container").append(option);
-				STATUS[fName] = 1;
-				//console.log("rowSelected " + fName);
-				$(selector, "#container")
-					.prop("disabled", true)
-					.trigger("chosen:updated");
-			});
-	}
-
-	$("#run").on("click", function() {
-		useNewTab("main.html");
+	$("#insert_action").on("click", () => {
+		window.location.href = window.location + "insert";
 	});
+	const existing_cookie = COMMON.getParsedCookie();
+	// alert("existing_cookie " + JSON.stringify(existing_cookie)); // TODO:
+	if (existing_cookie !== null) {
+		refreshFromDB().then(() => {
+			let r = TABLE.getRows();
+			const searchParams = FIELDS.map(field => {
+				return { field: field, type: "=", value: existing_cookie[field] };
+			});
+			let row = TABLE.searchRows(searchParams);
+			if (row.length === 1) {
+				TABLE.setPage(existing_cookie.page); // page must be visible to find radio input element
+				const cell = row[0].getCell("row");
+
+				$(cell.getElement())
+					.find("input")
+					.trigger("click");
+			}
+		});
+	} else {
+		refreshFromDB();
+	}
+	$("#main_action").on("click", () => useNewTab("main.html"));
+
+	$("#tools_action").on("click", () => useNewTab("tools.html"));
+
+	$("#tools_action_display").on("click", () => useNewTab("tools.html"));
+
+	$("#tab_action_edit").on("click", () => useNewTab("tabsedit.html"));
+	$("#tab_action_upload").on("click", () => useNewTab("tab_upload.html"));
 
 	// $(window).on('visibilitychange',
 	//     () => {
@@ -96,105 +114,101 @@ $(function() {
 	//             $('#reset').trigger('click');
 	//         }
 	//     });
-	$("body").on("keydown", e => {
-		switch (e.which) {
-			/////////// Removed 12/13/18 -- CR in data entry fields is getting here. Too early for page submit.
-			// case ENTER: // Enter
-			//     $("#buttons button.active").trigger('click');
-			//     break;
-			///////////
+	// $("body").on("keydown", e => {
+	// 	switch (e.which) {
+	// 		/////////// Removed 12/13/18 -- CR in data entry fields is getting here. Too early for page submit.
+	// 		// case ENTER: // Enter
+	// 		//     $("#buttons button.active").trigger('click');
+	// 		//     break;
+	// 		///////////
 
-			case TAB: // use TAB to select next active button
-				if (multiButtons) {
-					$("#" + button_ids[buttonActiveNum]).toggleClass("active");
-					if (e.shiftKey === false) {
-						++buttonActiveNum;
-						e.preventDefault();
-						if (buttonActiveNum === maxTabIndex) {
-							buttonActiveNum = 0;
-						}
-					} else if (e.shiftKey === true) {
-						--buttonActiveNum;
-						e.preventDefault();
-						if (buttonActiveNum < 0) {
-							buttonActiveNum = maxTabIndex - 1;
-						}
-					}
-					$("#" + button_ids[buttonActiveNum])
-						.toggleClass("active")
-						.focus();
-					break;
-				}
-				break;
-			default:
-				break;
-		}
-	});
+	// 		case TAB: // use TAB to select next active button
+	// 			if (multiButtons) {
+	// 				$("#" + button_ids[buttonActiveNum]).toggleClass("active");
+	// 				if (e.shiftKey === false) {
+	// 					++buttonActiveNum;
+	// 					e.preventDefault();
+	// 					if (buttonActiveNum === maxTabIndex) {
+	// 						buttonActiveNum = 0;
+	// 					}
+	// 				} else if (e.shiftKey === true) {
+	// 					--buttonActiveNum;
+	// 					e.preventDefault();
+	// 					if (buttonActiveNum < 0) {
+	// 						buttonActiveNum = maxTabIndex - 1;
+	// 					}
+	// 				}
+	// 				$("#" + button_ids[buttonActiveNum])
+	// 					.toggleClass("active")
+	// 					.focus();
+	// 				break;
+	// 			}
+	// 			break;
+	// 		default:
+	// 			break;
+	// 	}
+	// });
 
-	$("#tabs_upload").on("click", function() {
-		useNewTab("tab_upload.html");
-	});
+	// $("#tabs_upload").on("click", function() {
+	// 	useNewTab("tab_upload.html");
+	// });
 
-	$("#upload_action").on("click", function() {
-		useNewTab("upload.html");
-	});
+	// $("#upload_action").on("click", function() {
+	// 	useNewTab("upload.html");
+	// });
 
-	$("#tabs_action").on("click", function() {
-		useNewTab("tabsedit.html");
-	});
+	// $("#tabs_action").on("click", function() {
+	// 	useNewTab("tabsedit.html");
+	// });
 
 	function useNewTab(destination) {
 		if (existingWindow !== undefined && existingWindow !== null) {
 			existingWindow.close();
 			existingWindow = null;
 		}
-		handleChoice().then(
-			result => {
-				//console.log('destination', COMMON.getParsedCookie());
-				openInNewTab("/tabs/" + destination);
-			},
-			error => console.log("handleChoice Error: " + error)
-		);
+		cookieSetter();
+		// alert("useNewTab " + COMMON.getParsedCookie());
+		openInSameTab("/tabs/" + destination);
 	}
 
-	$("#delete_action").on("click", function() {
-		alert("Not Implemented");
-		return;
-		// let key4 = [QUERY.dept, QUERY.partId, QUERY.op, QUERY.machine].join("|");
-		// countImages(key4).then(
-		//     r => {
-		//         //debugger;
-		//         let fileCount = r.fileCount;
-		//         $.confirm({
-		//             closeIcon: true,
-		//             icon: 'fa fa-exclamation fa-3x',
-		//             boxWidth: '700px',
-		//             useBootstrap: false,
-		//             /*type: 'red',*/
-		//             animation: 'right',
-		//             title: showVals(fileCount),
-		//             content: '<span class="qmsg"><b>Please choose a button.</b></span>',
-		//             buttons: {
-		//                 "YES, Delete This Job!": {
-		//                     btnClass: 'btn-red',
-		//                     action: () => {
-		//                         let key5 = [QUERY.dept, QUERY.machine,
-		//                             QUERY.op, QUERY.pName, QUERY.partId
-		//                         ].join("|");
-		//                         jobArchive(key4, key5);
-		//                         location.reload();
-		//                     }
-		//                 },
-		//                 "No, Do Not Delete": {
-		//                     btnClass: 'btn-blue cancelButtonClass'
-		//                 }
-		//             }
+	// $("#delete_action").on("click", function() {
+	// 	alert("Not Implemented");
+	// 	return;
+	// 	// let key4 = [QUERY.dept, QUERY.partId, QUERY.op, QUERY.machine].join("|");
+	// 	// countImages(key4).then(
+	// 	//     r => {
+	// 	//         //debugger;
+	// 	//         let fileCount = r.fileCount;
+	// 	//         $.confirm({
+	// 	//             closeIcon: true,
+	// 	//             icon: 'fa fa-exclamation fa-3x',
+	// 	//             boxWidth: '700px',
+	// 	//             useBootstrap: false,
+	// 	//             /*type: 'red',*/
+	// 	//             animation: 'right',
+	// 	//             title: showVals(fileCount),
+	// 	//             content: '<span class="qmsg"><b>Please choose a button.</b></span>',
+	// 	//             buttons: {
+	// 	//                 "YES, Delete This Job!": {
+	// 	//                     btnClass: 'btn-red',
+	// 	//                     action: () => {
+	// 	//                         let key5 = [QUERY.dept, QUERY.machine,
+	// 	//                             QUERY.op, QUERY.pName, QUERY.partId
+	// 	//                         ].join("|");
+	// 	//                         jobArchive(key4, key5);
+	// 	//                         location.reload();
+	// 	//                     }
+	// 	//                 },
+	// 	//                 "No, Do Not Delete": {
+	// 	//                     btnClass: 'btn-blue cancelButtonClass'
+	// 	//                 }
+	// 	//             }
 
-		//         });
-		//     },
-		//     err => console.log("err " + err)
-		// );
-	});
+	// 	//         });
+	// 	//     },
+	// 	//     err => console.log("err " + err)
+	// 	// );
+	// });
 
 	// handle changes in choosers - that is, selection of a particular item
 	$(".chooser", "#container").on("change", function() {
@@ -237,43 +251,23 @@ $(function() {
 	});
 });
 
-function refreshFromDB() {
-	getData().then(
+async function refreshFromDB() {
+	await getData().then(
 		data => {
 			jsonData = data; // now global
 			// Choosers
 			FIELDS.forEach(initField); // QUERY empty to start
 			// Table
 			refreshFilterTable();
-			$("#run").hide();
-			$("#upload_action").hide();
-			$("#delete_action").hide();
-
-			$("#tabs_action").hide();
-			$("#tabs_upload").hide();
 		},
 		error => console.log("getData error " + error)
 	);
 }
 let existingWindow;
 
-function handleChoice() {
-	//console.log("handleChoice " + QUERY.partId);
-	return new Promise((resolve, reject) => {
-		$.ajax({
-			url: "/go_parts",
-			type: "post",
-			data: QUERY
-		})
-			.done(result => {
-				// cookie now set ??
-				// console.log("existing", COMMON.getParsedCookie());
-				// console.log("new cookie", result);
-				resolve(result);
-			})
-			.fail((request, status, error) => reject(error));
-		//.always(() => console.log("handlechoice complete"));
-	});
+function cookieSetter() {
+	QUERY.page = TABLE.getPage();
+	$.cookie(COMMON.getCookieName(), JSON.stringify(QUERY), { expires: 1 });
 }
 
 function resetPage() {
@@ -306,12 +300,12 @@ function resetVars() {
 	});
 }
 
-function openInNewTab(url) {
+function openInSameTab(url) {
 	if (existingWindow !== undefined && existingWindow !== null) {
-		//console.log("closing existing openInNewTab");
+		//console.log("closing existing openInSameTab");
 		existingWindow.close();
 	}
-	existingWindow = window.open(url, "_blank");
+	existingWindow = window.open(url, "_self");
 	existingWindow.focus();
 }
 var jsonData;
@@ -335,21 +329,25 @@ const STATUS = {
 const QUERY = {};
 
 function updateTable(rows) {
-	$("#dataTable").tabulator("setData", rows);
-	formatTableCells();
+	TABLE.setData(rows);
+	if (rows.length === 1) formatTableCells();
 	annotateTableCount(rows.length);
 }
 
 function refreshFilterTable() {
 	// set new (reduced) jsonData in table, uses QUERY
+	// let data = (fresh) ? jsonData : );
 	updateTable(jsonData.filter(row => rowMatchesQuery(row)));
+	// return (data.length === 1) ? data[0] : null;
 }
 
 function setUpTable() {
-	$("#dataTable").tabulator({
+	return new Tabulator("#dataTable", {
 		//height:"450px", // set height of table (optional)
-		fitColumns: true, //fit columns to width of table (optional)
+		layout: "fitColumns", //fit columns to width of table (optional)
 		pagination: "local",
+		paginationSize: 15,
+		initialSort: [{ column: "partId", dir: "asc" }],
 		columns: [
 			//Define Table Columns
 			// first column is checkbox for choosing all the values in the row
@@ -357,8 +355,9 @@ function setUpTable() {
 				title: "&#x2714;",
 				field: "row",
 				align: "center",
-				width: "20px",
-				onClick: cellSingleClick,
+				width: 20,
+				cellClick: cellSingleClick,
+				headerSort: false,
 				sortable: false,
 				formatter: function(/*value, data, cell, row, options, formatterParams*/) {
 					return '<div><input name="firstcol_radio" type="radio"></div>';
@@ -407,9 +406,7 @@ function setUpTable() {
 				cssClass: "machineCol",
 				onClick: cellSingleClick
 			}
-		],
-		sortBy: "partId", // when data is loaded into the table, sort it by partId
-		sortDir: "asc"
+		]
 	});
 }
 
@@ -464,7 +461,6 @@ function isFullySelected() {
 
 function rowSelected(e, rowData) {
 	let fullySelected = isFullySelected();
-
 	Object.keys(STATUS)
 		.filter(key => (!fullySelected ? STATUS[key] !== 1 : true)) // if fully selected, replace all values
 		.forEach(fName => {
@@ -507,60 +503,126 @@ function setNum(fName, number) {
 }
 
 function pageComplete() {
-	//$("#dataTable").hide();
-	// RMA highlight this row
-	$("#run").show();
-	$("#upload_action").show();
-	$("#delete_action").show();
-	jobHasTabs().then(
-		numDocs => {
-			let tabText = "<u>Tab" + (numDocs > 1 ? "s" : "");
-			let tabs_action_button = $("#tabs_action");
-			if (numDocs === 0) {
-				tabs_action_button.html("<u>Tabs Create</u>");
-			} else {
-				tabs_action_button.html(tabText + " Edit</u> (" + numDocs + ")");
-			}
-			tabs_action_button.show();
-			if (numDocs > 0) {
-				$("#tabs_upload")
-					.html(`<u>${tabText} Upload</u>`)
-					.show();
-			}
-		},
-		err => {
-			alert("jobHasTabs error " + err);
-		}
+	enable_menu(
+		"delete_job",
+		"main",
+		"tools",
+		"hand_tools",
+		"inspection_tools",
+		"tab",
+		"delete_job"
 	);
+	$("#this_job").visible();
+	$("#delete_job_action").show();
+}
+function enable(tag) {
+	$(tag)
+		.closest("li")
+		.removeClass("ui-state-disabled");
+}
+function disable(tag) {
+	$(tag)
+		.closest("li")
+		.addClass("ui-state-disabled");
+}
+function enable_menu(...theArgs) {
+	theArgs.forEach(action => {
+		switch (action) {
+			case "delete_job":
+			case "main":
+				enable(`#${action}_action`);
+				break;
 
-	multiButtons = true;
+			case "tools":
+			case "hand_tools":
+			case "inspection_tools":
+				enable(`#${action}_action`);
+				["display", "edit", "upload"].forEach(label =>
+					enable(`#${action}_action_${label}`)
+				);
+				break;
+			case "tab":
+				enable(`#${action}_action`);
+				["display", "edit", "upload"].forEach(label =>
+					enable(`#${action}_action_${label}`)
+				);
+
+				getJobTabs().then(tabList => {
+					const ul = $("#tabNames").empty();
+					const li = $("#tab_action_display_li");
+					if (tabList.length > 0) {
+						// .siblings() // just a single <UL> element
+						// .empty();
+						tabList.forEach((tabName, index) => {
+							const id = `tab_display_${tabName}`;
+							ul.append(
+								$(`<li ><div class="truncate" id="${id}">
+								<div class="showtab" index="${index}" tabName="${tabName}">${tabName}</div>
+								</div></li>`)
+							);
+						});
+
+						li.removeClass("ui-state-disabled");
+					} else {
+						li.addClass("ui-state-disabled");
+					}
+
+					$(".showtab").on("click", openTab);
+				});
+
+				break;
+		}
+	});
+	//
+
+	// // setup tools_menu
+
+	// // setup tab menu
+
+	// setup hand_tools menu
+	// setup inspection_tools menu
+}
+function openTab() {
+	const index = $(this).attr("index");
+	const tabName = $(this).attr("tabName");
+	cookieSetter();
+	openInSameTab(`/showtab/${index}/${tabName}`);
 }
 
-function jobHasTabs() {
+function getJobTabs() {
 	//const common = new Common();
-	const _id = COMMON.getKey4_ORDER()
-		.map(key => QUERY[key])
-		.join("|"); // create key4 string
 	return new Promise((resolve, reject) => {
+		const _id = COMMON.getKey4_ORDER()
+			.map(key => QUERY[key])
+			.join("|"); // create key4 string
 		$.post({
-			url: "/has_tabs",
+			url: "/get_tabs",
 			data: {
 				_id: _id
 			}
 		})
-			.done(result => resolve(result))
+			.done(result => {
+				if ("tabs" in result) {
+					result = result.tabs.map(tab => tab.tabName);
+				} else {
+					result = []; // no tabs found
+				}
+
+				resolve(result);
+			})
 			.fail((request, status, error) => reject(error));
 	});
 }
 
-function cellSingleClick(e, cell, value, data) {
+function cellSingleClick(e, cell) {
 	//e - the click event object
 	//cell - the DOM element of the cell
 	//value - the value of the cell
 	//data - the data for the row the cell is in
-	if (value === "") {
+
+	if (cell.getValue() === undefined) {
 		// radio button, first cell
-		rowSelected(e, data); // select all the values from this row
+		rowSelected(e, cell.getData()); // select all the values from this row
 	} else {
 		// other cells; use only the cell's value as new selection
 		var fName = $(this)[0].field;
@@ -618,7 +680,7 @@ function keyMatch(row) {
 	if (Object.keys(QUERY).length === 0) {
 		return true;
 	}
-	return Object.keys(QUERY).every(key => row[key] === QUERY[key]);
+	return Object.keys(FIELDS).every(key => row[key] === QUERY[key]);
 }
 
 function initField(fName) {

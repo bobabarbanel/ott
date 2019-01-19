@@ -129,7 +129,7 @@ function doRows(specs, turret, spindle, table, haves) {
         var td = $('<td class="left"/>');
         if (haves[link] !== undefined) {
             // white circle symbol in first column
-            var a = '<a target="_blank" href="/tabs/2.html#' + link + '">' + "&#9675;" + '</a>';
+            var a = '<a target="_self" href="/tabs/2.html#' + link + '">' + "&#9675;" + '</a>';
             td.html(a);
         }
 
