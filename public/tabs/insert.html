@@ -1,113 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+      <script
+         src="https://code.jquery.com/jquery-3.3.1.min.js"
+         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+         crossorigin="anonymous"></script>
+      <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+      <script
+         defer
+         src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
+         integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+         crossorigin="anonymous"
+         ></script>
+      <script src="/js/chosen.jquery.js"></script>
+      <link rel="stylesheet" type="text/css" href="/css/chosen.css">
 
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
-    <script
-			src="https://code.jquery.com/jquery-3.3.1.min.js"
-			integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-			crossorigin="anonymous"></script>
-    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-
-    <script
-			defer
-			src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
-			integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
-			crossorigin="anonymous"
-		></script>
-
-    <script src="/js/chosen.jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/chosen.css">
-
-    <link rel="stylesheet" href="/css/jquery-confirm.css">
-	<script src="/js/jquery-confirm.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/insert.css">
-    <link rel="stylesheet" type="text/css" href="/css/nav.css">
-
-    <title>Insert New Job</title>
-</head>
-
-<body>
-    <div class="topnav" id="myTopnav"></div>
-    
-        <content>
-            <div id="insertNotice"></div>
-            <h2 class="task">Enter a New Job</h2>
-                
-            <table id="new_key_input">
-                    <!-- partId -->
-                    <tr>
-                        <th class="field">Part Number</th>
-                        <td><input class="ins"  type="text" id="partId_new" value=""></input>
-                        </td>
-                        <td>
-                            <select id="partId_select" data-placeholder="Select a Part..." class="chooser chosen-partId">
-                                <option value=""></option>
-                            </select>
-                        </td>
-
-                    </tr>
-                    <!-- pName -->
-                    <tr>
-                        <th class="field">Part Name</th>
-                        <td> <input class="ins"  type="text" id="pName_new" value=""></input>
-                        </td>
-                        <td>
-                            <select id="pName_select" data-placeholder="Select a Name..." class="chooser chosen-pName">
-                                <option value=""></option>
-                            </select>
-                        </td>
-
-                    </tr>
-                    <!-- dept -->
-                    <tr>
-                        <th class="field">Department</th>
-                        <td><input class="ins"  type="text" id="dept_new" value=""></input>
-                        </td>
-                        <td>
-                            <select id="dept_select" data-placeholder="Select a Department..." class="chooser chosen-dept">
-                                <option value=""></option>
-                            </select>
-                        </td>
-
-                    </tr>
-                    <!-- op -->
-                    <tr>
-                        <th class="field">Operation</th>
-                        <td><input class="ins"  type="text" id="op_new" value=""></input>
-                        </td>
-                        <td>
-                            <select id="op_select" data-placeholder="Select an Operation..." class="chooser chosen-op">
-                                <option value=""></option>
-                            </select>
-                        </td>
-
-                    </tr>
-                    <!-- machine -->
-                    <tr>
-                        <th class="field">Machine</th>
-                        <td><input class="ins"  type="text" id="machine_new" value=""></input>
-                        </td>
-                        <td>
-                            <select id="machine_select" data-placeholder="Select a Machine..." class="chooser chosen-machine">
-                                <option value=""></option>
-                            </select>
-                        </td>
-
-                    </tr>
-            </table>
-            <div id="buttons">
-                <button id="reset" class="action" type="button">Reset</button>
-                <button id="submit" class="action" type="button">&nbsp;&nbsp;Submit&nbsp;&nbsp;</button>
-            </div>
-        </content>
-        
-        <script type="application/javascript" src="/js/utilClass.js"></script>
-		<script type="application/javascript" src="/js/commonClass.js"></script>
-    
-
-    <script src="/js/app_insert.js"></script>
-</body>
-
+      <link rel="stylesheet" href="/css/jquery-confirm.css">
+      <script src="/js/jquery-confirm.js"></script>
+      
+      <link rel="stylesheet" type="text/css" href="/css/insert.css">
+      <link rel="stylesheet" type="text/css" href="/css/nav.css">
+      <title>Insert New Job</title>
+   </head>
+   <body>
+      <div class="topnav" id="myTopnav"></div>
+      <content>
+         <div id="insertNotice"></div>
+         <h2 class="task">Enter a New Job</h2>
+         <table id="new_key_input">
+            <!-- partId -->
+            <tr>
+               <th class="field">Part Number</th>
+               <td><input class="ins"  type="text" id="partId_new" value=""></input>
+               </td>
+               <td>
+                  <select id="partId_select" data-placeholder="Select a Part..." class="chooser chosen-partId">
+                     <option value=""></option>
+                  </select>
+               </td>
+            </tr>
+            <!-- pName -->
+            <tr>
+               <th class="field">Part Name</th>
+               <td> <input class="ins"  type="text" id="pName_new" value=""></input>
+               </td>
+               <td>
+                  <select id="pName_select" data-placeholder="Select a Name..." class="chooser chosen-pName">
+                     <option value=""></option>
+                  </select>
+               </td>
+            </tr>
+            <!-- dept -->
+            <tr>
+               <th class="field">Department</th>
+               <td><input class="ins"  type="text" id="dept_new" value=""></input>
+               </td>
+               <td>
+                  <select id="dept_select" data-placeholder="Select a Department..." class="chooser chosen-dept">
+                     <option value=""></option>
+                  </select>
+               </td>
+            </tr>
+            <!-- op -->
+            <tr>
+               <th class="field">Operation</th>
+               <td><input class="ins"  type="text" id="op_new" value=""></input>
+               </td>
+               <td>
+                  <select id="op_select" data-placeholder="Select an Operation..." class="chooser chosen-op">
+                     <option value=""></option>
+                  </select>
+               </td>
+            </tr>
+            <!-- machine -->
+            <tr>
+               <th class="field">Machine</th>
+               <td><input class="ins"  type="text" id="machine_new" value=""></input>
+               </td>
+               <td>
+                  <select id="machine_select" data-placeholder="Select a Machine..." class="chooser chosen-machine">
+                     <option value=""></option>
+                  </select>
+               </td>
+            </tr>
+         </table>
+         <div id="buttons">
+            <button id="reset" class="action" type="button">Reset</button>
+            <button id="submit" class="action" type="button">&nbsp;&nbsp;Submit&nbsp;&nbsp;</button>
+         </div>
+      </content>
+      <script type="application/javascript" src="/js/utilClass.js"></script>
+      <script src="/js/app_insert.js"></script>
+   </body>
 </html>

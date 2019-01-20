@@ -1,8 +1,7 @@
 "use strict";
 // app_insert.js
 
-const COMMON = new Common();
-const key4id = COMMON.getKey4id();
+
 jQuery.fn.visible = function() {
 	return this.css("visibility", "visible");
 };
@@ -24,7 +23,7 @@ $(function() {
 	const FWIDTH = "180px";
 	const STATUS = {};
 	const KEY5 = {};
-	Util.setUpShortNav(key4id, "");
+	Util.setUpShortNav("", "");
 	doGetData();
 	$("#submit").invisible();
 	$("select").attr("tabindex", -1);
