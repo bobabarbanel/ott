@@ -11,8 +11,8 @@ jQuery.fn.invisible = function() {
 	return this.css("visibility", "hidden");
 };
 $(function() {
-    const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
-    var jsonData;
+	const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
+	var jsonData;
 	const FIELDS = ["partId", "pName", "dept", "op", "machine"];
 	const FIELDSORTER = {
 		partId: alphaCompare,
@@ -20,13 +20,14 @@ $(function() {
 		dept: alphaCompare,
 		op: (a, b) => a - b,
 		machine: alphaCompare
-    };
-    const FWIDTH = "180px";
+	};
+	const FWIDTH = "180px";
 	const STATUS = {};
 	const KEY5 = {};
-    Util.setUpShortNav(key4id, "");
-    doGetData();
+	Util.setUpShortNav(key4id, "");
+	doGetData();
 	$("#submit").invisible();
+	$("select").attr("tabindex", -1);
 
 	$("#reset").on("click", function() {
 		location.reload();
@@ -41,8 +42,8 @@ $(function() {
 						boxWidth: "500px",
 						useBootstrap: false,
 						type: "red",
-                        animation: "left",
-                        icon: 'fas fa-exclamation-triangle',
+						animation: "left",
+						icon: "fas fa-exclamation-triangle",
 						title: '"' + KEY5.machine + '" Warning: Machine Specs Are Unknown.',
 						content: "Do you want to submit this new Identifier?",
 						buttons: {
@@ -69,17 +70,20 @@ $(function() {
 
 	$(".chooser", "content").on("change", handleChooseOne);
 	$("input").on("change keyup paste", handleInputOne);
-	
+
 	function performPut() {
 		putKey5().then(
 			value => {
-                debugger;
-				if (value.error.code === 11000) {
+				debugger;
+				if ("error" in value && value.error.code === 11000) {
 					$("#submit").invisible();
 					$("#insertNotice").css("background-color", "red");
 					$("#insertNotice")
 						.text("Error: Duplicate Identifier.")
 						.visible();
+					setTimeout(function() {
+						$("#insertNotice").invisible();
+					}, 2000);
 				} else {
 					$("#insertNotice").css("background-color", "green");
 					$("#insertNotice")
@@ -162,7 +166,6 @@ $(function() {
 	}
 
 	function getData(message) {
-		
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: "/data",
@@ -266,7 +269,7 @@ $(function() {
 							.removeClass()
 							.invisible();
 						$("#submit").visible(); // exposes go button
-                    } 
+					}
 				});
 		}
 	}
