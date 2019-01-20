@@ -1,5 +1,18 @@
+body {
+    background: rgb(159, 190, 231);
+}
+
+content {
+    margin-top: 2em;
+	display: flex;
+	flex-direction: column;
+	width: 800px;
+}
 .chosen-container {
 	font-size: 16px;
+}
+.highlight {
+	background: red;
 }
 
 div a.chosen-single:not(.chosen-default) {
@@ -30,19 +43,19 @@ a.chosen-single:not(.chosen-default) span {
 	cursor: default;
 }
 
-h1.task {
+h2.task {
 	color: white;
 	background-color: blue;
-	margin-left: 80px;
+	margin-left: 120px;
 	text-align: center;
-}
-
-#container .horiz {
-	display: inline-block;
+	align-self: center;
+	width: 600px;
 }
 
 #buttons {
-	display: inline-block;
+	display: flex;
+	margin-left: 3em;
+	justify-content: space-around;
 }
 
 button {
@@ -51,12 +64,12 @@ button {
 	-moz-border-radius: 28;
 	border-radius: 14px;
 	text-shadow: 3px 2px 1px #9daef5;
-	
 	box-shadow: 3px 2px 9px #666666;
 	font-family: Arial;
 	width: 90px;
 	padding: 5px;
 	text-decoration: none;
+	margin-right: 1em;
 }
 
 
@@ -80,19 +93,9 @@ button {
 }
 #submit:hover {
 	background: #86b690;
-	
 	text-decoration: none;
 	color: black;
 	box-shadow: 2px 1px 1px #AAAAAA;
-}
-
-.action {
-	margin-left: 40px;
-}
-
-#run {
-	background: blue;
-	color: white;
 }
 
 #new_key_input {
@@ -101,11 +104,11 @@ button {
 }
 
 #insertNotice {
+	margin-top: 2.5em;
 	margin-left: 100px;
 	color: white;
 	width: 400px;
-	display: none;
-	font-size: 2em;
+	font-size: 1.5em;
 	text-align: center;
 }
 
@@ -118,6 +121,8 @@ th.field {
 	font-size: 16px;
 	text-align: right;
 	margin-right: 10px;
+	color: black;
+	width: 200px;
 }
 
 td, th {
@@ -126,4 +131,5 @@ td, th {
 
 .ins {
 	width: 200px;
+	height: 1.7em;
 }

@@ -48,7 +48,16 @@ class Util {
 		// alert('goHome ' + JSON.stringify(COMMON.getParsedCookie()));
 		window.location.href = "/";
 	}
+	static setUpShortNav(key4id, here) {
+		here = here.trim();
 
+		let topnav = $(".topnav");
+		let home_button = $(
+			'<a class="home" id="home_button"><i class="fas fa-home fa-lg"></i></a>'
+		);
+		home_button.on("click", Util.goHome);
+		topnav.append(home_button);
+	}
 	static setUpTabs(key4id, here, showTabNames) {
 		here = here.trim();
 		return new Promise((resolve, reject) => {
@@ -208,25 +217,4 @@ class Util {
 		let existingWindow = window.open(url, "_self");
 		existingWindow.focus();
 	}
-
-	// static getQueryVariable(variable) {
-	//     var query = window.location.search.substring(1);
-	//     var parms = query.split('&');
-	//     for (var i = 0; i < parms.length; i++) {
-	//         var pos = parms[i].indexOf('=');
-	//         if (pos > 0 && variable == parms[i].substring(0, pos)) {
-	//             return parms[i].substring(pos + 1);;
-	//         }
-	//     }
-	//     return "";
-	// }
-
-	// static URLParam(name) {
-	//     var results = new RegExp('[\?&]' + name + '=([^]*)').exec(window.location.href);
-	//     if (results == null) {
-	//         return null;
-	//     } else {
-	//         return decodeURIComponent(results[1]) || 0;
-	//     }
-	// }
 }
