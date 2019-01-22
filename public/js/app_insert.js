@@ -166,19 +166,23 @@ $(function() {
 
 	function getData(message) {
 		return new Promise((resolve, reject) => {
+			console.log("getdata");
 			$.ajax({
-				url: "/data",
+				url: "/get_jobs",
 				type: "get",
 				dataType: "json"
 			})
 				.done(result => {
-					// console.log(JSON.stringify(result, null, 4));
+					// console.log(JSON.stringify(result.length, null, 4));
 					resolve(result);
 				})
 
-				.fail((request, status, error) => reject(error))
+				.fail((request, status, error) => {
+					// console.log(JSON.stringify(error, null, 4));
+					reject(error);
+				});
 
-				.always(() => console.log("getdata complete: " + message));
+				//.always(() => console.log("getdata complete: " + message));
 		});
 	}
 

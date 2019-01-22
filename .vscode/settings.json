@@ -1,5 +1,7 @@
 {
     
     "breadcrumbs.enabled": true,
-    "workbench.editor.openPositioning": "left"
+    "workbench.editor.openPositioning": "left",
+    
+
 }

@@ -24,8 +24,12 @@
 			crossorigin="anonymous"
 		/>
 
-		<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
-        crossorigin="anonymous"></script>
+		<script
+			defer
+			src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
+			integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+			crossorigin="anonymous"
+		></script>
 
 		<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
 		<!-- <link rel="stylesheet" href="/css/jquery-ui-base.css"> -->
@@ -44,23 +48,13 @@
 			rel="stylesheet"
 			href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
 		/>
-		<!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
-		<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		<link rel="stylesheet" href="/css/jquery-confirm.css" />
 		<script src="/js/jquery-confirm.js"></script>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-		<!-- <link
-			href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.css"
-			rel="stylesheet"
-		/> -->
-
-		<!-- <script
-			type="text/javascript"
-			src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.11.0/tabulator.min.js"
-		></script> -->
 		<link
 			href="https://unpkg.com/tabulator-tables@4.1.4/dist/css/tabulator.min.css"
 			rel="stylesheet"
@@ -170,6 +164,7 @@
 				<p id="machine_num"></p>
 			</li>
 		</ul>
+
 		<div class="horiz_menu">
 			<div id="controls" class="vert_menu">
 				<button id="reset" class="btn-primary" type="button">Reset</button>
@@ -217,7 +212,10 @@
 					</ul>
 				</div>
 			</div>
-			<div tabindex="-1" id="dataTable"></div>
+			
+				<spin class="rotating"><i class="fas fa-spinner fa-pulse"></i></spin>
+				<div tabindex="-1" id="dataTable"></div>
+			
 		</div>
 
 		<script src="/js/app.js"></script>

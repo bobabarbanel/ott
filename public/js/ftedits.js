@@ -255,7 +255,6 @@ $(function() {
 
 	function inputChanges(ev) {
 		// called from type and function input text elements
-		debugger;
 		let now = $(this).val();
 		ev.preventDefault();
 

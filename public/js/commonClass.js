@@ -3,8 +3,8 @@
 
 class Common {
 	constructor() {
-		this.COOKIE = "chosenCookie";
-		this.KEY4_ORDER = ["dept", "partId", "op", "machine"];
+		this.COOKIENAME = "chosenCookie"; // IMPORTANT: Also defined in topRouter.js
+		this.KEY4_ORDER = ["dept", "partId", "op", "machine"]; // also defined in topRouter.js
 		this.KEY5_ORDER = ["dept", "pName", "partId", "op", "machine"];
 		this.setCookie();
 	}
@@ -25,7 +25,7 @@ class Common {
 	}
 
 	readCookie() {
-		var nameEQ = this.COOKIE + "=";
+		var nameEQ = this.COOKIENAME + "=";
 		var ca = document.cookie.split(";");
 		for (var i = 0; i < ca.length; i++) {
 			var c = ca[i];
@@ -62,6 +62,6 @@ class Common {
 	}
 
 	getCookieName() {
-		return this.COOKIE;
+		return this.COOKIENAME; // TODO: 
 	}
 }

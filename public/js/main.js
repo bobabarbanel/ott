@@ -18,7 +18,7 @@ $(function () {
     var title = "Main | Job: <b>" + key5.partId + '</b>';
     $("title").html(title); // browser tab title
 
-    Util.setUpTabs(key4id, window.name).then(
+    Util.setUpTabs(key4id, window.name, true).then(
         (tabs) => {
             Util.getMachineSpec(key5.machine)
                 .then(machineSpecs => {

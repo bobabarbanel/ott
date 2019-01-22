@@ -25,7 +25,7 @@ $(function () { // onload
 
     $('head title', window.parent.document).text("Tools for " + TV.key5.partId);
 
-    Util.setUpTabs(TV.key4id, pageName).then(
+    Util.setUpTabs(TV.key4id, pageName, true).then(
         () => {
             Util.getMachineSpec(TV.key5.machine)
                 .then(machineSpecs => {
