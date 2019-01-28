@@ -44,7 +44,7 @@ $(function() {
 
 		$("head title", window.parent.document).text(tabName);
 
-		Util.setUpTabs(TV.key4id, tabName, true).then(tabs => {
+		Util.setUpTabs(TV.key4id, tabName, {'tab': true, 'spec': true, 'tabmenus': true}).then(tabs => {
 			getTabImages().then(
 				// gets only non-archived images
 				stepFiles => {

@@ -69,6 +69,7 @@
 
 		<link rel="stylesheet" type="text/css" href="/css/chosen.css" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 		<script type="application/javascript" src="/js/commonClass.js"></script>
 
 		<title>Parts and More Parts</title>
@@ -77,7 +78,7 @@
 	<body>
 		<div class="pageheader">
 			<a tabindex="-1" href="#"> <img tabindex="-1" src="/img/Ott.jpg" /> </a>
-			<button id="insert_action" class="btn-default">Add New Job</button>
+			<button id="insert_action" class="btn-success">Add New Job</button>
 			<button id="delete_job_action" class="btn-warning">Delete Job</button>
 		</div>
 
@@ -174,7 +175,7 @@
 					<ul id="this_job_menu">
 						<li><div id="main_action">Main</div></li>
 						<li>
-							<div id="tools_action">Tools</div>
+							<div id="tools_action">Machine Tools</div>
 							<ul>
 								<li><div id="tools_action_display">Display</div></li>
 								<li><div id="tools_action_edit">Edit Names</div></li>
@@ -185,16 +186,14 @@
 							<div id="hand_tools_action">Hand Tools</div>
 							<ul>
 								<li><div id="hand_tools_action_display">Display</div></li>
-								<li><div id="hand_tools_action_edit">Edit Terms</div></li>
-								<li><div id="hand_tools_action_upload">Upload</div></li>
+								<li><div id="hand_tools_action_edit">Edit/Upload</div></li>
 							</ul>
 						</li>
 						<li>
 							<div id="inspection_tools_action">Inspection Tools</div>
 							<ul>
 								<li><div id="inspection_tools_action_display">Display</div></li>
-								<li><div id="inspection_tools_action_edit">Edit Terms</div></li>
-								<li><div id="inspection_tools_action_upload">Upload</div></li>
+								<li><div id="inspection_tools_action_edit">Edit/Upload</div></li>
 							</ul>
 						</li>
 

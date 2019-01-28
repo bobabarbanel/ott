@@ -12,6 +12,7 @@ container {
 content {
     width: 80%;
 }
+
 .caret {
     color: rgb(175, 111, 14);
     font-size: 30px;
@@ -121,9 +122,9 @@ pageheader {
 }
 
 
-#navButtonDiv {
+/* #navButtonDiv {
     display: none;
-}
+} */
 
 .jobTitle {
     margin-left: 2em;
@@ -132,9 +133,9 @@ pageheader {
     cursor: pointer;
 }
 
-
+/* 
 @media screen and (max-width: 1225px) {
     .navDropDownButton {
         display: block;
     }
-}
+} */

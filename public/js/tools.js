@@ -7,6 +7,7 @@ const TV = TabValues; // constants and variables
 const pageName = "Tools";
 const dirPathToImages = "../";
 const reverseURL = "/unArchiveToolImages";
+//const COMMON = new Common();
 
 $(function () { // onload
 
@@ -25,7 +26,7 @@ $(function () { // onload
 
     $('head title', window.parent.document).text("Tools for " + TV.key5.partId);
 
-    Util.setUpTabs(TV.key4id, pageName, true).then(
+    Util.setUpTabs(TV.key4id, pageName, {'tab': true, 'spec': true, 'tabmenus': true}).then(
         () => {
             Util.getMachineSpec(TV.key5.machine)
                 .then(machineSpecs => {
@@ -65,14 +66,13 @@ function callDeleteImages(ev) {
 //         }, 3000);
 //     }
 // }
-
+const COMMON = new Common();
 function getToolImages(archived) {
     let data = {
-        "key": TV.key5,
+        "key4id": COMMON.getKey4id(),
         "tab": pageName,
         "archived": archived
     };
-
     return new Promise((resolve, reject) => {
         $.ajax({
                 url: "/tool_images",

@@ -29,7 +29,7 @@ const key4id = common.getKey4id();
 const FTEDIT_PAGE = "/tabs/ftedits.html";
 $(function() {
 	$("#spin").hide();
-	Util.setUpTabs(key4id, "", false).then(() => setupToolUpload());
+	Util.setUpTabs(key4id, "", {}).then(() => setupToolUpload());
     
 	// alert(key4id);
 

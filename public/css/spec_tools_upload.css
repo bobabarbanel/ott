@@ -1,0 +1,19 @@
+body {
+    background: rgb(159, 190, 231);
+}
+
+container {
+    width: 100%;
+    padding-top: 30px;
+    padding-right: 20px;
+    padding-bottom: 0;
+    padding-left: 20px;
+    display: flex;
+    /* justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row; */
+}
+
+spec_tools {
+    display: none;
+}

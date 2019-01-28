@@ -18,6 +18,11 @@
     padding: 14px 16px;
     text-decoration: none;
     font-size: 17px;
+    font-family: "Times New Roman", Times, serif;
+    height: 4em;
+}
+.elevate {
+    margin-top: -0.5em
 }
 
 .home {

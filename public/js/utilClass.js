@@ -58,7 +58,10 @@ class Util {
 		home_button.on("click", Util.goHome);
 		topnav.append(home_button);
 	}
-	static setUpTabs(key4id, here, showTabNames) {
+	static setUpTabs(key4id, here, include) {
+		const showTabs = ("tab" in include && include.tab);
+		const showSpec = ("spec" in include && include.spec);
+		const showTabMenus = ("tabmenus" in include && include.tabmenus);
 		here = here.trim();
 		return new Promise((resolve, reject) => {
 			Util.getTabsData(key4id).then(
@@ -70,7 +73,7 @@ class Util {
 
 					let topnav = $(".topnav");
 					let home_button = $(
-						'<a class="home" id="home_button"><i class="fas fa-home fa-lg"></i></a>'
+						'<a class="home" tabndex="-1" id="home_button"><i class="fas fa-home fa-lg"></i></a>'
 					);
 					home_button.on("click", Util.goHome);
 					topnav.append(home_button);
@@ -82,7 +85,7 @@ class Util {
 
 					let nextTab;
 					// Main
-					nextTab = $('<a href="/tabs/main.html">Main</a>');
+					nextTab = $('<a tabndex="-1" href="/tabs/main.html">Main</a>');
 					if (here === "Main") {
 						nextTab.addClass("active");
 						navDropDown.append($(`<span class="tabaccess_here">Main</span>`));
@@ -95,19 +98,24 @@ class Util {
 
 					// Tools
 
-					nextTab = $('<a href="/tabs/tools.html">Tools</a>');
+					nextTab = $('<a tabndex="-1" class="elevate" href="/tabs/tools.html">Machine</br>Tools</a>');
 					if (here === "Tools") {
 						nextTab.addClass("active");
-						navDropDown.append($(`<span class="tabaccess_here">Tools</span>`));
+						navDropDown.append($(`<span class="tabaccess_here">Machine Tools</span>`));
 					} else {
 						navDropDown.append(
-							$('<a class="tabaccess" href="/tabs/tools.html">Tools</a>')
+							$('<a class="tabaccess" href="/tabs/tools.html">Machine Tools</a>')
 						);
 					}
 					topnav.append(nextTab);
 
+
+					if(showSpec) { // TODO:
+						// which specs does this this job have 'hand_tools' and/or 'inspection_tools'?
+					}
+
 					let width = 150;
-					if (showTabNames && "tabs" in data) {
+					if (showTabs && "tabs" in data) {
 						data.tabs.forEach((tab, index) => {
 							let navItem = $(Util.definePageTab(index, tab, true));
 							let possible = tab.tabName.length * 14;
@@ -124,7 +132,7 @@ class Util {
 					}
 
 					navDropDown.css("width", width + "px");
-					if (showTabNames) {
+					if (showTabMenus) {
 						let buttons = $('<buttons class="navButtons"></buttons>');
 						buttons.append(
 							$(
@@ -194,7 +202,7 @@ class Util {
 	static definePageTab(num, tab, useTarget) {
 		if (useTarget) {
 			return $(
-				`<a class="tabaccess" href="/showtab/${num}/${tab.tabName}"><span>${
+				`<a class="tabaccess" tabndex="-1" href="/showtab/${num}/${tab.tabName}"><span>${
 					tab.tabName
 				}</span></a>`
 			);

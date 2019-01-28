@@ -4,7 +4,7 @@
 const ENTER = 13;
 const TAB = 9;
 window.name = "HOME";
-const COMMON = new Common();
+let COMMON;
 jQuery.fn.visible = function() {
 	return this.css("visibility", "visible");
 };
@@ -13,6 +13,25 @@ jQuery.fn.invisible = function() {
 	return this.css("visibility", "hidden");
 };
 let TABLE;
+var jsonData;
+const FIELDS = ["partId", "pName", "dept", "op", "machine"];
+const FIELDSORTER = {
+	partId: alphaCompare,
+	pName: alphaCompare,
+	dept: alphaCompare,
+	op: (a, b) => a - b,
+	machine: alphaCompare
+};
+
+const FWIDTH = "180px";
+const STATUS = {
+	partId: 0,
+	pName: 0,
+	dept: 0,
+	op: 0,
+	machine: 0
+};
+const QUERY = {};
 
 $(function() {
 	window.name = "HOME";
@@ -30,27 +49,9 @@ $(function() {
 	$("#insert_action").on("click", () => {
 		window.location.href = window.location + "insert";
 	});
-	const existing_cookie = COMMON.getParsedCookie();
 
-	if (existing_cookie) {
-		refreshFromDB().then(() => {
-			let r = TABLE.getRows();
-			const searchParams = FIELDS.map(field => {
-				return { field: field, type: "=", value: existing_cookie[field] };
-			});
-			let row = TABLE.searchRows(searchParams);
-			if (row.length === 1) {
-				TABLE.setPage(existing_cookie.page); // page must be visible to find radio input element
-				const cell = row[0].getCell("row");
+	initPage();
 
-				$(cell.getElement())
-					.find("input")
-					.trigger("click");
-			}
-		});
-	} else {
-		refreshFromDB();
-	}
 	$("#main_action").on("click", e => useSameTab(e, "main.html"));
 
 	$("#tools_action").on("click", e => useSameTab(e, "tools.html"));
@@ -67,68 +68,28 @@ $(function() {
 
 	$("#delete_job_action").on("click", deleteAJob);
 
-	// $(window).on('visibilitychange',
-	//     () => {
-	//         if (document.visibilityState === 'visible') {
-	//             //("reset");
-	//             $('#reset').trigger('click');
-	//         }
-	//     });
-	// $("body").on("keydown", e => {
-	// 	switch (e.which) {
-	// 		/////////// Removed 12/13/18 -- CR in data entry fields is getting here. Too early for page submit.
-	// 		// case ENTER: // Enter
-	// 		//     $("#buttons button.active").trigger('click');
-	// 		//     break;
-	// 		///////////
-
-	// 		case TAB: // use TAB to select next active button
-	// 			if (multiButtons) {
-	// 				$("#" + button_ids[buttonActiveNum]).toggleClass("active");
-	// 				if (e.shiftKey === false) {
-	// 					++buttonActiveNum;
-	// 					e.preventDefault();
-	// 					if (buttonActiveNum === maxTabIndex) {
-	// 						buttonActiveNum = 0;
-	// 					}
-	// 				} else if (e.shiftKey === true) {
-	// 					--buttonActiveNum;
-	// 					e.preventDefault();
-	// 					if (buttonActiveNum < 0) {
-	// 						buttonActiveNum = maxTabIndex - 1;
-	// 					}
-	// 				}
-	// 				$("#" + button_ids[buttonActiveNum])
-	// 					.toggleClass("active")
-	// 					.focus();
-	// 				break;
-	// 			}
-	// 			break;
-	// 		default:
-	// 			break;
-	// 	}
+	// $("#hand_tools_action_upload").on("click", e => {
+	// 	useSameDestination(e, "/spec_tools_upload/hand_tools");
+	// });
+	// $("#inspection_tools_action_upload").on("click", e => {
+	// 	useSameDestination(e, "/spec_tools_upload/inspection_tools");
 	// });
 
-	// $("#tabs_upload").on("click", function() {
-	// 	useSameTab("tab_upload.html");
-	// });
+	$("#hand_tools_action_edit").on("click", e => {
+		useSameDestination(e, "/spec_tools_edit/hand_tools");
+	});
+	$("#inspection_tools_action_upload").on("click", e => {
+		useSameDestination(e, "/spec_tools_edit/inspection_tools");
+	});
 
-	// $("#upload_action").on("click", function() {
-	// 	useSameTab("upload.html");
-	// });
-
-	// $("#tabs_action").on("click", function() {
-	// 	useSameTab("tabsedit.html");
-	// });
-
-	function useSameTab(event, destination) {
-		// if (existingWindow !== undefined && existingWindow !== null) {
-		// 	existingWindow.close();
-		// 	existingWindow = null;
-		// }
+	function useSameDestination(event, destination) {
 		event.preventDefault();
 		cookieSetter();
-		openInSameTab("/tabs/" + destination);
+		openInSameTab(destination);
+	}
+
+	function useSameTab(event, destination) {
+		useSameDestination(event, "/tabs/" + destination);
 	}
 
 	// handle changes in choosers - that is, selection of a particular item
@@ -172,6 +133,35 @@ $(function() {
 	});
 });
 
+function initPage() {
+	COMMON = new Common(); // fresh read of cookie, if any
+	const existing_cookie = COMMON.getParsedCookie();
+	// alert('initPage ' + JSON.stringify(existing_cookie));
+	if (existing_cookie) {
+		refreshFromDB().then(() => {
+			let r = TABLE.getRows();
+			const searchParams = FIELDS.map(field => {
+				return { field: field, type: "=", value: existing_cookie[field] };
+			});
+			let row = TABLE.searchRows(searchParams);
+			if (row.length === 1) {
+				TABLE.setPage(existing_cookie.page); // page must be visible to find radio input element
+				const cell = row[0].getCell("row");
+
+				$(cell.getElement())
+					.find("input")
+					.trigger("click");
+			}
+		});
+	} else {
+		$("#delete_job_action").invisible();
+		$("#this_job").invisible();
+		for (var member in QUERY) delete QUERY[member]; // clear values in QUERY
+		for (var member in STATUS) STATUS[member] = 0; // reset values in STATUS
+
+		refreshFromDB();
+	}
+}
 async function refreshFromDB() {
 	await getData().then(
 		data => {
@@ -187,53 +177,21 @@ async function refreshFromDB() {
 
 function cookieSetter() {
 	QUERY.page = TABLE.getPage();
-	$.cookie(COMMON.getCookieName(), JSON.stringify(QUERY), { expires: 1 });
+	Cookies.set(COMMON.getCookieName(), JSON.stringify(QUERY), { expires: 1 });
+	console.log("now", Cookies.get(COMMON.getCookieName()));
+	// debugger;
 }
 
 function resetPage() {
-	resetVars().then(
-		() => {
-			location.reload();
-			//console.log("resetVars " + signal)
-		},
-		error => console.log("resetVars Error: " + error)
-	);
+	Cookies.remove(COMMON.getCookieName());
+	//$.removeCookie();
+	location.href = "/";
 }
-function resetVars() {
-	$.removeCookie(COMMON.getCookieName(), { path: "/" });
-	return new Promise((resolve, reject) => {
-		$.ajax({
-			url: "/reset",
-			type: "get"
-		})
-			.done(result => resolve(result))
-
-			.fail((request, status, error) => reject(error));
-	});
-}
+//function resetVars() {}
 
 function openInSameTab(url) {
 	window.open(url, "_self");
 }
-var jsonData;
-const FIELDS = ["partId", "pName", "dept", "op", "machine"];
-const FIELDSORTER = {
-	partId: alphaCompare,
-	pName: alphaCompare,
-	dept: alphaCompare,
-	op: (a, b) => a - b,
-	machine: alphaCompare
-};
-
-const FWIDTH = "180px";
-const STATUS = {
-	partId: 0,
-	pName: 0,
-	dept: 0,
-	op: 0,
-	machine: 0
-};
-const QUERY = {};
 
 function updateTable(rows) {
 	TABLE.setData(rows);
@@ -413,26 +371,35 @@ function rowSelected(e, rowData) {
 
 async function deleteAJob(/*event*/) {
 	// gather stats on job
-	const job = FIELDS.map(field => QUERY[field]).join(" | ");
+	cookieSetter();
+
+	const jobId = COMMON.getKey5_ORDER()
+		.map(field => QUERY[field])
+		.join("|");
 	const stats = await getJobStats();
 
 	const rows = ["Tool", "Hand Tool", "Inspection Tool", "Tab"]
 		.map(tag => {
-			return (stats[tag] === 0 ? '' : `<tr><th>${tag}s</th><td>${stats[tag]}</td></tr>`);
+			return stats[tag] === 0
+				? ""
+				: `<tr><th>${tag}s</th><td>${stats[tag]}</td></tr>`;
 		})
 		.join("");
 	let report;
 	if (rows === "") {
 		report = "<b>No images defined for this job.</b>";
 	} else {
-		report = $(`<table id="delTable"><thead><tr><th>Images For</th><th>Count</th></tr><tbody>${rows}</tbody></table>`);
+		report = $(
+			`<table id="delTable"><thead><tr><th>Images For</th><th>Count</th></tr><tbody>${rows}</tbody></table>`
+		);
 	}
 
 	// if(statsText.length === 0) {
 	// 	statsText.push('No defined images for: Tools, Hand Tools, Inspection Tools, or Tabs')
 	// }
+
 	$.confirm({
-		title: `Confirm Job Deletion:<p class="deletejob">${job}</p>`,
+		title: `Confirm Job Deletion:<p class="deletejob">${jobId}</p>`,
 		icon: "fas fa-trash-alt trash",
 		type: "orange",
 		content: report,
@@ -442,7 +409,13 @@ async function deleteAJob(/*event*/) {
 				text: "&nbsp;&nbsp;&nbsp;&nbsp;Delete&nbsp;&nbsp;&nbsp;",
 				btnClass: "btn-primary",
 				action: async function() {
-					await performJobDeletion();
+					const deleteResult = await performJobDeletion(jobId);
+
+					if (deleteResult.nModified === 1) {
+						//$.removeCookie(COMMON.getCookieName(), { path: "/" });
+						Cookies.remove(COMMON.getCookieName());
+						initPage();
+					}
 				}
 			},
 			cancel: {
@@ -454,16 +427,16 @@ async function deleteAJob(/*event*/) {
 		}
 	});
 }
-async function performJobDeletion() {
+
+async function performJobDeletion(jobId) {
 	return new Promise((resolve, reject) => {
 		$.ajax({
-			url: "/jobDeletion",
+			url: "/archiveJob",
 			type: "post",
 			dataType: "json",
 			data: {
-				key4id: COMMON.getKey4_ORDER()
-					.map(key => QUERY[key])
-					.join("|")
+				key4id: jobId,
+				action: true // archive this job
 			}
 		})
 			.done(result => {
@@ -473,7 +446,6 @@ async function performJobDeletion() {
 			.fail((request, status, error) => {
 				reject(error);
 			});
-			
 	});
 }
 
@@ -716,6 +688,10 @@ function initField(fName) {
 		// always disable if there is but one value
 		$(".chosen-" + fName, "#container")
 			.prop("disabled", true)
+			.trigger("chosen:updated");
+	} else {
+		$(".chosen-" + fName, "#container")
+			.prop("disabled", false)
 			.trigger("chosen:updated");
 	}
 }

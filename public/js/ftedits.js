@@ -115,7 +115,7 @@ $(function() {
 	}
 
 	////////////////////////////////////////////////////////////
-	Util.setUpTabs(key4id, "", false).then(() => {
+	Util.setUpTabs(key4id, "", {}).then(() => {
 		disableSubmitButton(true);
 		$("#job").text(COMMON.getKey5DisplayText());
 		let parsedCookie = COMMON.getParsedCookie();

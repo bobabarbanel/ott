@@ -98,8 +98,8 @@ li.horiz p {
 }
 
 .tabulator-col-content {
-	background: lightgreen;
-	color: black;
+	background: blue;
+	color: white;
 	text-align: center;
 	font-weight: bold;
 }
@@ -212,7 +212,7 @@ li.horiz p {
 }
 
 .rowChosen .tabulator-cell, .flash {
-	background: rgb(145, 255, 0) !important;
+	background: rgb(158, 193, 240) !important;
 }
 
 #this_job_menu, #job_menu {
@@ -253,48 +253,13 @@ li.horiz p {
 div.menutitle {
 	margin: 30px 0 0 15px;
 	font-size: 20px;
-	background: grey;
-	color: white;
+	background:rgb(158, 193, 240);
+	color: black;
+	font-weight: bold;
 	width: 100%;
 	text-align: center;
 }
 
-/* @keyframes rotating {
-    from {
-        transform: rotate(0deg);
-        -o-transform: rotate(0deg);
-        -ms-transform: rotate(0deg);
-        -moz-transform: rotate(0deg);
-        -webkit-transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-        -o-transform: rotate(360deg);
-        -ms-transform: rotate(360deg);
-        -moz-transform: rotate(360deg);
-        -webkit-transform: rotate(360deg);
-    }
-} */
-
-/* @-webkit-keyframes rotating {
-    from {
-        transform: rotate(0deg);
-        -webkit-transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-        -webkit-transform: rotate(360deg);
-    }
-} */
-
-/* 
-.rotating {
-    -webkit-animation: rotating 1s linear infinite;
-    -moz-animation: rotating 1s linear infinite;
-    -ms-animation: rotating 1s linear infinite;
-    -o-animation: rotating 1s linear infinite;
-	animation: rotating 1s linear infinite;
-} */
 
 spin {
 	font-size: 54px;
