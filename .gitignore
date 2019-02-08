@@ -6,3 +6,4 @@ notes/**
 node_modules/**
 rawImages/**
 public/.DS_Store
+.DS_Store
