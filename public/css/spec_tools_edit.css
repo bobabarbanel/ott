@@ -10,7 +10,7 @@ container {
     position: absolute;
     width: 100%;
     left: 1em;
-    top: 2.8em;
+    top: 3.8em;
     width: 100%;
     /* padding-top: 30px;
     padding-right: 20px;
@@ -81,4 +81,8 @@ horiz {
 .tabulator-col-title {
     text-align:center;
     font-size: 120%;
+}
+.fileUpload {
+    margin-left: 1em;
+    border-radius: 2mm;
 }

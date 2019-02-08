@@ -4,7 +4,7 @@ var _ = require("lodash");
 
 var errors = {
   // JSHint options
-  E001: "Bad option: '{a}'.",
+  E001: "Bad {a}option: '{b}'.",
   E002: "Bad option value.",
 
   // JSHint input
@@ -79,7 +79,10 @@ var errors = {
   E061: "Invalid position for 'yield' expression (consider wrapping in parenthesis).",
   E062: "Rest parameter does not a support default value.",
   E063: "Super property may only be used within method bodies.",
-  E064: "Super call may only be used within class method bodies."
+  E064: "Super call may only be used within class method bodies.",
+  E065: "Functions defined outside of strict mode with non-simple parameter lists may not " +
+    "enable strict mode.",
+  E066: "Asynchronous iteration is only available with for-of loops."
 };
 
 var warnings = {
@@ -121,7 +124,7 @@ var warnings = {
   W036: "Unexpected /*member '{a}'.",
   W037: "'{a}' is a statement label.",
   W038: "'{a}' used out of scope.",
-  W039: "'{a}' is not allowed.",
+  W039: null,
   W040: "If a strict mode function is executed using function invocation, " +
     "its 'this' value will be undefined.",
   W041: null,
@@ -193,7 +196,7 @@ var warnings = {
   W102: null,
   W103: "The '{a}' property is deprecated.",
   W104: "'{a}' is available in ES{b} (use 'esversion: {b}') or Mozilla JS extensions (use moz).",
-  W105: "Unexpected {a} in '{b}'.",
+  W105: null,
   W106: "Identifier '{a}' is not in camel case.",
   W107: "Script URL.",
   W108: "Strings must use doublequote.",
@@ -232,7 +235,12 @@ var warnings = {
   W141: "Empty {a}: this is unnecessary and can be removed.",
   W142: "Empty {a}: consider replacing with `import '{b}';`.",
   W143: "Assignment to properties of a mapped arguments object may cause " +
-    "unexpected changes to formal parameters."
+    "unexpected changes to formal parameters.",
+  W144: "'{a}' is a non-standard language feature. Enable it using the '{b}' unstable option.",
+  W145: "Superfluous 'case' clause.",
+  W146: "Unnecessary `await` expression.",
+  W147: "Regular expressions should include the 'u' flag.",
+  W148: "Unnecessary RegExp 's' flag."
 };
 
 var info = {

@@ -8,6 +8,7 @@
     left: 0;
     top: 0;
     z-index: 99;
+    height: 4em;
 }
 
 .topnav a {
@@ -19,7 +20,7 @@
     text-decoration: none;
     font-size: 17px;
     font-family: "Times New Roman", Times, serif;
-    height: 4em;
+   
 }
 .elevate {
     margin-top: -0.5em

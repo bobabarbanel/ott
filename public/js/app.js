@@ -78,7 +78,7 @@ $(function() {
 	$("#hand_tools_action_edit").on("click", e => {
 		useSameDestination(e, "/spec_tools_edit/hand_tools");
 	});
-	$("#inspection_tools_action_upload").on("click", e => {
+	$("#inspection_tools_action_edit").on("click", e => {
 		useSameDestination(e, "/spec_tools_edit/inspection_tools");
 	});
 
@@ -123,12 +123,17 @@ $(function() {
 			.prop("disabled", true)
 			.trigger("chosen:updated");
 
-		// Table
 		refreshFilterTable();
-		// count how many columns have set values now
 
 		if (isFullySelected()) {
 			pageComplete();
+			//r = TABLE.getRowFromPosition(0,true)
+			//c = r.getCells()[0]
+			// $(c.getElement()).find("input[type=radio]")[0]
+			//$("#radio_1").prop("checked", true);
+			const cell = TABLE.getRowFromPosition(0,true).getCells()[0];
+			$(cell.getElement()).find("input[type=radio]").prop("checked", true);
+
 		}
 	});
 });
@@ -213,6 +218,7 @@ function setUpTable() {
 		pagination: "local",
 		paginationSize: 15,
 		initialSort: [{ column: "partId", dir: "asc" }],
+		//rowClick:function(e, row){			alert('row');			},
 		columns: [
 			//Define Table Columns
 			// first column is checkbox for choosing all the values in the row
@@ -221,7 +227,7 @@ function setUpTable() {
 				field: "row",
 				align: "center",
 				width: 20,
-				cellClick: cellSingleClick,
+				cellClick: (e, cell) => rowSelected(e, cell.getData()),
 				headerSort: false,
 				sortable: false,
 				formatter: function(/*value, data, cell, row, options, formatterParams*/) {
@@ -234,7 +240,7 @@ function setUpTable() {
 				field: "partId",
 				sorter: "string",
 				cssClass: "partIdCol",
-				onClick: cellSingleClick
+				cellClick: cellSingleClick
 			},
 			{
 				title: "Part Name",
@@ -243,7 +249,7 @@ function setUpTable() {
 				sorter: "string",
 				align: "center",
 				cssClass: "pNameCol",
-				onClick: cellSingleClick
+				cellClick: cellSingleClick
 			},
 			{
 				title: "Department",
@@ -252,7 +258,7 @@ function setUpTable() {
 				sorter: "string",
 				align: "center",
 				cssClass: "deptCol",
-				onClick: cellSingleClick
+				cellClick: cellSingleClick
 			},
 			{
 				title: "Operation",
@@ -261,7 +267,7 @@ function setUpTable() {
 				sorter: "number",
 				align: "center",
 				cssClass: "opCol",
-				onClick: cellSingleClick
+				cellClick: cellSingleClick
 			},
 			{
 				title: "Machine",
@@ -269,7 +275,7 @@ function setUpTable() {
 				field: "machine",
 				sorter: "string",
 				cssClass: "machineCol",
-				onClick: cellSingleClick
+				cellClick: cellSingleClick
 			}
 		]
 	});
@@ -278,9 +284,8 @@ function setUpTable() {
 function getData() {
 	$("spin").visible();
 	return new Promise((resolve, reject) => {
-		$.ajax({
+		$.get({
 			url: "/get_jobs",
-			type: "get",
 			dataType: "json"
 		})
 			.done(result => {
@@ -346,7 +351,6 @@ function rowSelected(e, rowData) {
 				.text(val);
 			$(selector, "#container").append(option);
 			STATUS[fName] = 1;
-			//console.log("rowSelected " + fName);
 			$(selector, "#container")
 				.prop("disabled", true)
 				.trigger("chosen:updated");
@@ -378,7 +382,7 @@ async function deleteAJob(/*event*/) {
 		.join("|");
 	const stats = await getJobStats();
 
-	const rows = ["Tool", "Hand Tool", "Inspection Tool", "Tab"]
+	const rows = ["Tool", "Tab"]
 		.map(tag => {
 			return stats[tag] === 0
 				? ""
@@ -593,59 +597,66 @@ function cellSingleClick(e, cell) {
 	//e - the click event object
 	//cell - the DOM element of the cell
 
-	if (cell.getValue() === undefined) {
-		// radio button, first cell
-		rowSelected(e, cell.getData()); // select all the values from this row
-	} else {
-		// other cells; use only the cell's value as new selection
-		var fName = $(this)[0].field;
-		QUERY[fName] = data[fName];
-		STATUS[fName] = 1;
-		setNum(fName, 1);
+	var fName = cell.getColumn().getField();
+	QUERY[fName] = cell.getValue();
+	STATUS[fName] = 1;
+	setNum(fName, 1);
 
-		updateField(fName);
-		// find possible values for other fields
-		FIELDS.forEach(f => {
-			if (QUERY[f] === undefined) {
-				updateField(f);
-			}
-		});
-
-		var selector = "#" + fName + "_select";
-		$(selector, "#container").empty();
-
-		// single select for this field; add only one option to <select>
-		$(selector, "#container").append(
-			$("<option>")
-				.val(value)
-				.text(value)
-		);
-		// update
-		$(selector, "#container")
-			.prop("disabled", true)
-			.trigger("chosen:updated");
-
-		// Table
-		refreshFilterTable();
-		// count how many columns have set values now
-
-		if (isFullySelected()) {
-			pageComplete();
+	// find possible values for other fields
+	FIELDS.forEach(f => {
+		if (QUERY[f] === undefined) {
+			updateField(f);
 		}
+	});
+
+	var selector = "#" + fName + "_select";
+	$(selector, "#container").empty();
+
+	// single select for this field; add only one option to <select>
+	$(selector, "#container").append(
+		$("<option>")
+			.val(QUERY[fName])
+			.text(QUERY[fName])
+	);
+	// update
+	$(selector, "#container")
+		.prop("disabled", true)
+		.trigger("chosen:updated");
+
+	refreshFilterTable();
+
+	if (isFullySelected()) {
+		pageComplete();
 	}
 }
 
-function findUnique(fName) {
-	var oneColVals = jsonData.filter(row => keyMatch(row)).map(row => row[fName]);
+// TODO: Combine these 4 functions...
+function findUniqueStart(fName) {
+	var oneColVals = jsonData
+		.filter(row => keyMatchStart(row))
+		.map(row => row[fName]);
 	return [...new Set(oneColVals)]; // return distinct values only
 }
-
-function keyMatch(row) {
+function keyMatchStart(row) {
 	if (Object.keys(QUERY).length === 0) {
 		return true;
 	}
 	return Object.keys(FIELDS).every(key => row[key] === QUERY[key]);
 }
+
+function findUnique(fName) {
+	var oneColVals = TABLE.getRows()
+		.filter(row => keyMatch(row))
+		.map(row => row.getData()[fName]);
+	return [...new Set(oneColVals)]; // return distinct values only
+}
+function keyMatch(row) {
+	if (Object.keys(QUERY).length === 0) {
+		return true;
+	}
+	return Object.keys(QUERY).every(key => row.getData()[key] === QUERY[key]);
+}
+///////////////////////////
 
 function initField(fName) {
 	// set up options for one field fName .chosen and initiate chosen
@@ -653,7 +664,7 @@ function initField(fName) {
 	const selector = "#" + fName + "_select";
 	// QUERY will be empty to start with
 	///////////////////////////////////
-	var oneColVals = findUnique(fName); // returns field fName as array of unique values, passing filters from QUERY
+	var oneColVals = findUniqueStart(fName); // returns field fName as array of unique values, passing filters from QUERY
 	///////////////////////////////////
 	oneColVals = oneColVals.sort(FIELDSORTER[fName]);
 
@@ -684,16 +695,10 @@ function initField(fName) {
 		search_contains: false
 	});
 
-	if (howMany === 1) {
-		// always disable if there is but one value
-		$(".chosen-" + fName, "#container")
-			.prop("disabled", true)
-			.trigger("chosen:updated");
-	} else {
-		$(".chosen-" + fName, "#container")
-			.prop("disabled", false)
-			.trigger("chosen:updated");
-	}
+	// always disable if there is but one value
+	$(".chosen-" + fName, "#container")
+		.prop("disabled", howMany === 1)
+		.trigger("chosen:updated");
 }
 
 function alphaCompare(a, b) {
@@ -740,5 +745,5 @@ function updateField(fName) {
 	refreshFilterTable();
 
 	//console.log(STATUS);
-	return howMany;
+	// return howMany;
 }

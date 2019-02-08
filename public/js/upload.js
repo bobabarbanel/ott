@@ -23,8 +23,9 @@ jQuery.fn.visible = function() {
 jQuery.fn.invisible = function() {
 	return this.css("visibility", "hidden");
 };
-const common = new Common();
-const key4id = common.getKey4id();
+const COMMON = new Common();
+const key4id = COMMON.getKey4id();
+const key5Obj = COMMON.getParsedCookie();
 
 const FTEDIT_PAGE = "/tabs/ftedits.html";
 $(function() {
@@ -33,15 +34,14 @@ $(function() {
     
 	// alert(key4id);
 
-	function getSheetTagsFiles(common, tab) {
+	function getSheetTagsFiles(tab) {
 		//debugLog("getSheetTagsFiles");
-		let keyObj = common.getParsedCookie();
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: "/sheetTags",
 				type: "post",
 				data: {
-					key: keyObj,
+					key: key5Obj,
 					tab: tab,
 					files: true // **do** retrieve files/images list
 				},
@@ -60,13 +60,13 @@ $(function() {
         $('.home').on('click', () => { Util.goHome() } );
 
         
-		let key5 = common.getParsedCookie();
+		
 		$("#job").text(
-			[key5.partId, key5.pName, key5.dept, key5.op, key5.machine].join(" : ")
+			[key5Obj.partId, key5Obj.pName, key5Obj.dept, key5Obj.op, key5Obj.machine].join(" : ")
 		);
 		f_t_edits(true); // edit button disabled
-		Util.getMachineSpec(common.getParsedCookie().machine).then(machineSpecs => {
-			getSheetTagsFiles(common, SECTION).then(toolData => {
+		Util.getMachineSpec(key5Obj.machine).then(machineSpecs => {
+			getSheetTagsFiles(SECTION).then(toolData => {
 				paintPage(machineSpecs, toolData);
 				$("#progress").hide();
 			});
@@ -339,7 +339,7 @@ function paintPage(machineSpecs, toolData) {
 			// add data used to put images in database
 			formData.append("func", func);
 			formData.append("type", type);
-			formData.append("key4", JSON.stringify(common.getKey4())); // from cookie
+			formData.append("key4", JSON.stringify(key4id)); // from cookie
 			formData.append("tab", tab);
 
 			formData.append("turret", turret);

@@ -62,6 +62,10 @@ exports.ecmaIdentifiers = {
     Uint8ClampedArray  : false,
     WeakMap            : false,
     WeakSet            : false
+  },
+  8: {
+    Atomics            : false,
+    SharedArrayBuffer  : false
   }
 };
 
@@ -70,11 +74,11 @@ exports.ecmaIdentifiers = {
 exports.browser = {
   Audio                : false,
   Blob                 : false,
-  addEventListener     : false,
+  addEventListener     : false, // EventTarget
   applicationCache     : false,
-  atob                 : false,
+  atob                 : false, // WindowOrWorkerGlobalScope
   blur                 : false,
-  btoa                 : false,
+  btoa                 : false, // WindowOrWorkerGlobalScope
   cancelAnimationFrame : false,
   CanvasGradient       : false,
   CanvasPattern        : false,
@@ -91,15 +95,17 @@ exports.browser = {
   CSSStyleDeclaration  : false,
   CSSStyleRule         : false,
   CSSStyleSheet        : false,
-  clearInterval        : false,
-  clearTimeout         : false,
+  clearInterval        : false, // WindowOrWorkerGlobalScope
+  clearTimeout         : false, // WindowOrWorkerGlobalScope
   close                : false,
   closed               : false,
   Comment              : false,
   CompositionEvent     : false,
+  createImageBitmap    : false, // WindowOrWorkerGlobalScope
   CustomEvent          : false,
   DOMParser            : false,
   defaultStatus        : false,
+  dispatchEvent        : false, // EventTarget
   Document             : false,
   document             : false,
   DocumentFragment     : false,
@@ -229,12 +235,14 @@ exports.browser = {
   openDatabase         : false,
   opener               : false,
   Option               : false,
+  origin               : false, // WindowOrWorkerGlobalScope
   parent               : false,
   performance          : false,
   print                : false,
+  queueMicrotask       : false, // WindowOrWorkerGlobalScope
   Range                : false,
   requestAnimationFrame : false,
-  removeEventListener  : false,
+  removeEventListener  : false, // EventTarget
   Request              : false,
   resizeBy             : false,
   resizeTo             : false,
@@ -244,8 +252,8 @@ exports.browser = {
   scrollBy             : false,
   scrollTo             : false,
   sessionStorage       : false,
-  setInterval          : false,
-  setTimeout           : false,
+  setInterval          : false, // WindowOrWorkerGlobalScope
+  setTimeout           : false, // WindowOrWorkerGlobalScope
   SharedWorker         : false,
   status               : false,
   Storage              : false,
@@ -448,11 +456,23 @@ exports.devel = {
 };
 
 exports.worker = {
-  importScripts  : true,
-  onmessage      : true,
-  postMessage    : true,
-  self           : true,
-  FileReaderSync : true
+  addEventListener    : true, // EventTarget
+  atob                : true, // WindowOrWorkerGlobalScope
+  btoa                : true, // WindowOrWorkerGlobalScope
+  clearInterval       : true, // WindowOrWorkerGlobalScope
+  clearTimeout        : true, // WindowOrWorkerGlobalScope
+  createImageBitmap   : true, // WindowOrWorkerGlobalScope
+  dispatchEvent       : true, // EventTarget
+  importScripts       : true,
+  onmessage           : true,
+  origin              : true, // WindowOrWorkerGlobalScope
+  postMessage         : true,
+  queueMicrotask      : true, // WindowOrWorkerGlobalScope
+  removeEventListener : true, // EventTarget
+  self                : true,
+  setInterval         : true, // WindowOrWorkerGlobalScope
+  setTimeout          : true, // WindowOrWorkerGlobalScope
+  FileReaderSync      : true
 };
 
 // Widely adopted global names that are not part of ECMAScript standard

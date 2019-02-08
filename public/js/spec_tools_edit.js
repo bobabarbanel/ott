@@ -57,7 +57,10 @@ $(function() {
 			DATA.push(...name_counts);
 
 			tableSetup();
-			TABLE.setData(DATA);
+			TABLE.setData(DATA).then(
+				() => $(".fileUpload").on("change", fileUpload)  // needed to set onChange method for 1st page
+			);
+
 			// const tool_names = name_counts.map(obj => obj.term);
 			input.on("keydown", ev => {
 				if (ev.keyCode === ENTER || ev.keyCode === TAB) {
@@ -157,17 +160,22 @@ async function removeTerm(term) {
 }
 
 function tableSetup() {
-	$("#terms-table").css("width", "575px");
+	$("#terms-table").css("width", "595px");
+	let signal = false;
 	TABLE = new Tabulator("#terms-table", {
-		// layout: "fitColumns",
+		layout: "fitColumns",
 		pagination: "local",
-		paginationSize: 20,
+		paginationSize: 15,
 		initialSort: [
 			{
 				column: "term",
 				dir: "asc"
 			}
 		],
+		pageLoaded: function(/*pageno*/) {
+			// make sure after files uploaded to server, that we process them
+			$(".fileUpload").on("change", fileUpload);
+		},
 
 		columns: [
 			{
@@ -227,12 +235,29 @@ function tableSetup() {
 			},
 			{
 				title: "Upload Images",
-				// formatter: "buttonCross",
-				width: 250,
+				// width: 270,
 				align: "center",
 				headerSort: false,
-				tooltip: "Select Images to Upload"
+				tooltip: "Select Images to Upload",
+				formatter: function(cell, formatterParams, onRendered) {
+					//cell - the cell component
+					//formatterParams - parameters set for the column
+					//onRendered - function to call when the formatter has been rendered
+					const term = cell.getData().term;
+					let fup = `<input class="fileUpload" type="file" data="${term}" name="uploads[]" accept="image/jpg" multiple/>`;
+
+					return fup;
+				}
+				// cellClick: fileUpload
 			}
 		]
 	});
+	
+	$(".fileUpload").on("change", fileUpload);
+}
+function fileUpload(e) {
+	const term = $(this).attr('data');
+	const files = $(this).get(0).files;
+	// TODO: complete file processing.
+	debugger;
 }
