@@ -117,7 +117,7 @@ content {
 pageheader {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 60%;
 }
 
@@ -127,7 +127,9 @@ pageheader {
 } */
 
 .jobTitle {
-    margin-left: 2em;
+    margin-left: 7em;
+    font-size: 24px;
+    font-weight: bold;
 }
 .tablink, .sectionlink, .steplink {
     cursor: pointer;

@@ -58,60 +58,76 @@ class Util {
 		home_button.on("click", Util.goHome);
 		topnav.append(home_button);
 	}
-	static setUpTabs(key4id, here, include) {
-		const showTabs = ("tab" in include && include.tab);
-		const showSpec = ("spec" in include && include.spec);
-		const showTabMenus = ("tabmenus" in include && include.tabmenus);
-		here = here.trim();
+	static completeNavMenu(key4id, here, include) {
+		const showTabs = "tab" in include && include.tab;
+		const showSpec = "spec" in include && include.spec;
+		const showMain = "main" in include && include.main;
+		const showMachine = "machine" in include && include.main;
+		const showTabMenus = "tabmenus" in include && include.tabmenus;
+		let topnav = $(".topnav");
+		let navDropDown = $("navDropDown");
 		return new Promise((resolve, reject) => {
 			Util.getTabsData(key4id).then(
 				data => {
-					$(".navDropDownButton").html(
-						'<i class="fas fa-bars" style="margin-top:10px; border:1px solid white; padding: 10%">'
-					);
-					let navDropDown = $("navDropDown");
-
-					let topnav = $(".topnav");
-					let home_button = $(
-						'<a class="home" tabndex="-1" id="home_button"><i class="fas fa-home fa-lg"></i></a>'
-					);
-					home_button.on("click", Util.goHome);
-					topnav.append(home_button);
-					let home_link = $(
-						'<a href="/" class="home_link"><i class="fas fa-home"></a>'
-					);
-					home_link.on("click", Util.goHome);
-					navDropDown.append(home_link);
+					this.homeButton();
 
 					let nextTab;
-					// Main
-					nextTab = $('<a tabndex="-1" href="/tabs/main.html">Main</a>');
-					if (here === "Main") {
-						nextTab.addClass("active");
-						navDropDown.append($(`<span class="tabaccess_here">Main</span>`));
-					} else {
-						navDropDown.append(
-							$('<a class="tabaccess" href="/tabs/main.html">Main</a>')
-						);
+					if (showMain) {
+						// Main
+						nextTab = $('<a tabndex="-1" href="/tabs/main.html">Main</a>');
+						if (here === "Main") {
+							nextTab.addClass("active");
+							navDropDown.append($(`<span class="tabaccess_here">Main</span>`));
+						} else {
+							navDropDown.append(
+								$('<a class="tabaccess" href="/tabs/main.html">Main</a>')
+							);
+						}
+						topnav.append(nextTab);
 					}
-					topnav.append(nextTab);
 
 					// Tools
-
-					nextTab = $('<a tabndex="-1" class="elevate" href="/tabs/tools.html">Machine</br>Tools</a>');
-					if (here === "Tools") {
-						nextTab.addClass("active");
-						navDropDown.append($(`<span class="tabaccess_here">Machine Tools</span>`));
-					} else {
-						navDropDown.append(
-							$('<a class="tabaccess" href="/tabs/tools.html">Machine Tools</a>')
+					if(showMachine) {
+						nextTab = $(
+							'<a tabndex="-1" class="elevate" href="/tabs/tools.html">Machine</br>Tools</a>'
 						);
+						if (here === "Tools") {
+							nextTab.addClass("active");
+							navDropDown.append(
+								$(`<span class="tabaccess_here">Machine Tools</span>`)
+							);
+						} else {
+							navDropDown.append(
+								$(
+									'<a class="tabaccess" href="/tabs/tools.html">Machine Tools</a>'
+								)
+							);
+						}
+						topnav.append(nextTab);
 					}
-					topnav.append(nextTab);
+					
 
-
-					if(showSpec) { // TODO:
+					if (showSpec) {
+						// TODO:
 						// which specs does this this job have 'hand_tools' and/or 'inspection_tools'?
+						["Hand", "Inspection"].forEach(tooltype => {
+							nextTab = $(
+								`<a tabndex="-1" class="elevate" href="/tabs/spec_tools.html?spec_type=${tooltype}">${tooltype}</br>Tools</a>`
+							);
+							if (here === `${tooltype}`) {
+								nextTab.addClass("active");
+								navDropDown.append(
+									$(`<span class="tabaccess_here">${tooltype} Tools</span>`)
+								);
+							} else {
+								navDropDown.append(
+									$(
+										`<a class="tabaccess" href="/tabs/spec_tools.html?spec_type=${tooltype}">${tooltype} Tools</a>`
+									)
+								);
+							}
+							topnav.append(nextTab);
+						});
 					}
 
 					let width = 150;
@@ -155,7 +171,35 @@ class Util {
 			);
 		});
 	}
+	static setUpTabs(key4id, here, include) {
+		here = here.trim();
+		if (key4id) {
+			return this.completeNavMenu(key4id, here, include);
+		}
+		return new Promise((resolve, reject) => {
+			// need only home nav item
+			this.homeButton();
+			resolve(null);
+		});
+	}
+	static homeButton() {
+		$(".navDropDownButton").html(
+			'<i class="fas fa-bars" style="margin-top:10px; border:1px solid white; padding: 10%">'
+		);
+		let navDropDown = $("navDropDown");
 
+		let topnav = $(".topnav");
+		let home_button = $(
+			'<a class="home" tabndex="-1" id="home_button"><i class="fas fa-home fa-lg"></i></a>'
+		);
+		home_button.on("click", Util.goHome);
+		topnav.append(home_button);
+		let home_link = $(
+			'<a href="/" class="home_link"><i class="fas fa-home"></a>'
+		);
+		home_link.on("click", Util.goHome);
+		navDropDown.append(home_link);
+	}
 	static getTabsData(key4id) {
 		return new Promise((resolve, reject) => {
 			$.post({
@@ -202,9 +246,9 @@ class Util {
 	static definePageTab(num, tab, useTarget) {
 		if (useTarget) {
 			return $(
-				`<a class="tabaccess" tabndex="-1" href="/showtab/${num}/${tab.tabName}"><span>${
+				`<a class="tabaccess" tabndex="-1" href="/showtab/${num}/${
 					tab.tabName
-				}</span></a>`
+				}"><span>${tab.tabName}</span></a>`
 			);
 		} else {
 			return $(`<span class="tabaccess_here">${tab.tabName}</span>`);

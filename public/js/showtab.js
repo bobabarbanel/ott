@@ -1,6 +1,5 @@
 "use strict";
 
-
 /* globals Util, LinkGroup, TabValues */
 // showtab.js
 
@@ -44,7 +43,12 @@ $(function() {
 
 		$("head title", window.parent.document).text(tabName);
 
-		Util.setUpTabs(TV.key4id, tabName, {'tab': true, 'spec': true, 'tabmenus': true}).then(tabs => {
+		Util.setUpTabs(TV.key4id, tabName, {
+			main: true,
+			tab: true,
+			spec: true,
+			tabmenus: true
+		}).then(tabs => {
 			getTabImages().then(
 				// gets only non-archived images
 				stepFiles => {
@@ -449,14 +453,14 @@ $(function() {
 
 		//     }
 		// );
-    }
-    
-    // $.getScript("tabValueCalss.js")
+	}
+
+	// $.getScript("tabValueCalss.js")
 	// 	.done(function(script, textStatus) {
 	// 		pageSetUp();
 	// 	})
 	// 	.fail(function(jqxhr, settings, exception) {
 	// 		alert("fail");
-    // 	});
-    pageSetup();
+	// 	});
+	pageSetup();
 });

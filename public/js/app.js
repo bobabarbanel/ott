@@ -82,6 +82,20 @@ $(function() {
 		useSameDestination(e, "/spec_tools_edit/inspection_tools");
 	});
 
+	$("#hand_tools_action_display").on("click", e => {
+		useSameDestination(e, "/spec_tools_display/Hand");
+	});
+	$("#inspection_tools_action_display").on("click", e => {
+		useSameDestination(e, "/spec_tools_display/Inspection");
+	});
+
+	$("#hand_tools_action_assign").on("click", e => {
+		useSameDestination(e, "/spec_tools_assign/Hand");
+	});
+	$("#inspection_tools_action_assign").on("click", e => {
+		useSameDestination(e, "/spec_tools_assign/Inspection");
+	});
+
 	function useSameDestination(event, destination) {
 		event.preventDefault();
 		cookieSetter();
@@ -382,7 +396,7 @@ async function deleteAJob(/*event*/) {
 		.join("|");
 	const stats = await getJobStats();
 
-	const rows = ["Tool", "Tab"]
+	const rows = ["Tool",   "Tab"]
 		.map(tag => {
 			return stats[tag] === 0
 				? ""

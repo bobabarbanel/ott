@@ -83,7 +83,7 @@ td.disabled {
 }
 
 .hidebuttons {
-    display: none;
+    visibility: hidden;
 }
 
 span.popup {

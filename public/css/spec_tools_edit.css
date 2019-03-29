@@ -39,7 +39,7 @@ pageheader {
     margin-left: 2em;
 }
 .action {
-    background: yellow;
+    background: yellow !important;
 }
 
 input.upper {
@@ -85,4 +85,26 @@ horiz {
 .fileUpload {
     margin-left: 1em;
     border-radius: 2mm;
+}
+#spin {
+    position: absolute;
+    left: 950px;
+    top: 1em;
+    font-size: 54px;
+    color: red;
+    display:none;
+}
+.hidebuttons {
+    display: none;
+}
+.stripes {
+    background: repeating-linear-gradient( 45deg, #ae60bc, #ae60bc 5px, #5d3364 5px, #5d3364 10px);
+    background-size: 200% 200%;
+    animation: barberpole 4s linear infinite;
+}
+
+@keyframes barberpole {
+    100% {
+        background-position: 100% 100%;
+    }
 }

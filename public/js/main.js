@@ -15,10 +15,10 @@ $(function () {
 
     ////////////////////////////////////////////////////////////
     //alert(JSON.stringify(key5,null,4));
-    var title = "Main | Job: <b>" + key5.partId + '</b>';
-    $("title").html(title); // browser tab title
+    // var title = "Main | Job: <b>" + key5.partId + '</b>';
+    $("title").html("Main"); // browser tab title
 
-    Util.setUpTabs(key4id, window.name, {tab: true, spec: true}).then(
+    Util.setUpTabs(key4id, window.name, {main: true, machine: true, tab: true, spec: true}).then(
         (tabs) => {
             Util.getMachineSpec(key5.machine)
                 .then(machineSpecs => {
@@ -60,7 +60,7 @@ function genLinkList(aList) {
 function paintPage(machineSpecs, toolData, tabs) {
     // page header
     let jobTitle = [key5.partId, key5.pName, key5.dept, key5.op, key5.machine].join(" : ");
-    $('pageheader').append($(`<h1 class="pageTitle">${window.name}</h1><h4 class="jobTitle">${jobTitle}</h4>`));
+    $('pageheader').append($(`<h1 class="pageTitle">${window.name}</h1><span class="jobTitle">${jobTitle}</span>`));
 
     // tools
     toolsTable(machineSpecs, toolData);

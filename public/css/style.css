@@ -149,7 +149,7 @@ li.horiz p {
 	margin: -37px 0 30px 30px;
 }
 
-#delete_job_action {
+#delete_job_action, #assign_hi_tools_to_jobs {
 	margin-left: 1em;
 }
 
