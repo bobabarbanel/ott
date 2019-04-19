@@ -5,10 +5,6 @@
 const COMMON = new Common();
 const key4id = COMMON.getKey4id();
 const key5 = COMMON.getParsedCookie();
-const ENTER = 13;
-const TABCHAR = 9;
-let TABLE;
-const DATA = [];
 let SPEC_TYPE;
 
 // Read a page's GET URL variables and return them as an associative array.
@@ -26,8 +22,10 @@ function getUrlVars() {
 	return vars;
 }
 let defaultIndex = 0; // will use first image found if no primary found
-const catPrimary = {};
+let thePrimary = null;
 let fotorama;
+let allInfo;
+const IMAGES = {};
 $(function() {
 	SPEC_TYPE = getUrlVars()["spec_type"]; // 'Hand' or 'Inspection'
 	if (SPEC_TYPE === undefined) {
@@ -61,11 +59,11 @@ $(function() {
 		key5.machine
 	].join(" : ");
 	const ta = $("textarea.comment");
-	$("#topOfPage button").on("click", e => {
+	$("#topOfPage button").on("click", e => { // make an image the Primary
 		e.preventDefault();
 		const af = fotorama.activeFrame;
-		catPrimary[af.term] = fotorama.activeIndex;
-		$.post({
+		thePrimary = fotorama.activeIndex;
+		$.post({ // reset primary image in database
 			url: "/set_spec_images_primary",
 			dataType: "json",
 			data: {
@@ -76,30 +74,24 @@ $(function() {
 			}
 		})
 			.done(result => {
-				// defaultIndex = fotorama.activeIndex;
-				setActive();
+				IMAGES[af.term].forEach( // reset primary image in IMAGES object, fileRefs array
+					(aRef,index) => {
+						aRef.primary = (index === thePrimary);
+					}
+				);
+				setActive(true);
 			})
 			.fail(error => {
 				alert("mongo update error for primary change");
 			});
 	});
-	function havePrimary(index) {
-		return (
-			Object.keys(catPrimary).find(term => catPrimary[term] === index) !==
-			undefined
-		);
-	}
-	function setActive() {
-		const activeIsPrimary = havePrimary(fotorama.activeIndex);
-		if($("#defaultIndicator").css("display") === 'block' && activeIsPrimary) {
-			$("#defaultIndicator").css("background", "yellow");
-			
-		} 
-		$("#topOfPage button").css("display", !activeIsPrimary ? "block" : "none");
-		$("#defaultIndicator").css("display", activeIsPrimary ? "block" : "none");
-		setTimeout(()=> $("#defaultIndicator").css("background", "white"), 500);
-		
-	}
+	// function havePrimary(index) {
+	// 	return (
+	// 		Object.keys(catPrimary).find(term => catPrimary[term] === index) !==
+	// 		undefined
+	// 	);
+	// }
+
 	// ta.on('change', () => {
 	//     $(this).height(0).height(this.scrollHeight);
 	// });
@@ -116,163 +108,159 @@ $(function() {
 				<h3 class="jobTitle">${jobTitle}</h3>`
 			)
 		);
-		$(".comment").hide();
-		const images = [];
-		let index = 0;
-		const known = {};
+		ta.hide();
+		// const images = []; // array of image objects
+		// let index = 0;
+		const known = {}; // keys will be the terms for this Job
 
-		let startSection;
-		$('#section').css('visibility','hidden');
-		getImages(key4id).then(termsArray => {
+		// let startSection;
+		$("#section").css("visibility", "hidden");
+		getImages(key4id).then(async termsArray => {
+			// [{term, [fileRefs]}]
+			allInfo = termsArray;
 			if (termsArray === null) {
 				$("body").append(
 					$(
 						`<h1 class="no_image_message">There are no ${STYPE} images<br/>for this Job.</h1>`
 					)
 				);
-				
+
 				return;
 			}
-			$('#section').css('visibility','visible');
+			$("#section").css("visibility", "visible"); // the selector
+			// process all the terms with fileRefs
+			let showSection = null;
+			
 			termsArray.forEach(item => {
 				// already sorted
 				let { term, files } = item;
+				IMAGES[term] = files; // an array of fileRefs
 				// console.log(files);
+				if (showSection === null) showSection = term;
 				if (known[term] === undefined) {
 					$("#section").append($(`<option>${term}</option>`));
 					known[term] = true;
 				}
-				files.forEach(afRef => {
-					if (afRef.primary) {
-						if (Object.keys(catPrimary).length === 0) {
-							defaultIndex = index; // for first category's item to show when page opens
-						}
-						startSection = term;
-						catPrimary[term] = index; // holds all the current term's default positions for images
-					}
-					images.push({
-						img: relFileRef(afRef),
-						thumb: relFileRef(afRef, "_small"),
-						comment: afRef.comment,
-						term: term,
-						dir: afRef.dir,
-						filename: afRef.filename,
-						primary: afRef.primary ? true : false
-					});
-					index++;
-				});
 			});
+			$("#section").on("change", async () => {
+				const selectedTerm = $("#section option:selected").text();
+				await loadStuff(selectedTerm);
+				
+			});
+
 			$("#section")
-				.val(startSection)
-				.on("change", () => {
-					const selectedTerm = $("#section option:selected").text();
-					for (let i = 0; i < images.length; i++) {
-						if (images[i].term === selectedTerm) {
-							fotorama.show(i);
-							break;
-						}
-					}
-				});
-
-			$("content").append(`<div id="fotorama" 
-								class="fotorama" 
-								data-auto="false"
-								data-nav="thumbs" 
-								data-width="100%" 
-								data-transition="crossfade" 
-								data-max-height="83%" 
-								data-max-width="100%">
-							</div>`);
-			const $fotoramaDiv = $("#fotorama")
-				// Listen to the events
-				.on(
-					"fotorama:load fotorama:showend", // Stage image of some frame is loaded
-
-					function(e, fotorama, extra) {
-						let fa = fotorama.activeFrame;
-						ta.text(fa.comment);
-						setTimeout(() => {
-							// delay may be needed to allow width and text to adjust
-							ta.height(0).height(ta[0].scrollHeight);
-						}, 1);
-						const stageFrame = $(fa.$stageFrame[0]);
-						const img = $(stageFrame).find("img");
-						const imageWidth = parseInt(img.css("width"));
-						const windowWidth = $(window).width();
-						const commentWidth = Math.floor((windowWidth - imageWidth) * 0.4);
-						ta.css("width", commentWidth + "px");
-						$("#section").val(fa.term);
-						setActive();
-					}
-				)
-
-				.fotorama({
-					spinner: {
-						lines: 13,
-						color: "rgba(0, 0, 255, .75)"
-					}
-				});
-			fotorama = $fotoramaDiv.data("fotorama");
-			loadStuff().then(() => {
-				// markTransitions();
-				// setHover();
-				$(".comment").show();
-			});
-			
-			async function loadStuff() {
-				await fotorama.load(images);
-				await fotorama.show(defaultIndex);
-			}
-			
-
-
-			// setHover();
-			// $(".fotorama__nav__frame > .fotorama__thumb > img").on(
-
-			// () => {
-			// 	console.log("out");
-			// 	// $("showterm").hide();
-			// }
+				.val(showSection)
+				.trigger("change");
 		});
 	});
 });
 
+async function loadStuff(section) {
+	let primary = 0; // default image to show if primary is not identified
+	$("content").empty()
+		.append(`<textarea id="ta" class="comment"></textarea>
+				<div id="fotorama" 
+					class="fotorama" 
+					data-auto="false"
+					data-nav="thumbs" 
+					data-width="100%" 
+					data-transition="crossfade" 
+					data-max-height="83%" 
+					data-max-width="100%">
+				</div>`);
+	const ta = $("#ta");
+	const $fotoramaDiv = $("#fotorama")
+		// Listen to the events
+		.on(
+			"fotorama:load fotorama:showend", // Stage image of some frame is loaded
+			fotofunc
+		)
+		.fotorama({
+			spinner: {
+				lines: 13,
+				color: "rgba(0, 0, 255, .75)"
+			}
+		});
+	fotorama = $fotoramaDiv.data("fotorama");
+	const toShow = IMAGES[section] // array of filerefs
+		.map((afRef, index) => {
+			if (afRef.primary) {
+				// primary = index;
+				thePrimary = index;
+				ta.text(afRef.comment);
+			}
+			return {
+				img: relFileRef(afRef),
+				thumb: relFileRef(afRef, "_small"),
+				comment: afRef.comment,
+				term: section,
+				dir: afRef.dir,
+				filename: afRef.filename,
+				primary: afRef.primary ? true : false
+			};
+		});
+	let hideThumbs = false;
+	if (toShow.length === 1) {
+		// fix crash in fotorama when only one image, add "fake" last image
+		// and then hide thumbnails after rendering
+		toShow.push({
+			img: "/img/placeholder.png",
+			thumb: "/img/empty.png",
+			comment: null,
+			term: section,
+			primary: null
+		});
+		hideThumbs = true;
+	}
+	await fotorama.load(toShow);
+	await fotorama.show(thePrimary);
+	if (hideThumbs) {
+		$(".fotorama__nav-wrap").addClass("ignore"); // hides thumbnails
+	}	
+}
+
+const fotofunc = (e, fotorama, extra) => {
+	const fa = fotorama.activeFrame;
+	const ta = $("#ta");
+	if (fa.comment === null) {
+		ta.hide();
+	} else {
+		ta.text(fa.comment).show();
+		if(fa.primary) {
+			ta.addClass('primaryComment');
+		} else {
+			ta.removeClass('primaryComment');
+		}
+		setTimeout(() => {
+			// delay may be needed to allow width and text to adjust
+			ta.height(0).height(ta[0].scrollHeight);
+		}, 1);
+	}
+
+	const stageFrame = $(fa.$stageFrame[0]);
+	const img = $(stageFrame).find("img");
+	const imageWidth = parseInt(img.css("width"));
+	const windowWidth = $(window).width();
+	const commentWidth = Math.floor((windowWidth - imageWidth) * 0.4);
+	ta.css("width", commentWidth + "px");
+	// $("#section").val(fa.term);
+	setActive(fa.primary);
+};
+
 function relFileRef(afRef, tag) {
 	return afRef.dir + (tag ? tag : "") + "/" + afRef.filename;
 }
-// function setHover() {
-// 	const dashes = new RegExp("--", "g");
-// 	$(".fotorama__nav-wrap").on(
-// 		"mouseenter",
-// 		".fotorama__nav__frame.fotorama__nav__frame--thumb",
-// 		e => {
-// 			e.preventDefault();
-// 			const jt = $(e.target);
-// 			let src = "";
-// 			if (jt.hasClass("fotorama__nav__frame fotorama__nav__frame--thumb")) {
-// 				src = $(e.target).find(
-// 					".fotorama__thumb.fotorama__loaded.fotorama__loaded--img > img"
-// 				)[0];
-// 			} else {
-// 				src = $(e.target);
-// 			}
-// 			src = $(src).attr("src");
-// 			const part = src.split("/")[3];
-// 			if (part) {
-// 				const term = part.split("_")[1].replace(dashes, " "); // restrore spaces in term name
-// 				$("#showterm")
-// 					.css({ left: e.pageX - 20, top: e.pageY - 20 })
-// 					.text(term)
-// 					.show();
-// 			}
-// 		}
-// 	);
-// 	$(".fotorama__nav-wrap").on(
-// 		"mouseleave",
-// 		".fotorama__nav__frame.fotorama__nav__frame--thumb",
-// 		() => {
-// 			// console.log("out");
-// 			// alert($(this)[0].src);
-// 			$("#showterm").hide();
-// 		}
-// 	);
+
+function  setActive(isPrimary) {
+	if (isPrimary === null) {
+		$("#topOfPage button").css("display", "none");
+		$("#defaultIndicator").css("display", "none");
+	} else {
+		if ($("#defaultIndicator").css("display") === "block" && isPrimary) {
+			$("#defaultIndicator").css("background", "yellow");
+		}
+		$("#topOfPage button").css("display", !isPrimary ? "block" : "none");
+		$("#defaultIndicator").css("display", isPrimary ? "block" : "none");
+		setTimeout(() => $("#defaultIndicator").css("background", "white"), 500);
+	}
+}

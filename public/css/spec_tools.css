@@ -22,10 +22,23 @@ spec_type {
     align-items: center;
     align-content: center;
 }
-
+/* #solo {
+    position: absolute;
+    z-index: 50;
+    top: 200px;
+    left: 100px;
+    display: none;
+} */
+.ignore {
+    visibility: hidden !important;
+}
+.primaryComment {
+    border: 2px solid red;
+}
 #pageheader select {
     background-color: yellow;
     margin-top: 10px;
+    margin-left: 10px;
     font-size: 18px;
 }
 
