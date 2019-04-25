@@ -1,5 +1,5 @@
 "use strict";
-/* globals Util, LinkGroup, TabValues */
+/* globals Util, LinkGroup, TabValues, Common */
 // tools.js
 
 const TV = TabValues; // constants and variables
@@ -7,7 +7,7 @@ const TV = TabValues; // constants and variables
 const pageName = "Tools";
 const dirPathToImages = "../";
 const reverseURL = "/unArchiveToolImages";
-//const COMMON = new Common();
+
 
 $(function () { // onload
 
@@ -46,26 +46,6 @@ function callDeleteImages(ev) {
     TV.deleteImages(ev,setArchiveForToolImages, listDeleting);
 }
 
-// add scroll offset to fragment target (if there is one)
-// function delayedFragmentTargetOffset() {
-//     var url = $(":target").context.URL;
-
-//     var hashCharPosition = url.lastIndexOf("#");
-//     if (hashCharPosition !== -1) {
-//         var div = $(url.substring(hashCharPosition));
-
-//         var offset = div.offset();
-
-//         var scrollto = offset.top - 50; // minus fixed header height
-//         $('html, body').animate({
-//             scrollTop: scrollto
-//         }, 0);
-//         div.css("background-color", "yellow");
-//         setTimeout(function () {
-//             div.css("background-color", "");
-//         }, 3000);
-//     }
-// }
 const COMMON = new Common();
 function getToolImages(archived) {
     let data = {
@@ -353,11 +333,7 @@ function startUp() {
     $('body').on('click', () => $("navDropDown").hide());
     $('.checkAllDel').hide();
 
-    $('job').text(
-        [
-            TV.key5.partId, TV.key5.pName, TV.key5.dept, TV.key5.op, TV.key5.machine
-        ].join(" : ")
-    );
+    $('job').text(COMMON.jobTitle());
 
     //setTimeout(delayedFragmentTargetOffset, 500);
 

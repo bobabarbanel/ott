@@ -50,13 +50,8 @@ $(function() {
 				});
 		});
 	};
-	const jobTitle = [
-		key5.partId,
-		key5.pName,
-		key5.dept,
-		key5.op,
-		key5.machine
-	].join(" : ");
+	const jobTitle = COMMON.jobTitle();
+		
 	const ta = $("textarea.comment");
 	$("#topOfPage button").on("click", e => {
 		e.preventDefault();

@@ -1,6 +1,5 @@
 "use strict";
-
-/* globals Util, LinkGroup, TabValues */
+/* globals Util, LinkGroup, TabValues, Common */
 // showtab.js
 
 let TV = TabValues;
@@ -8,6 +7,7 @@ let TV = TabValues;
 const pageName = "Tabs";
 const dirPathToImages = "../../";
 const reverseURL = "/unArchiveTabImages";
+const COMMON = new Common();
 
 $(function() {
 	// onload
@@ -28,14 +28,7 @@ $(function() {
 		let tabNum = parseInt($("#tabnum").text());
 
 		$("#deleteMenu").hide();
-		$("job").html(`Tab${TV.SPACE}${tabName}${">" + TV.SPACE}
-        ${[
-					TV.key5.partId,
-					TV.key5.pName,
-					TV.key5.dept,
-					TV.key5.op,
-					TV.key5.machine
-				].join(" : ")}`);
+		$("job").html(`Tab ${tabName}>  ${COMMON.jobTitle()}`);
 
 		$(TV.FLOATNAME)
 			.removeClass()

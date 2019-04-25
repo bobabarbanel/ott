@@ -1,10 +1,7 @@
 "use strict";
-/* globals Common, Util */
+/* globals Util */
 // spec_tools_edit.js :: Term adds, delete, plus image uploads
 
-// const COMMON = new Common();
-// const key4id = COMMON.getKey4id();
-// const key5 = COMMON.getParsedCookie();
 const ENTER = 13;
 const TABCHAR = 9;
 let TABLE;
@@ -15,13 +12,7 @@ $(function() {
 	SPEC_TYPE = $("spec_type").text();
 	const STYPE = SPEC_TYPE.toUpperCase().replace("_", " ");
 	$("title").html(`${STYPE} Edit`);
-	// const jobTitle = [
-	// 	key5.partId,
-	// 	key5.pName,
-	// 	key5.dept,
-	// 	key5.op,
-	// 	key5.machine
-	// ].join(" : ");
+	
 	$("pageheader").append(
 		$(
 			`<h1 class="pageTitle">${STYPE}</h1>` // <h3 class="jobTitle">${jobTitle}</h3>`

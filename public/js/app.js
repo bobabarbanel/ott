@@ -194,7 +194,8 @@ async function refreshFromDB() {
 	);
 }
 
-function cookieSetter() {
+function cookieSetter() { // cookie contains all 5 fields: 
+	// partId, dept, machine, op, and pName
 	QUERY.page = TABLE.getPage();
 	Cookies.set(COMMON.getCookieName(), JSON.stringify(QUERY), { expires: 1 });
 	console.log("now", Cookies.get(COMMON.getCookieName()));

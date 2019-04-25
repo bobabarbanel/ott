@@ -5,7 +5,7 @@ class Common {
 	constructor() {
 		this.COOKIENAME = "chosenCookie"; // IMPORTANT: Also defined in topRouter.js
 		this.KEY4_ORDER = ["dept", "partId", "op", "machine"]; // also defined in topRouter.js, _id in most collections
-		this.KEY5_ORDER = ["dept", "machine" ,"op", "pName","partId",]; // _id in main collection
+		this.KEY5_ORDER = ["dept", "machine" ,"op", "pName","partId",]; // also include pName value
 		this.setCookie();
 	}
 
@@ -57,7 +57,7 @@ class Common {
 		return this.KEY5_ORDER;
 	}
 
-	getKey5DisplayText() {
+	jobTitle() {
 		let key5 = this.getParsedCookie();
 		return this.getKeys()
 			.map(key => key5[key])

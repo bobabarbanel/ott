@@ -1,5 +1,4 @@
 "use strict";
-
 /* globals Common, Util */
 // spec_tools_assign.js :: Assing terms to one Job
 
@@ -32,13 +31,8 @@ $(function() {
 	const STYPE = SPEC_TYPE + " " + "Tools";
 	spec_type = SPEC_TYPE.toLowerCase() + "_tools"; // hand_tools or inspection_tools
 	$("title").html(`${STYPE} Assign`);
-	const jobTitle = [
-		key5.partId,
-		key5.pName,
-		key5.dept,
-		key5.op,
-		key5.machine
-	].join(" : ");
+	const jobTitle = COMMON.jobTitle();
+		
 	$("pageheader").append(
 		$(
 			`<h1 class="pageTitle">Assign <u>${STYPE}</u> Terms</h1>

@@ -10,21 +10,21 @@ container {
 }
 
 content {
-    width: 80%;
+    width: 100%;
 }
 
-.caret {
+.caretmarker {
     color: rgb(175, 111, 14);
-    font-size: 30px;
-    cursor: ns-resize;
+    font-size: 40px;
+    cursor: pointer;
 }
 .tabouter{
     display: flex;
     align-items: flex-start;
     margin-top: 20px;
     border-top: 4px solid green;
-    margin-left: 2em;
-    width: 60%;
+    /* margin-left: 2em; */
+    width: 100%;
 }
 .tabdiv{
     display: flex;
@@ -35,11 +35,15 @@ content {
     align-items: flex-start;
     border-top: 4px solid green;
     margin-left: 2em;
-    width: 60%;
+    width: 90%;
 }
 .tooldiv {
     display: flex;
-    align-items: baseline;
+    align-items: flex-start;
+}
+.toollink {
+    margin-left: 30px;
+    cursor: pointer;
 }
 
 .left {
@@ -58,13 +62,16 @@ content {
 
 /* toolTable */
 .toolTable {
-    width: 100%;
-    border-collapse: collapse;
+    width: 80%;
     margin-left: 2em;
     margin-top: 1em;
-    border: 2px solid lightgreen;
+    display: none;
+    height: 500px;
+    /* height: 500px;
+    width: 1000px;
+    background: orange; */
 }
-
+/*
 .toolTable, .toolTable th, .toolTable td {
     border: 1px solid black;
     text-align: center;
@@ -93,7 +100,7 @@ content {
 
 .toolTable td.left a:link {
     text-decoration: none;
-}
+} */
 
 
 
@@ -103,6 +110,7 @@ content {
     background: white;
     width: 60%;
     margin-left: 2em;
+    margin-top: 1em;
     border: 2px solid lightgreen;
 }
 .sectionRow {
@@ -119,12 +127,8 @@ pageheader {
     align-items: baseline;
     justify-content: flex-start;
     width: 60%;
+    border-bottom: 2px solid black;
 }
-
-
-/* #navButtonDiv {
-    display: none;
-} */
 
 .jobTitle {
     margin-left: 7em;
@@ -134,10 +138,12 @@ pageheader {
 .tablink, .sectionlink, .steplink {
     cursor: pointer;
 }
-
-/* 
-@media screen and (max-width: 1225px) {
-    .navDropDownButton {
-        display: block;
-    }
-} */
+.tablink {
+    margin-left: 30px;
+}
+.bottomborder {
+    border-bottom: 1px solid black;
+}
+.pos_off, .tabulator-col-title {
+    text-align: center;
+}

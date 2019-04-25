@@ -48,8 +48,8 @@ class Util {
 		// alert('goHome ' + JSON.stringify(COMMON.getParsedCookie()));
 		window.location.href = "/";
 	}
-	static setUpShortNav(key4id, here) {
-		here = here.trim();
+	static setUpShortNav() {
+		// here = here.trim();
 
 		let topnav = $(".topnav");
 		let home_button = $(
@@ -112,7 +112,7 @@ class Util {
 						// which specs does this this job have 'hand_tools' and/or 'inspection_tools'?
 						["Hand", "Inspection"].forEach(tooltype => {
 							nextTab = $(
-								`<a tabndex="-1" class="elevate" href="/tabs/spec_tools.html?spec_type=${tooltype}">${tooltype}</br>Tools</a>`
+								`<a tabndex="-1" class="elevate" href="/tabs/spec_tools_display.html?spec_type=${tooltype}">${tooltype}</br>Tools</a>`
 							);
 							if (here === `${tooltype}`) {
 								nextTab.addClass("active");
@@ -122,7 +122,7 @@ class Util {
 							} else {
 								navDropDown.append(
 									$(
-										`<a class="tabaccess" href="/tabs/spec_tools.html?spec_type=${tooltype}">${tooltype} Tools</a>`
+										`<a class="tabaccess" href="/tabs/spec_tools_display.html?spec_type=${tooltype}">${tooltype} Tools</a>`
 									)
 								);
 							}

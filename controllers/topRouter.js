@@ -1,5 +1,6 @@
 "use strict";
 // File: controllers/topRouter.js
+// const Util = require('../public/js/utilClass');
 
 // const COOKIENAME = "chosenCookie"; // IMPORTANT: also defined in commonClass.js
 // const KEY4_ORDER = ["dept", "partId", "op", "machine"];
@@ -40,7 +41,7 @@ module.exports = function(dir, app, db) {
 	});
 
 	app.get("/machine/:mnum", (req, res) => {
-		var query = {
+		const query = {
 			"machines.mid": req.params.mnum
 		};
 		db.collection("machineSpecs")
@@ -61,13 +62,43 @@ module.exports = function(dir, app, db) {
 		res.render("spec_tools_edit.html", { spec_type: req.params.spec_type });
 	});
 	app.get("/spec_tools_display/:spec_type", (req, res) => {
-		res.render("spec_tools.html", { spec_type: req.params.spec_type });
+		res.render("spec_tools_display.html", { spec_type: req.params.spec_type });
 	});
 	app.get("/spec_tools_upload/:spec_type", (req, res) => {
 		res.render("spec_tools_upload.html", { spec_type: req.params.spec_type });
 	});
 	app.get("/spec_tools_assign/:spec_type", (req, res) => {
 		res.render("spec_tools_assign.html", { spec_type: req.params.spec_type });
+	});
+
+	app.post("/update_spec_image_comment", async (req, res) => {
+		const spec_type = req.body.spec_type;
+		const filename = req.body.filename;
+		const dir = req.body.dir;
+		const term = req.body.term;
+		const modified_text = req.body.text;
+		const col = db.collection("spec_terms");
+		console.log({ spec_type, term, filename, dir, modified_text });
+		try {
+			col
+				.updateOne(
+					{ _id: spec_type },
+					{ $set: { "terms.$[t].files.$[fref].comment": modified_text } },
+					{
+						arrayFilters: [
+							{ "t.term": term },
+							{ $and: [{ "fref.dir": dir }, { "fref.filename": filename }] }
+						],
+						multi: false
+					}
+				)
+				.then(success => {
+					res.json({ success: success });
+				});
+		} catch (error) {
+			res.status = 500;
+			res.json({ error: error });
+		}
 	});
 
 	app.post("/get_spec_image_filerefs", async (req, res) => {
@@ -369,15 +400,119 @@ module.exports = function(dir, app, db) {
 	app.post("/addkey", (req, res) => {
 		req.body.lastUpdated = new Date(); // timestamp for jobs
 		db.collection("main")
-			.insertOne(req.body)
+			.insertOne(req.body.main)
 			.then(result => {
-				res.send(result);
+				return createMainTable(result, req.body, res);
+				// res.send(result);
 			})
 			.catch(reason => {
 				res.send({
 					error: reason
 				});
 			});
+	});
+
+	function createMainTable(result, { main, machineSpecs }, res) {
+
+		const doc = {
+			_id: main._id,
+			rows: []
+		};
+		["Turret1", "Turret2"].forEach(turretStr => {
+			if (machineSpecs[turretStr] !== undefined) {
+				doRows(doc.rows, machineSpecs, turretStr, "Spindle1");
+				if (machineSpecs[turretStr].Spindle2 !== undefined) {
+					doRows(doc.rows, machineSpecs, turretStr, "Spindle2");
+				}
+			}
+		});
+		// save doc
+		db.collection("main_table")
+			.insertOne(doc)
+			.then(
+				() => {
+					console.log("new main_table for",doc._id);
+					res.json(result);
+				}
+			)
+			.catch(reason => {
+				console.error(reason);
+				res.status(500).send({
+					error: reason
+				});
+			});
+	}
+	function numsOf(str) {
+		return parseInt(str.replace(/[^\d]/g, ""));
+	}
+	const cols = [
+		"function",
+		"type",
+		"Position_#",
+		"Offset_#",
+		"Function",
+		"Type",
+		"Name/Model_/EDP",
+		"Diameter",
+		"Insert_Width",
+		"Insert_Name",
+		"Grade",
+		"Radius",
+		"Angle",
+		"Holder_Type",
+		"Holder_Model",
+		"Stick Out",
+		"Mori Seiki_TNRC",
+		"CRC",
+		"Mori Seiki_Command Point",
+		"Okuma_TNRC X",
+		"Okuma_TNRC Z",
+		"Misc Info****",
+		"Restart_N#",
+		"Turret_Model Holder",
+		"Collet_Size/Model",
+		"Shank_Dia/Width"
+	];
+	function doRows(rows, specs, turretStr, spindleStr) {
+		let lowT = parseInt(specs[turretStr].range[0]);
+		let highT = parseInt(specs[turretStr].range[1]);
+		let lowS = parseInt(specs[turretStr][spindleStr][0]);
+		let numT = numsOf(turretStr);
+		let numS = numsOf(spindleStr);
+
+		for (
+			var position = lowT, offset = lowS;
+			position <= highT;
+			position++, offset++
+		) {
+			const array = new Array(cols.length);
+			array.fill("");
+			rows.push({
+				turret: numT,
+				spindle: numS,
+				position: position,
+				offset: offset,
+				cols: array
+			});
+		}
+	}
+
+	app.post('/getMainTable', (req, res) => {
+		const key4id = req.body.key4id;
+		// console.log(key4id);
+		db.collection('main_table').findOne(
+			{ 
+				_id: key4id
+			},
+		
+			(err, result) => {
+				if(err) {
+					return res.json({'error': err});
+				} 
+				// console.log(result);
+				return res.json(result.rows);
+			});
+		
 	});
 
 	app.post("/sheetTags", (req, res) => {
@@ -469,26 +604,26 @@ module.exports = function(dir, app, db) {
 		// res.render('index.html', {});
 	});
 
-	app.post("/pname", (req, res) => {
-		var query = {
-			dept: req.body.dept,
-			machine: req.body.machine,
-			op: req.body.op,
-			partId: req.body.partId
-		};
-		var project = {
-			pName: 1
-		};
-		var myPromise = db.collection("main").findOne(query, project);
+	// app.post("/pname", (req, res) => {
+	// 	var query = {
+	// 		dept: req.body.dept,
+	// 		machine: req.body.machine,
+	// 		op: req.body.op,
+	// 		partId: req.body.partId
+	// 	};
+	// 	var project = {
+	// 		pName: 1
+	// 	};
+	// 	var myPromise = db.collection("main").findOne(query, project);
 
-		myPromise.then(
-			r => {
-				res.json(r);
-			},
-			() => res.json("none")
-		);
-		return;
-	});
+	// 	myPromise.then(
+	// 		r => {
+	// 			res.json(r);
+	// 		},
+	// 		() => res.json("none")
+	// 	);
+	// 	return;
+	// });
 
 	// app.get("/reset", (req, res) => {
 	// 	res.clearCookie(COOKIENAME);

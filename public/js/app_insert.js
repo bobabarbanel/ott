@@ -1,6 +1,6 @@
 "use strict";
+/* globals Util */
 // app_insert.js
-
 
 jQuery.fn.visible = function() {
 	return this.css("visibility", "visible");
@@ -10,20 +10,20 @@ jQuery.fn.invisible = function() {
 	return this.css("visibility", "hidden");
 };
 $(function() {
-	const idOrderedKeys = ["dept", "machine", "op", "pName", "partId"];
-	var jsonData;
+	const key4_idOrderedKeys = ["dept",  "partId", "op", "machine" ];
+	let JSONDATA;
 	const FIELDS = ["partId", "pName", "dept", "op", "machine"];
 	const FIELDSORTER = {
 		partId: alphaCompare,
 		pName: alphaCompare,
 		dept: alphaCompare,
-		op: (a, b) => a - b,
+		op: (a, b) => a - b, // numeric
 		machine: alphaCompare
 	};
 	const FWIDTH = "180px";
 	const STATUS = {};
 	const KEY5 = {};
-	Util.setUpShortNav("", "");
+	Util.setUpShortNav(); // Home button only
 	doGetData();
 	$("#submit").invisible();
 	$("select").attr("tabindex", -1);
@@ -71,9 +71,8 @@ $(function() {
 	$("input").on("change keyup paste", handleInputOne);
 
 	function performPut() {
-		putKey5().then(
+		putMain().then(
 			value => {
-				debugger;
 				if ("error" in value && value.error.code === 11000) {
 					$("#submit").invisible();
 					$("#insertNotice").css("background-color", "red");
@@ -98,7 +97,7 @@ $(function() {
 	}
 	function doGetData() {
 		getData("Parts Startup").then(data => {
-			jsonData = data; // now global
+			JSONDATA = data; // now global
 			// Choosers
 			FIELDS.forEach(initField); // KEY5 empty to start
 			//console.log("doGetData complete " + data.length);
@@ -166,7 +165,6 @@ $(function() {
 
 	function getData(message) {
 		return new Promise((resolve, reject) => {
-			console.log("getdata");
 			$.ajax({
 				url: "/get_jobs",
 				type: "get",
@@ -182,18 +180,18 @@ $(function() {
 					reject(error);
 				});
 
-				//.always(() => console.log("getdata complete: " + message));
+			//.always(() => console.log("getdata complete: " + message));
 		});
 	}
-
-	function putKey5() {
+	// TODO: Fix KEY5
+	async function putMain() {
+		const machineSpecs = await Util.getMachineSpec(KEY5.machine);
+		KEY5._id = key4_idOrderedKeys.map(key => KEY5[key]).join("|"); // uses only 4 fields for _id
 		return new Promise((resolve, reject) => {
-			KEY5._id = idOrderedKeys.map(key => KEY5[key]).join("|");
-
 			$.ajax({
 				url: "/addkey",
 				type: "post",
-				data: KEY5
+				data: { main: KEY5, machineSpecs: machineSpecs }
 			})
 				.done(result => resolve(result))
 				.fail((request, status, error) => reject(error));
@@ -205,7 +203,7 @@ $(function() {
 	}
 
 	function findUnique(fName) {
-		var oneColVals = jsonData
+		var oneColVals = JSONDATA
 			.filter(row => keyMatch(row))
 			.map(row => row[fName]);
 		return [...new Set(oneColVals)]; // return distinct values only
@@ -219,7 +217,7 @@ $(function() {
 	}
 
 	function initField(fName) {
-		// set up options for one field fName .chosen and initiate chosen
+		// set up options for one field fName . and initiate chosen
 
 		const selector = "#" + fName + "_select";
 		// KEY5 will be empty to start with
@@ -274,6 +272,8 @@ $(function() {
 						$("#submit").visible(); // exposes go button
 					}
 				});
+				$("#" + fName + "_select", "content")
+				.parent().trigger('click');	
 		}
 	}
 });

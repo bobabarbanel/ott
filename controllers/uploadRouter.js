@@ -36,12 +36,12 @@ function fileRef(aDir, aFname) {
 module.exports = function(dir, app, db) {
 	app.use(logger);
 
-	function calcFullTargetDir(key4, section) {
+	function calcFullTargetDir(machine, section) {
 		// Directory path determined using first+second letter of Machine name,
 		// and fixed TARGETHEADSTRING. Has leading "public/".
 		// debugLog("calcFullTargetDir key4 " + JSON.stringify(key4));
 		/******************************/
-		let machine = key4.machine;
+		// let machine = key4.machine;
 		// e.g., /images/Tools/LC
 		return [TARGETHEADSTRING, section, machine.substring(0, 2)].join("/");
 	}
@@ -77,11 +77,11 @@ module.exports = function(dir, app, db) {
 		return [dir1, "public", dir2, fname].join("/");
 	}
 
-	function calcFullTargetBaseFileName(key4, turret, position, spindle, offset) {
+	function calcFullTargetBaseFileName(partId, op, machine, turret, position, spindle, offset) {
 		return [
-			key4.partId,
-			key4.op,
-			key4.machine,
+			partId,
+			op,
+			machine,
 			turret,
 			position,
 			spindle,
@@ -171,7 +171,7 @@ module.exports = function(dir, app, db) {
 
 	let uploadCount = 0; // tie to key4
 	function processUploads(
-		key4,
+		key4id,
 		_id,
 		base,
 		tailnum,
@@ -183,9 +183,9 @@ module.exports = function(dir, app, db) {
 	) {
 		let ftdLarge, ftdMedium, ftdSmall;
 		[ftdLarge, ftdMedium, ftdSmall] = idirs;
-		let key4id = ["dept", "partId", "op", "machine"]
-			.map(k => key4[k])
-			.join("|"); // can we use common somehow??
+		// let key4id = ["dept", "partId", "op", "machine"]
+		// 	.map(k => key4[k])
+		// 	.join("|"); // can we use common somehow??
 		uploadCount = 0;
 		myFiles.forEach((aFile, index) => {
 			let fileName = aFile.name;
@@ -776,7 +776,12 @@ module.exports = function(dir, app, db) {
 		let myFiles = [];
 
 		form.parse(req, function(err, fields, files) {
-			let key4 = JSON.parse(fields["key4"]);
+			let key4id = fields["key4"];
+			const pieces = key4id.split('|');
+			// const dept = pieces[0];
+			const partId = pieces[1];
+			const op = pieces[2];
+			const machine = pieces[3];
 
 			let turret =
 				typeof fields["turret"] === "string"
@@ -796,9 +801,10 @@ module.exports = function(dir, app, db) {
 					: fields["offset"];
 			let tab = fields["tab"];
 
-			let mongoKey4 = [key4.dept, key4.partId, key4.op, key4.machine].join("|");
+			// let mongoKey4 = key4id; //[key4.dept, key4.partId, key4.op, key4.machine].join("|");
+			
 			let query = {
-				key4: mongoKey4,
+				key4: key4id,
 				tab: tab,
 				position: position,
 				offset: offset,
@@ -816,9 +822,9 @@ module.exports = function(dir, app, db) {
 			numberOfFiles = myFiles.length;
 			// add machine (2 chars) to directories
 			let ftdMedium, ftdSmall, ftdLarge;
-			ftdLarge = calcFullTargetDir(key4, SECTION + "_large");
-			ftdMedium = calcFullTargetDir(key4, SECTION);
-			ftdSmall = calcFullTargetDir(key4, SECTION + "_small");
+			ftdLarge = calcFullTargetDir(machine, SECTION + "_large");
+			ftdMedium = calcFullTargetDir(machine, SECTION);
+			ftdSmall = calcFullTargetDir(machine, SECTION + "_small");
 			// public/images/Tools_large/img/MLetters (first 2 letters of machine name)
 
 			[ftdLarge, ftdMedium, ftdSmall].forEach(mDir => {
@@ -834,12 +840,19 @@ module.exports = function(dir, app, db) {
 					nextNum: numberOfFiles
 				}
 			});
+			// const key4 = {};
+			// const pieces = key4id.split('|');
+			// key["dept"] = pieces[0];
+			// key["partId"] = pieces[1];
+			// key["op"] = pieces[2];
+			// key["machine"] = pieces[3];
+
 			promise.then(
 				doc => {
 					processUploads(
-						key4,
+						key4id,
 						doc.value._id,
-						calcFullTargetBaseFileName(key4, turret, position, spindle, offset),
+						calcFullTargetBaseFileName(partId, op, machine, turret, position, spindle, offset),
 						doc.value.nextNum, // critical: the starting number for files to make unique
 						numberOfFiles,
 						myFiles,

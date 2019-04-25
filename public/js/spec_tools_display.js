@@ -51,32 +51,31 @@ $(function() {
 				});
 		});
 	};
-	const jobTitle = [
-		key5.partId,
-		key5.pName,
-		key5.dept,
-		key5.op,
-		key5.machine
-	].join(" : ");
+
+	const jobTitle = COMMON.jobTitle();
+		
 	const ta = $("textarea.comment");
-	$("#topOfPage button").on("click", e => { // make an image the Primary
+	$("#topOfPage button").on("click", e => {
+		// make an image the Primary
 		e.preventDefault();
 		const af = fotorama.activeFrame;
 		thePrimary = fotorama.activeIndex;
-		$.post({ // reset primary image in database
+		$.post({
+			// reset primary image in database
 			url: "/set_spec_images_primary",
 			dataType: "json",
 			data: {
-				spec_type: SPEC_TYPE.toLowerCase() + "_tools",
+				spec_type: spec_type_id(),
 				filename: af.filename,
 				dir: af.dir,
 				term: af.term
 			}
 		})
 			.done(result => {
-				IMAGES[af.term].forEach( // reset primary image in IMAGES object, fileRefs array
-					(aRef,index) => {
-						aRef.primary = (index === thePrimary);
+				IMAGES[af.term].forEach(
+					// reset primary image in IMAGES object, fileRefs array
+					(aRef, index) => {
+						aRef.primary = index === thePrimary;
 					}
 				);
 				setActive(true);
@@ -130,7 +129,7 @@ $(function() {
 			$("#section").css("visibility", "visible"); // the selector
 			// process all the terms with fileRefs
 			let showSection = null;
-			
+
 			termsArray.forEach(item => {
 				// already sorted
 				let { term, files } = item;
@@ -145,7 +144,6 @@ $(function() {
 			$("#section").on("change", async () => {
 				const selectedTerm = $("#section option:selected").text();
 				await loadStuff(selectedTerm);
-				
 			});
 
 			$("#section")
@@ -154,11 +152,77 @@ $(function() {
 		});
 	});
 });
+function taInput(e) {
+	if ($(this).hasClass("initial")) {
+		console.log("ta change initial");
+		$(this).removeClass("initial");
+		// show save button
+		$(".commentsave, .commentcancel").css("visibility", "visible");
+	}
+	// else {
+	// 	console.log("ta input");
+	// }
+}
+
+const spec_type_id = () => SPEC_TYPE.toLowerCase() + "_tools";
+
+const commentToDb = (text) => {
+	const fa = fotorama.activeFrame;
+	const selectedTerm = $("#section option:selected").text();
+	const dir = fa.dir;
+	const filename = fa.filename;
+	
+	return new Promise((resolve, reject) => {
+		$.post({
+			url: "/update_spec_image_comment",
+			dataType: "json",
+			data: {
+				spec_type: spec_type_id(),
+				term: selectedTerm,
+				text: text,
+				dir: dir,
+				filename: filename
+			}
+		})
+			.done(result => {
+				resolve(result);
+			})
+			.fail(error => {
+				reject(error);
+			});
+	});
+};
+
+function saveComment(e) {
+	commentToDb($('#ta').val()).then(() => {
+		afterCommentEdit()
+	});
+}
+
+function afterCommentEdit() {
+	$(".commentsave, .commentcancel").css("visibility", "hidden");
+	$("#ta").addClass("initial");
+}
+
+function restoreComment(e) {
+	const fa = fotorama.activeFrame;
+	const ta = $("#ta");
+
+	if (fa.comment === null) {
+		ta.val("");
+	} else if (fa.comment !== ta.val()) {
+		ta.val(fa.comment);
+	}
+	afterCommentEdit();
+}
 
 async function loadStuff(section) {
 	let primary = 0; // default image to show if primary is not identified
-	$("content").empty()
-		.append(`<textarea id="ta" class="comment"></textarea>
+	$("content").empty().append(`
+		
+		<button id="taSave" class="commentsave btn-primary">Save Changed Comment</button>
+		<button id="taCancel" class="commentcancel btn-secondary">Cancel</button>
+		<textarea id="ta" class="comment"></textarea>
 				<div id="fotorama" 
 					class="fotorama" 
 					data-auto="false"
@@ -168,7 +232,9 @@ async function loadStuff(section) {
 					data-max-height="83%" 
 					data-max-width="100%">
 				</div>`);
-	const ta = $("#ta");
+	const ta = $("#ta").on("input", taInput);
+	$("#taSave").on("click", saveComment);
+	$("#taCancel").on("click", restoreComment);
 	const $fotoramaDiv = $("#fotorama")
 		// Listen to the events
 		.on(
@@ -187,7 +253,7 @@ async function loadStuff(section) {
 			if (afRef.primary) {
 				// primary = index;
 				thePrimary = index;
-				ta.text(afRef.comment);
+				ta.val(afRef.comment);
 			}
 			return {
 				img: relFileRef(afRef),
@@ -216,22 +282,25 @@ async function loadStuff(section) {
 	await fotorama.show(thePrimary);
 	if (hideThumbs) {
 		$(".fotorama__nav-wrap").addClass("ignore"); // hides thumbnails
-	}	
+	}
 }
 
 const fotofunc = (e, fotorama, extra) => {
 	const fa = fotorama.activeFrame;
 	const ta = $("#ta");
-	if (fa.comment === null) {
-		ta.hide();
-	} else {
-		ta.text(fa.comment).show();
-		if(fa.primary) {
-			ta.addClass('primaryComment');
+	$(".commentsave, .commentcancel").css("visibility", "hidden");
+	ta.addClass("initial")
+		.text("")
+		.hide();
+	if (fa.comment !== null) {
+		if (fa.primary) {
+			ta.addClass("primaryComment");
 		} else {
-			ta.removeClass('primaryComment');
+			ta.removeClass("primaryComment");
 		}
+
 		setTimeout(() => {
+			ta.val(fa.comment).show();
 			// delay may be needed to allow width and text to adjust
 			ta.height(0).height(ta[0].scrollHeight);
 		}, 1);
@@ -251,7 +320,7 @@ function relFileRef(afRef, tag) {
 	return afRef.dir + (tag ? tag : "") + "/" + afRef.filename;
 }
 
-function  setActive(isPrimary) {
+function setActive(isPrimary) {
 	if (isPrimary === null) {
 		$("#topOfPage button").css("display", "none");
 		$("#defaultIndicator").css("display", "none");

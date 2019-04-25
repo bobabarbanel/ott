@@ -24,16 +24,14 @@ jQuery.fn.invisible = function() {
 	return this.css("visibility", "hidden");
 };
 const COMMON = new Common();
-const key4id = COMMON.getKey4id();
-const key5Obj = COMMON.getParsedCookie();
+const KEY4ID = COMMON.getKey4id();
+const KEY5 = COMMON.getParsedCookie();
 
 const FTEDIT_PAGE = "/tabs/ftedits.html";
 $(function() {
 	$("#spin").hide();
-	Util.setUpTabs(key4id, "", {}).then(() => setupToolUpload());
+	Util.setUpTabs(KEY4ID, "", {}).then(() => setupToolUpload());
     
-	// alert(key4id);
-
 	function getSheetTagsFiles(tab) {
 		//debugLog("getSheetTagsFiles");
 		return new Promise((resolve, reject) => {
@@ -41,7 +39,7 @@ $(function() {
 				url: "/sheetTags",
 				type: "post",
 				data: {
-					key: key5Obj,
+					key: KEY5,
 					tab: tab,
 					files: true // **do** retrieve files/images list
 				},
@@ -61,11 +59,10 @@ $(function() {
 
         
 		
-		$("#job").text(
-			[key5Obj.partId, key5Obj.pName, key5Obj.dept, key5Obj.op, key5Obj.machine].join(" : ")
-		);
+		$("#job").text(COMMON.jobTitle());
+
 		f_t_edits(true); // edit button disabled
-		Util.getMachineSpec(key5Obj.machine).then(machineSpecs => {
+		Util.getMachineSpec(KEY5.machine).then(machineSpecs => {
 			getSheetTagsFiles(SECTION).then(toolData => {
 				paintPage(machineSpecs, toolData);
 				$("#progress").hide();
@@ -288,8 +285,8 @@ function paintPage(machineSpecs, toolData) {
 				.html("Uploading:&nbsp;Complete");
 			setTimeout(() => {
 				$("#progress").html("Now Processing Images");
-				checkProgress(key4id);
-				polling = setInterval(checkProgress, 500, key4id);
+				checkProgress(KEY4ID);
+				polling = setInterval(checkProgress, 500, KEY4ID);
 			}, 700);
 		} else {
 			$("#progress")
@@ -339,7 +336,7 @@ function paintPage(machineSpecs, toolData) {
 			// add data used to put images in database
 			formData.append("func", func);
 			formData.append("type", type);
-			formData.append("key4", JSON.stringify(key4id)); // from cookie
+			formData.append("key4", KEY4ID); // from cookie
 			formData.append("tab", tab);
 
 			formData.append("turret", turret);

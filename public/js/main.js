@@ -7,9 +7,10 @@ const COMMON = new Common();
 const key4id = COMMON.getKey4id();
 const key5 = COMMON.getParsedCookie();
 
-const openMark = '&#9658;';
-const closeMark = '&#9660;';
-const right_caret = '<span class="caret">' + openMark + '</span>';
+const openMark = '<i class="fas fa-caret-right"></i>';
+const closeMark = '<i class="fas fa-caret-down"></i>';
+const right_caret = `<span class="caretmarker">${openMark}</span>`;
+const down_caret = `<span class="caretmarker">${closeMark}</span>`;
 
 $(function () {
 
@@ -72,22 +73,24 @@ function paintPage(machineSpecs, toolData, tabs) {
 /// tools display and response
 
 function toolsTable(machineSpecs, toolData) {
-    let aToolDiv = $(`<div class="tooldiv">${right_caret}<h2 class="toollink">Tools</t2></div>`);
+    let aToolDiv = $(`<div class="tooldiv"><h2 class="toollink">${right_caret} Tools</h2></div>`);
 
     let aToolOuter = $(`<div class="toolouter"></div>`).append(aToolDiv);
     let table = $(`<table class="toolTable">`).hide();
     aToolOuter.append(table);
 
-    aToolDiv.find('.caret').first().on('click', (ev) => {
-        let caret = $(ev.target);
-        let toolTable = caret.parent().parent().find('.toolTable');
+    aToolDiv.find('h2').on('click', (ev) => {
+        // ev.preventDefault();
+        const caret = $(ev.target);
+        const toolTable = caret.closest('.toolouter').find('.toolTable');
+        
         if (toolTable.css('display') === "none") {
-            caret.html(closeMark);
+            caret.find('.toollink').html(`${down_caret}<br/>Tools`);
             toolTable.show("slide", {
                 direction: "left"
             }, "slow");
         } else {
-            caret.html(openMark);
+            caret.find('.toollink').html(`${right_caret} Tools`);
             toolTable.hide("slide", {
                 direction: "left"
             }, "slow");

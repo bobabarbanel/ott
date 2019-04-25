@@ -117,7 +117,7 @@ $(function() {
 	////////////////////////////////////////////////////////////
 	Util.setUpTabs(key4id, "", {}).then(() => {
 		disableSubmitButton(true);
-		$("#job").text(COMMON.getKey5DisplayText());
+		$("#job").text(COMMON.jobTitle());
 		let parsedCookie = COMMON.getParsedCookie();
 		Util.getMachineSpec(parsedCookie.machine).then(machineSpecs => {
 			Util.getSheetTags(parsedCookie, SECTION).then(toolData => {

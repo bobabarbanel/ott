@@ -28,7 +28,7 @@ $(function () {
     hideSpin();
     DOM.NAV = $('nav');
     DOM.PROGRESS = $('#progress').hide();
-    DOM.JOB = $('job').text([KEY5.partId, KEY5.pName, KEY5.dept, KEY5.op, KEY5.machine].join(" : "));
+    DOM.JOB = $('job').text(COMMON.jobTitle());
     ///////
     main();
     ///////

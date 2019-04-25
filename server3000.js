@@ -32,6 +32,7 @@ const topRouter = require("./controllers/topRouter");
 MongoClient.connect(url, {useNewUrlParser: true}, 
   (err, database) => {
     if (err) { return console.log("Mongo Error: " + err); }
+    console.log("Mongo connected. Starting services.")
     let dir = __dirname;
 
     const db = database.db('parts');
