@@ -1,0 +1,112 @@
+body {
+    background: lightblue;
+    margin: 0 30px auto;
+}
+
+.jobTitle {
+    margin-left: 2em;
+}
+
+.no_image_message {
+    color: red;
+    margin: 100px 0 0 100px;
+}
+
+.commentsave, .commentcancel {
+    visibility: hidden;
+    font-size: 24px;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+#fotorama {
+    margin-top: -40px;
+}
+
+#pageheader {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: center;
+}
+
+.ignore {
+    visibility: hidden !important;
+}
+.primaryComment {
+    border: 2px solid red;
+}
+#pageheader select {
+    background-color: yellow;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 18px;
+}
+
+@keyframes grow-left {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}
+
+#defaultIndicator {
+    width: 200px;
+    border: 2px solid red;
+    display: none;
+    margin-left: 50px;
+    margin-top: 10px;
+    font-style: bold;
+    font-size: 24px;
+    text-align: center;
+    animation: grow-left ease 0.4s forwards;
+}
+
+
+textarea.comment {
+    background: rgb(233, 233, 233);
+    position: absolute;
+    top: 200px;
+    left: 50px;
+    z-index: 50;
+    max-height: 58%;
+    overflow-y: scroll;
+    font-weight: bold;
+    font-size: 18px;
+    height: auto;
+}
+/* content {
+    position: absolute;
+    top: 50px;
+} */
+
+#topOfPage {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    margin-top: 46px;
+}
+
+#topOfPage button {
+    border-radius: 20px;
+    margin-left: 130px;
+    margin-top: 10px;
+    display: none;
+    font-style: bold;
+    font-size: 18px;
+    text-align: center;
+}
+
+.fotorama__thumb-border {
+    border-color: red !important;
+}
+
+/* #showterm {
+    position: absolute;
+    
+    z-index: 100;
+    color: white;
+    background: blue;
+} */

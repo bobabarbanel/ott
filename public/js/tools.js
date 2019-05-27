@@ -328,13 +328,27 @@ function setTitlesForSingle(img) {
     $("#tsSection").html(txt);
     return txt;
 }
+function scrollToElement() {
+    const hash = location.hash;
+    const jq = $(hash);
+    
+    if(jq.offset()) {
+        let start = jq.offset().top-120;
+        start = (start > 0) ? start : 0;
+        $(window).scrollTop(start).scrollLeft(0);
+        $(hash + "+ div").addClass('highlight');
+    }
+}
 
 function startUp() {
     $('body').on('click', () => $("navDropDown").hide());
+    
+    setTimeout( () => scrollToElement(), 500);
+    
     $('.checkAllDel').hide();
-
+    
     $('job').text(COMMON.jobTitle());
-
+    
     //setTimeout(delayedFragmentTargetOffset, 500);
 
     $('#taButtonCancel').on("click", () => {

@@ -68,6 +68,11 @@ $(function() {
 
 	$("#delete_job_action").on("click", deleteAJob);
 
+	$("#terms_edit_action").on("click", e => {
+		e.preventDefault();
+		openInSameTab("/terms/terms_edit_upload");
+	});
+
 	// $("#hand_tools_action_upload").on("click", e => {
 	// 	useSameDestination(e, "/spec_tools_upload/hand_tools");
 	// });

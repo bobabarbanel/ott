@@ -1,12 +1,15 @@
 "use strict";
 // File: controllers/topRouter.js
-// const Util = require('../public/js/utilClass');
 
-// const COOKIENAME = "chosenCookie"; // IMPORTANT: also defined in commonClass.js
-// const KEY4_ORDER = ["dept", "partId", "op", "machine"];
 module.exports = function(dir, app, db) {
 	require("./uploadRouter")(dir, app, db);
+	require("./termRouter")(dir, app, db);
+	app.use(logger);
 
+	function logger(req, res, next) {
+		console.log(new Date(), req.method, req.url);
+		next();
+	}
 	// main page
 	app.get("/", (req, res) => {
 		// get parts data to start
@@ -383,10 +386,7 @@ module.exports = function(dir, app, db) {
 				}
 			])
 			.toArray();
-		// var myPromise = col('images').find(query,
-		// 	{ "key4": 0, "tab": 0 })
-		// 	.sort({ turret: 1, position: 1, spindle: 1, offset: 1 })
-		// 	.toArray();
+
 
 		myPromise.then(
 			r => {
@@ -395,124 +395,6 @@ module.exports = function(dir, app, db) {
 			() => res.json([])
 		);
 		return;
-	});
-
-	app.post("/addkey", (req, res) => {
-		req.body.lastUpdated = new Date(); // timestamp for jobs
-		db.collection("main")
-			.insertOne(req.body.main)
-			.then(result => {
-				return createMainTable(result, req.body, res);
-				// res.send(result);
-			})
-			.catch(reason => {
-				res.send({
-					error: reason
-				});
-			});
-	});
-
-	function createMainTable(result, { main, machineSpecs }, res) {
-
-		const doc = {
-			_id: main._id,
-			rows: []
-		};
-		["Turret1", "Turret2"].forEach(turretStr => {
-			if (machineSpecs[turretStr] !== undefined) {
-				doRows(doc.rows, machineSpecs, turretStr, "Spindle1");
-				if (machineSpecs[turretStr].Spindle2 !== undefined) {
-					doRows(doc.rows, machineSpecs, turretStr, "Spindle2");
-				}
-			}
-		});
-		// save doc
-		db.collection("main_table")
-			.insertOne(doc)
-			.then(
-				() => {
-					console.log("new main_table for",doc._id);
-					res.json(result);
-				}
-			)
-			.catch(reason => {
-				console.error(reason);
-				res.status(500).send({
-					error: reason
-				});
-			});
-	}
-	function numsOf(str) {
-		return parseInt(str.replace(/[^\d]/g, ""));
-	}
-	const cols = [
-		"function",
-		"type",
-		"Position_#",
-		"Offset_#",
-		"Function",
-		"Type",
-		"Name/Model_/EDP",
-		"Diameter",
-		"Insert_Width",
-		"Insert_Name",
-		"Grade",
-		"Radius",
-		"Angle",
-		"Holder_Type",
-		"Holder_Model",
-		"Stick Out",
-		"Mori Seiki_TNRC",
-		"CRC",
-		"Mori Seiki_Command Point",
-		"Okuma_TNRC X",
-		"Okuma_TNRC Z",
-		"Misc Info****",
-		"Restart_N#",
-		"Turret_Model Holder",
-		"Collet_Size/Model",
-		"Shank_Dia/Width"
-	];
-	function doRows(rows, specs, turretStr, spindleStr) {
-		let lowT = parseInt(specs[turretStr].range[0]);
-		let highT = parseInt(specs[turretStr].range[1]);
-		let lowS = parseInt(specs[turretStr][spindleStr][0]);
-		let numT = numsOf(turretStr);
-		let numS = numsOf(spindleStr);
-
-		for (
-			var position = lowT, offset = lowS;
-			position <= highT;
-			position++, offset++
-		) {
-			const array = new Array(cols.length);
-			array.fill("");
-			rows.push({
-				turret: numT,
-				spindle: numS,
-				position: position,
-				offset: offset,
-				cols: array
-			});
-		}
-	}
-
-	app.post('/getMainTable', (req, res) => {
-		const key4id = req.body.key4id;
-		// console.log(key4id);
-		db.collection('main_table').findOne(
-			{ 
-				_id: key4id
-			},
-		
-			(err, result) => {
-				if(err) {
-					return res.json({'error': err});
-				} 
-				// console.log(result);
-				return res.json(result.rows);
-			});
-		
 	});
 
 	app.post("/sheetTags", (req, res) => {

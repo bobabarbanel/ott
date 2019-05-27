@@ -34,7 +34,7 @@ function fileRef(aDir, aFname) {
 }
 
 module.exports = function(dir, app, db) {
-	app.use(logger);
+	// app.use(logger);
 
 	function calcFullTargetDir(machine, section) {
 		// Directory path determined using first+second letter of Machine name,
@@ -1346,8 +1346,8 @@ module.exports = function(dir, app, db) {
 			);
 	});
 
-	function logger(req, res, next) {
-		console.log(new Date(), req.method, req.url);
-		next();
-	}
+	// function logger(req, res, next) {
+	// 	console.log(new Date(), req.method, req.url);
+	// 	next();
+	// }
 };

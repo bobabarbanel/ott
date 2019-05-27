@@ -2,6 +2,12 @@
 body {
     background: rgb(138, 170, 172);
 }
+body.replacing {
+    background: rgb(120, 127, 168);
+}
+body.viewing {
+    background: rgb(118, 167, 118);
+}
 container {
     position: absolute;
     width: 100%;
@@ -59,17 +65,19 @@ content {
     text-align: left;
     width: 70px;
 }
-
-/* toolTable */
-.toolTable {
-    width: 80%;
+.tableContainer {
     margin-left: 2em;
     margin-top: 1em;
-    display: none;
+   
+}
+/* toolTable */
+.toolTable {
+    width: 1200px;
+    /* margin-left: 2em;
+    margin-top: 1em;
+    display: none; */
     height: 500px;
-    /* height: 500px;
-    width: 1000px;
-    background: orange; */
+    display: none;
 }
 /*
 .toolTable, .toolTable th, .toolTable td {
@@ -143,7 +151,34 @@ pageheader {
 }
 .bottomborder {
     border-bottom: 1px solid black;
+    font-weight: bold;
 }
 .pos_off, .tabulator-col-title {
     text-align: center;
+}
+.na {
+    font-size: 80%;
+    color: grey;
+}
+.tabulator-edit-select-list-item {
+    background-color: #FBFFD0;
+}
+.tabulator-cell[tabulator-field=imagelink]:hover {
+    background: pink;
+}
+.tabulator-cell[tabulator-field=imagelink] > a {
+    position: relative;
+    top: -5px;
+    font-size: 20px;
+}
+.show_edit {
+    font-size: 14px;
+    margin-left: 12px;
+    width: 8em;
+}
+span.replaceIndicator {
+    color: white;
+    font-size: 20px;
+    background: red;
+    visibility: hidden;
 }

@@ -1,0 +1,156 @@
+body {
+    background: rgb(159, 190, 231);
+}
+
+content {
+    width: 80%;
+}
+
+.termadder {
+    list-style: none;
+}
+
+input[type="radio"] {
+    margin-right: 1em;
+}
+/* buttonid#addTermButton {
+
+} */
+
+container {
+    position: absolute;
+    width: 100%;
+    left: 1em;
+    top: 3.8em;
+    width: 100%;
+    /* padding-top: 30px;
+    padding-right: 20px;
+    padding-bottom: 0;
+    padding-left: 20px; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.dup {
+    background: pink;
+}
+.action {
+    background: yellow;
+}
+duplicate {
+    visibility: hidden;
+}
+.visible {
+    visibility: visible;
+}
+
+spec_tools {
+    display: none;
+}
+
+pageheader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 80%;
+}
+
+.jobTitle {
+    margin-left: 2em;
+}
+
+.action {
+    background: yellow !important;
+}
+
+input.upper {
+    /* force input values to appear in uppercase */
+    text-transform: uppercase;
+    align-self: flex-start;
+    font-size: 1.5em;
+    width: 10em;
+}
+
+horizCenter {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+    align-content: center;
+}
+horizCenter * {
+    align-self: center;
+}
+horizCenter button {
+    margin-left: 20px;
+}
+horiz {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+}
+
+#termtab {
+    margin-left: 2em;
+    font-size: 1.5em;
+    align-self: flex-start;
+}
+
+#terms-table {
+    margin-top: 0.3em;
+}
+
+.del_highlight {
+    background: orange;
+}
+
+#filter-value {
+    width: 10em;
+    font-size: 20px;
+}
+
+.tabulator-col {
+    background: lightgreen !important;
+}
+
+.filter {
+    background: white;
+}
+
+.tabulator-col-title {
+    text-align: center;
+    font-size: 120%;
+}
+
+.fileUpload {
+    margin-left: 1em;
+    border-radius: 2mm;
+}
+
+#spin {
+    position: absolute;
+    left: 950px;
+    top: 1em;
+    font-size: 54px;
+    color: red;
+    display: none;
+}
+
+.hidebuttons {
+    display: none;
+}
+
+.stripes {
+    background: repeating-linear-gradient( 45deg, #ae60bc, #ae60bc 5px, #5d3364 5px, #5d3364 10px);
+    background-size: 200% 200%;
+    animation: barberpole 4s linear infinite;
+}
+
+@keyframes barberpole {
+    100% {
+        background-position: 100% 100%;
+    }
+}

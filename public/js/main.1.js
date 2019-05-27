@@ -19,7 +19,7 @@ let TOOLDATA;
 const WORDLISTS = {};
 let SHOWIMAGES = true;
 function setReplace(val, text = "") {
-	// console.log("set replace now:", text, '"', val + '"');
+	console.log("set replace now:", text, '"', val + '"');
 	_replace = val;
 	if (val) {
 		$("span.replaceIndicator").css("visibility", "visible");
@@ -65,7 +65,7 @@ function toggleShowImages() {
 	TABLE.setColumns(columns);
 	tableBuilt();
 }
-
+/// expt
 function displayImages(e, cell) {
 	e.preventDefault();
 	const value = cell.getValue();
@@ -81,7 +81,7 @@ function displayImages(e, cell) {
 }
 
 function displayImages_support(field, value) {
-	// alert(`Show images for field ** ${field} **, term "${value}"`);
+	alert(`Show images for field ** ${field} **, term "${value}"`);
 	useSameDestination(
 		encodeURI(`/terms/terms_display?type=${field}&term=${value}`)
 	);
@@ -111,14 +111,31 @@ $(function () {
 		const toolInfo = await Util.getSheetTags(key5, "Tools");
 		await Promise.all(
 			["type", "function", "other"].map(which => {
+				// const key = `${which}s`; // have to add 's' to 'function, so do for all
 				return new Promise((resolve, reject) => {
 					$.get({
-						url: `/terms/${which}/getSuggestions`,
+						url: `/terms/get_main_term_counts/${which}`,
 						dataType: "json"
 					})
-						.done(results => { // an array
-							// alert(result);
-							WORDLISTS[which] = results; // have to add 's' to 'function, so do for all
+						.done(results => {
+							// [{ 
+							//     term: "term", 
+							//     mt_count: #
+							//  }, ... ]
+							results = results.map(r => 
+								{	// add attributes
+									r.image_count = 0;
+									r.type = which;
+									return r;
+								});
+							// [{ 
+							//     term: "term", 
+							//     mt_count: #,
+							//     image_count = 0,
+							//     type: "function"|"type"|"other"
+							//  }, ... ]
+							
+							WORDLISTS[which] = results; 
 							resolve(null);
 						})
 
@@ -131,7 +148,7 @@ $(function () {
 		);
 		await new Promise((resolve, reject) => {
 			$.get({
-				url: '/terms/get_term_image_pairs',
+				url: '/terms/get_term_image_counts',
 				dataType: 'json'
 			})
 				.done(pairs => { // [{type: "type", term: "term" }, ...]
@@ -141,24 +158,31 @@ $(function () {
 						'type': false,
 						'other': false
 					};
-
+					
 					pairs.forEach(
-						({type, term}, index) => {
-							
-							if (!WORDLISTS[type].includes(term)) {
-								WORDLISTS[type].push(term);
+						({type, term, image_count}, index) => {
+							const found = termObjincludes(WORDLISTS[type], term);
+							if (found === -1) { // not found
+								WORDLISTS[type].push({
+									term: term,
+									type: type,
+									mt_count: 0,
+									image_count: image_count
+								});
+								console.log("pairs", index, type, term, image_count);
 								changes[type] = true;
+							} else {
+								WORDLISTS[type][found].image_count = image_count;
 							}
 						}
 					);
 					['function', 'type', 'other'].forEach(
 						(which) => {
 							if (changes[which]) {
-								WORDLISTS[which].sort();
+								WORDLISTS[which].sort(termObjSort);
 							}
 						}
 					);
-
 					paintPage(machineSpecs, toolInfo, tabs);
 					startUp();
 					resolve('done');
@@ -170,10 +194,25 @@ $(function () {
 				});
 
 		});
+
+
+
+
 	};
 	run();
 	////////////////////////////////////////////////////////////
 });
+
+function termObjincludes(list, term, type) {
+	return list.findIndex(
+		(ele) => (ele.term === term ) // list already type specific
+	);
+}
+function termObjSort(a,b) {
+	if(a.term < b.term) return -1;
+	return 1;
+	// can never be ===, so no 0 return
+}
 
 function startUp() {
 	$("#navButtonDiv").css("display", "none");
@@ -363,12 +402,14 @@ function defineColumns() {
 			allowEmpty: true, //allow empty string values
 			values: WORDLISTS[which], //create list of values from all values contained in this column
 			searchFunc: function (term, values) {
-				//search for matches, a) at start of term, and then b) anywhere in term
+				//search for exact matches
 				const matches = {
 					a: [],
 					b: []
 				};
-
+				// return wordlists[which].filter(
+				// 	(value) => value.indexOf(term) === 0
+				// )
 				const up_term = term.toUpperCase();
 				// create matches with start of string having precedence
 				WORDLISTS[which].forEach(item => {
@@ -410,7 +451,7 @@ function defineColumns() {
 			headerSort: false,
 			width: 100,
 			editor: "autocomplete",
-			editorParams: termEditorParams("other"),
+			editorParams: termEditorParams("others"),
 			formatter: termFormatter,
 			mutatorEdit: upperMutator,
 			cellContext: cellContextMethod
@@ -444,7 +485,7 @@ function defineColumns() {
 			width: 150,
 			cssClass: "bottomborder",
 			editor: "autocomplete",
-			editorParams: termEditorParams("function"),
+			editorParams: termEditorParams("functions"),
 			formatter: termFormatter,
 			mutatorEdit: upperMutator,
 			cellContext: cellContextMethod
@@ -457,7 +498,7 @@ function defineColumns() {
 			width: 150,
 			cssClass: "bottomborder",
 			editor: "autocomplete",
-			editorParams: termEditorParams("type"),
+			editorParams: termEditorParams("types"),
 			formatter: termFormatter,
 			mutatorEdit: upperMutator,
 			cellContext: cellContextMethod
@@ -575,10 +616,10 @@ function defineTable() {
 		switch (field) {
 			case "type":
 			case "function":
-				list = WORDLISTS[field];
+				list = WORDLISTS[field + "s"];
 				break;
 			default:
-				list = WORDLISTS.other;
+				list = WORDLISTS.others;
 				let rowdata = cell.getData();
 				for (let i = 0, max = colTitles_terms.length; i < max; i++) {
 					cols[i] = rowdata["c" + i];
