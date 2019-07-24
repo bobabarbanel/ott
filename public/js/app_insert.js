@@ -107,6 +107,7 @@ $(function() {
 	function handleInputOne(who) {
 		var input = $(who.currentTarget);
 		var field = input.attr("id").replace("_new", "");
+		input.val(input.val().toUpperCase());
 		var newval = input.val();
 
 		KEY5[field] = newval;

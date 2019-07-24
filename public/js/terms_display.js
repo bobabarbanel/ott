@@ -7,27 +7,13 @@ const key4id = COMMON.getKey4id();
 // const key5 = COMMON.getParsedCookie();
 let TYPE, TERM;
 
-// Read a page's GET URL variables and return them as an associative array.
-// function getUrlVars() {
-// 	var vars = [],
-// 		hash;
-// 	var hashes = window.location.href
-// 		.slice(window.location.href.indexOf("?") + 1)
-// 		.split("&");
-// 	for (var i = 0; i < hashes.length; i++) {
-// 		hash = hashes[i].split("=");
-// 		vars.push(hash[0]);
-// 		vars[hash[0]] = hash[1];
-// 	}
-// 	return vars;
-// }
 let defaultIndex = 0; // will use first image found if no primary found
-let thePrimary = 0;
+let THE_PRIMARY = 0;
 let fotorama;
 let ALLFREFS;
+let FRAMES;
 
 $(function () {
-	// const URLVARS = getUrlVars(); // 'Hand' or 'Inspection'
 	TYPE = $("type").text();
 	TERM = $("term").text();
 
@@ -41,31 +27,13 @@ $(function () {
 
 	$("title").html(STYPE);
 
-	const getImages = () => {
-		return new Promise((resolve, reject) => {
-			$.post({
-				url: "/terms/get_term_image_filerefs",
-				dataType: "json",
-				data: {
-					type: TYPE,
-					term: TERM
-				}
-			})
-				.done(result => {
-					resolve(result);
-				})
-				.fail(error => {
-					reject(error);
-				});
-		});
-	};
-
 	const ta = $("textarea.comment");
 	$("#topOfPage button").on("click", e => {
 		// make an image the Primary
 		e.preventDefault();
 		const af = fotorama.activeFrame;
-		thePrimary = fotorama.activeIndex;
+		const old_primary = THE_PRIMARY;
+		THE_PRIMARY = fotorama.activeIndex;
 		$.post({
 			// reset primary image in database
 			url: "/terms/set_term_primary",
@@ -79,81 +47,90 @@ $(function () {
 		})
 			.done(result => {
 				ALLFREFS.forEach(
-					// reset primary image in IMAGES object, fileRefs array
+					// reset primary image in IMAGES object, and in the fileRefs array
 					(aRef, index) => {
-						aRef.primary = index === thePrimary;
+						aRef.primary = index === THE_PRIMARY;
 					}
 				);
+				// fotorama.splice(index , howMany[, frame1, ..., frameN])
+				const old_primary_frame = FRAMES[old_primary];
+				old_primary_frame.primary = false;
+				const new_primary_frame = FRAMES[THE_PRIMARY];
+				new_primary_frame.primary = true;
+				fotorama.splice(old_primary, 1, old_primary_frame);
+				fotorama.splice(THE_PRIMARY, 1, new_primary_frame);
 				setActive(true);
 			})
 			.fail(error => {
 				alert("mongo update error for primary change");
 			});
 	});
-	// function havePrimary(index) {
-	// 	return (
-	// 		Object.keys(catPrimary).find(term => catPrimary[term] === index) !==
-	// 		undefined
-	// 	);
-	// }
 
-	// // ta.on('change', () => {
-	// //     $(this).height(0).height(this.scrollHeight);
-	// // });
 	Util.setUpTabs(key4id, "", {
 		tab: true,
 		spec: true,
 		main: true,
 		machine: true,
 		tabmenus: false
-	}).then(tabs => {
+	}).then(() => {
 		$("#pageheader").append($(`<h1 class="pageTitle">${STYPE}</h1>`));
 		ta.hide();
 
-		getImages().then(async termsArray => {
-			// [{term, [fileRefs]}]
-
-			if (termsArray.length === 0) {
-				$("body").append(
-					$(
-						`<h1 class="no_image_message">
-						There are no ${(cType === 'Other') ? "" : cType} images for "${TERM}".
-						</h1>`
-					)
-				);
-
-				return;
-			}
-			ALLFREFS = termsArray.slice(0); // top level copy of array
-			// process all the terms with fileRefs
-			await loadStuff();
-		});
+		getImages(cType, TERM);
 	});
 });
 
+function getImages(cType, TERM) {
+	return new Promise((resolve, reject) => {
+		$.post({
+			url: "/terms/get_term_image_filerefs",
+			dataType: "json",
+			data: {
+				type: TYPE,
+				term: TERM
+			}
+		})
+			.done(results => {
+				if (results.length === 0) {
+					$("body").append(
+						$(
+							`<h1 class="no_image_message">
+							There are no ${(cType === 'Other') ? "" : cType} images for "${TERM}".
+							</h1>`
+						)
+					);
+					return resolve(null);
+				}
+				ALLFREFS = results.slice(0); // top level copy of array
+				// process all the terms with fileRefs
+				loadStuff();
+				return resolve(null);
+			})
+			.fail(error => {
+				reject(error);
+			});
+	});
+};
+
 function taInput(e) {
 	if ($(this).hasClass("initial")) {
-		console.log("ta change initial");
+		// console.log("ta change initial");
 		$(this).removeClass("initial");
 		// show save button
 		$(".commentsave, .commentcancel").css("visibility", "visible");
 	}
-	// else {
-	// 	console.log("ta input");
-	// }
 }
 
-// const spec_type_id = () => SPEC_TYPE.toLowerCase() + "_tools";
-
-const commentToDb = text => {
+const commentToDb = (text) => {
 	const fa = fotorama.activeFrame;
-	const selectedTerm = $("#section option:selected").text();
+	// const selectedTerm = $("#section option:selected").text();
 	const dir = fa.dir;
 	const filename = fa.filename;
+	fa.comment = text;
 
 	return new Promise((resolve, reject) => {
 		$.post({
-			url: "/update_term_image_comment",
+			url: "/terms/update_term_image_comment",
 			dataType: "json",
 			data: {
 				type: TYPE,
@@ -172,17 +149,6 @@ const commentToDb = text => {
 	});
 };
 
-function saveComment(e) {
-	commentToDb($("#ta").val()).then(() => {
-		afterCommentEdit();
-	});
-}
-
-function afterCommentEdit() {
-	$(".commentsave, .commentcancel").css("visibility", "hidden");
-	$("#ta").addClass("initial");
-}
-
 function restoreComment(e) {
 	const fa = fotorama.activeFrame;
 	const ta = $("#ta");
@@ -195,26 +161,32 @@ function restoreComment(e) {
 	afterCommentEdit();
 }
 
-async function loadStuff() {
-	let primary = 0; // default image to show if primary is not identified
-	$("content").empty().append(`
-		<button id="taSave" class="commentsave btn-primary">Save Changed Comment</button>
-		<button id="taCancel" class="commentcancel btn-secondary">Cancel</button>
-		<textarea id="ta" class="comment"></textarea>
-				<div id="fotorama" 
-					class="fotorama" 
-					data-auto="false"
-					data-nav="thumbs" 
-					data-width="100%" 
-					data-transition="crossfade" 
-					data-max-height="83%" 
-					data-max-width="100%">
-				</div>`);
-				
+function saveComment(e) {
+	// $('fotorama__arr fotorama__arr--prev').attr("disabled", true);
+	
+	commentToDb($("#ta").val()).then(() => {
+		afterCommentEdit();
+		
+	});
+	e.preventDefault();
+	return false;
+}
+
+function afterCommentEdit() {
+	$(".commentsave, .commentcancel").css("visibility", "hidden");
+	$("#ta").addClass("initial");
+}
+
+function loadStuff() {
+	// let primary = 0; // default image to show if primary is not identified
+
 	const ta = $("#ta").on("input", taInput); // comment textarea
 	// buttons for comment edits
-	$("#taSave").on("click", saveComment);
-	$("#taCancel").on("click", restoreComment);
+	// console.log($("button#taSave")[0]);
+	$(".commentsave").on("click", saveComment);
+	$(".commentcancel").on("click", restoreComment);
+	// console.log("END", $("button#taSave")[0]);
+
 	const $fotoramaDiv = $("#fotorama")
 		// Listen to the events
 		.on(
@@ -228,10 +200,10 @@ async function loadStuff() {
 			}
 		});
 	fotorama = $fotoramaDiv.data("fotorama");
-	const toShow = ALLFREFS.map((afRef, index) => {
+	FRAMES = ALLFREFS.map((afRef, index) => {
 		// array of filerefs
 		if (afRef.primary) {
-			thePrimary = index;
+			THE_PRIMARY = index;
 			ta.val(afRef.comment);
 		}
 		return {
@@ -244,12 +216,12 @@ async function loadStuff() {
 			primary: afRef.primary ? true : false
 		};
 	});
-	
+
 	let hideThumbs = false;
-	if (toShow.length === 1) {
+	if (FRAMES.length === 1) {
 		// fix crash in fotorama when only one image, add "fake" last image
 		// and then hide thumbnails after rendering
-		toShow.push({
+		FRAMES.push({
 			img: "/img/placeholder.png",
 			thumb: "/img/empty.png",
 			comment: null,
@@ -258,9 +230,9 @@ async function loadStuff() {
 		});
 		hideThumbs = true;
 	}
-	await fotorama.load(toShow);
+	fotorama.load(FRAMES);
+	fotorama.show(THE_PRIMARY);
 
-	await fotorama.show(thePrimary);
 	if (hideThumbs) {
 		$(".fotorama__nav-wrap").addClass("ignore"); // hides thumbnails
 	}
@@ -299,7 +271,7 @@ const fotofunc = (e, fotorama, extra) => {
 
 function relFileRef(afRef, tag) {
 	const path = afRef.dir + (tag ? tag : '') + '/' + afRef.filename;
-	console.log({path});
+	// console.log({path});
 	return path;
 }
 

@@ -1,13 +1,17 @@
 /* main.css */
+
 body {
     background: rgb(138, 170, 172);
 }
+
 body.replacing {
     background: rgb(120, 127, 168);
 }
+
 body.viewing {
     background: rgb(118, 167, 118);
 }
+
 container {
     position: absolute;
     width: 100%;
@@ -24,7 +28,8 @@ content {
     font-size: 40px;
     cursor: pointer;
 }
-.tabouter{
+
+.tabouter {
     display: flex;
     align-items: flex-start;
     margin-top: 20px;
@@ -32,10 +37,12 @@ content {
     /* margin-left: 2em; */
     width: 100%;
 }
-.tabdiv{
+
+.tabdiv {
     display: flex;
     align-items: baseline;
 }
+
 .toolouter {
     display: flex;
     align-items: flex-start;
@@ -43,10 +50,12 @@ content {
     margin-left: 2em;
     width: 90%;
 }
+
 .tooldiv {
     display: flex;
     align-items: flex-start;
 }
+
 .toollink {
     margin-left: 30px;
     cursor: pointer;
@@ -61,16 +70,19 @@ content {
     text-align: center;
     width: 70px;
 }
+
 .stepcol {
     text-align: left;
     width: 70px;
 }
+
 .tableContainer {
     margin-left: 2em;
     margin-top: 1em;
-   
 }
+
 /* toolTable */
+
 .toolTable {
     width: 1200px;
     /* margin-left: 2em;
@@ -79,6 +91,7 @@ content {
     height: 500px;
     display: none;
 }
+
 /*
 .toolTable, .toolTable th, .toolTable td {
     border: 1px solid black;
@@ -110,8 +123,6 @@ content {
     text-decoration: none;
 } */
 
-
-
 /* tabUL */
 
 .tabUL {
@@ -121,9 +132,11 @@ content {
     margin-top: 1em;
     border: 2px solid lightgreen;
 }
+
 .sectionRow {
     background-color: #EEEEEE;
 }
+
 .stepRow {
     background: #CCCCCC;
 }
@@ -143,42 +156,79 @@ pageheader {
     font-size: 24px;
     font-weight: bold;
 }
+
 .tablink, .sectionlink, .steplink {
     cursor: pointer;
 }
+
 .tablink {
     margin-left: 30px;
 }
+
 .bottomborder {
     border-bottom: 1px solid black;
     font-weight: bold;
 }
+
 .pos_off, .tabulator-col-title {
     text-align: center;
 }
+
 .na {
     font-size: 80%;
     color: grey;
 }
+
 .tabulator-edit-select-list-item {
     background-color: #FBFFD0;
 }
+
 .tabulator-cell[tabulator-field=imagelink]:hover {
     background: pink;
 }
-.tabulator-cell[tabulator-field=imagelink] > a {
+
+.tabulator-cell[tabulator-field=imagelink]>a {
     position: relative;
     top: -5px;
     font-size: 20px;
 }
+
 .show_edit {
     font-size: 14px;
     margin-left: 12px;
     width: 8em;
 }
+
 span.replaceIndicator {
     color: white;
     font-size: 20px;
     background: red;
     visibility: hidden;
+}
+
+.tinyToast {
+    background-color: rgb(255, 207, 51) !important;
+    border-radius: 5px !important;
+    font-size: 14px !important;
+    height: 40px;
+    width: 180px;
+    color: '#333';
+    position: relative !important;
+    border: 1px solid rgb(255, 207, 51) !important;
+    padding-top: 0.55em !important;
+    z-index: 1000;
+}
+
+.tinytoast>h3 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+span.noimages {
+    color: rgb(167, 97, 97);
+}
+
+.tabulator-row {
+    height: 31px;
 }

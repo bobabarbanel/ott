@@ -56,9 +56,6 @@ $(function() {
 	////////////////////////////////////////////////////////////
 	function setupToolUpload() {
         $('.home').on('click', () => { Util.goHome() } );
-
-        
-		
 		$("#job").text(COMMON.jobTitle());
 
 		f_t_edits(true); // edit button disabled

@@ -1,7 +1,7 @@
 "use strict";
 // File: controllers/topRouter.js
 
-module.exports = function(dir, app, db) {
+module.exports = function (dir, app, db) {
 	require("./uploadRouter")(dir, app, db);
 	require("./termRouter")(dir, app, db);
 	app.use(logger);
@@ -103,6 +103,8 @@ module.exports = function(dir, app, db) {
 			res.json({ error: error });
 		}
 	});
+
+
 
 	app.post("/get_spec_image_filerefs", async (req, res) => {
 		const spec_type = req.body.spec_type;
@@ -398,20 +400,20 @@ module.exports = function(dir, app, db) {
 	});
 
 	app.post("/sheetTags", (req, res) => {
-		let key4 = [
+		const key4 = [
 			req.body.key.dept,
 			req.body.key.partId,
 			req.body.key.op,
 			req.body.key.machine
 		].join("|");
-		let includeFiles = req.body.files;
+		const includeFiles = req.body.files;
 
-		let col = db.collection("images");
+		const IMAGES = db.collection("images");
 		let query = {
 			key4: key4,
 			tab: req.body.tab
 		};
-		let project = {
+		const project = {
 			_id: 0,
 			turret: 1,
 			spindle: 1,
@@ -433,7 +435,7 @@ module.exports = function(dir, app, db) {
 			delete project.files;
 		}
 
-		let myPromise = col
+		let myPromise = IMAGES
 			.aggregate([
 				{
 					$match: query

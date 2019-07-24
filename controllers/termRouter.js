@@ -149,121 +149,52 @@ module.exports = function (dir, app, db) {
 		);
 	});
 
-	function allwords() {
-		return MAIN_TABLE_COLLECTION.aggregate([
-			{
-				$project: {
-					_id: 0,
-					"rows.cols": 1
-				}
-			},
-			{
-				$unwind: {
-					path: "$rows"
-				}
-			},
-			{
-				$unwind: {
-					path: "$rows.cols"
-				}
-			},
-			{ $match: { "rows.cols": { $ne: "" } } },
-			{
-				$group: {
-					_id: null,
-					text: { $addToSet: "$rows.cols" }
-				}
-			},
-			{
-				$unwind: {
-					path: "$text"
-				}
-			},
-			{ $sort: { text: 1 } },
-			{ $project: { _id: 0 } }
-		]).toArray();
-	}
 
-	function allfunctions() {
-		return MAIN_TABLE_COLLECTION.aggregate([
-			{
-				$project: {
-					_id: 0,
-					"rows.function": 1
-				}
-			},
-			{
-				$unwind: {
-					path: "$rows"
-				}
-			},
-			{
-				$match: {
-					"rows.function": { $ne: "" }
-				}
-			},
 
-			{
-				$group: {
-					_id: null,
-					text: { $addToSet: "$rows.function" }
-				}
-			},
-			{
-				$unwind: {
-					path: "$text"
-				}
-			},
-			{ $sort: { text: 1 } }
-		]).toArray();
-	}
-	function alltypes() {
-		return MAIN_TABLE_COLLECTION.aggregate([
-			{
-				$project: {
-					_id: 0,
-					"rows.type": 1
-				}
-			},
-
-			{
-				$unwind: {
-					path: "$rows"
-				}
-			},
-			{
-				$match: {
-					"rows.type": { $ne: "" }
-				}
-			},
-			{
-				$group: {
-					_id: null,
-					text: { $addToSet: "$rows.type" }
-				}
-			},
-			{
-				$unwind: {
-					path: "$text"
-				}
-			},
-			{
-				$sort: { text: 1 }
-			}
-		]).toArray();
-	}
-	app.get("/terms/:which/getSuggestions", (req, res) => {
-		const DISPATCH = {
-			function: allfunctions,
-			type: alltypes,
-			other: allwords
-		};
-
+	app.get("/terms/getSuggestions", (req, res) => {
 		try {
-			DISPATCH[req.params.which]().then(results => {
-				res.json(results.map(u => u.text));
+			TERM_IMAGES_COLLECTION.aggregate(
+				[
+					// Stage 0 - exclude archived terms
+					{
+						$match: {
+							"archived": { $exists: false }
+						}
+					},
+					// Stage 1 - only include type and term fields
+					{
+						$project: {
+							// specifications
+							_id: 0,
+							files: 0,
+							nextNum: 0
+						}
+					},
+
+					// Stage 2 - put in alpha order
+					{
+						$sort: {
+							type: 1,
+							term: 1
+
+						}
+					},
+
+					// Stage 3 - combine terms into sorted list under type
+					{
+						$group: {
+							_id: "$type",
+							terms: { $push: "$term" }
+						}
+					},
+
+				]
+			).toArray().then(results => {
+				console.log(results);
+				res.json(results);
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			res.status(500).json({ error: error });
 		}
 	});
@@ -295,15 +226,7 @@ module.exports = function (dir, app, db) {
 
 	});
 
-	// function create_new_main_table_doc(term, type) {
-	// 	return MAIN_TABLE_COLLECTION.insertOne(
-	// 		{
-	// 			term: term,
-	// 			type: type,
-	// 			file: []
-	// 		}
-	// 	);
-	// }
+
 
 	app.post("/terms/replace_others", async (req, res) => {
 		let count = 0;
@@ -397,24 +320,50 @@ module.exports = function (dir, app, db) {
 
 
 	app.post("/terms/get_term_image_filerefs", (req, res) => {
-		const query = {
-			type: req.body.type,
-			term: req.body.term
-		};
+		const {type, term} = req.body;
 		// console.log('get_term_image_filerefs',req.body);
+		try {
 
-		TERM_IMAGES_COLLECTION.findOne(
-			query,
-			(err, result) => {
-				if (err) {
-					return res.status(500).json({ error: err });
+			TERM_IMAGES_COLLECTION.aggregate(
+				[{
+					$match:
+						{ 
+							type: type, 
+							term: term, 
+							archived: { $exists: false } 
+						}
+				},
+				{
+					$project:
+						{ 
+							_id: 0, 
+							type: 0, 
+							term: 0, 
+							nextNum: 0 
+						}
+				},
+				{
+					$project:
+					{
+						files: {
+							$filter:
+							{
+								input: "$files",
+								as: "fileref",
+								cond: { $ne: ["$$fileref.archived", true] }
+							}
+						}
+					}
+				}]
+			).toArray().then(
+				(results) => { // should be an array of length 1
+					return res.json(results[0].files);
 				}
-				// console.log(result);
-				if (result === null) return res.json([]);
-				return res.json(result.files);
-			}
-		);
-
+			);
+		}
+		catch (err) {
+			return res.status(500).json(err);
+		}
 	});
 
 	app.get("/terms/terms_display", (req, res) => {
@@ -422,32 +371,68 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/terms/set_term_primary", (req, res) => {
-
-
 		const { type, term, filename, dir } = req.body;
-		// TODO: consider transaction
-
-		TERM_IMAGES_COLLECTION.findOne({ type: type, term: term }, (err, doc) => {
+		// console.log(req.body);
+		TERM_IMAGES_COLLECTION.findOne({
+			type: type,
+			term: term,
+			archived: { $exists: false }
+		}, (err, doc) => {
 			if (err) {
-				res.status(500), json(err);
+				res.status(500).json(err);
 			}
+			// console.log("count",doc.files.length);
 			doc.files.forEach(aRef => {
 				if (aRef.dir !== dir || aRef.filename !== filename) {
 					delete aRef.primary; // remove any previous
 				} else {
 					aRef.primary = true; // set one primary
+					// console.log("change made");
 				}
 			});
 
 			try {
-				col.replaceOne({ type: type, term: term }, doc, { upsert: true });
-				res.json("ok");
+				TERM_IMAGES_COLLECTION.replaceOne(
+					{ type: type, term: term },
+					doc,
+					{ upsert: true }
+				).then(
+					(success) => {
+						// console.log("replacement made");
+						res.json(success);
+					}
+				);
+
 			} catch (err) {
-				res.status(500), json(err);
+				res.status(500).json(err);
 			}
 		});
 	});
-
+	app.get('/terms/getTermImageCounts', (req, res) => {
+		try {
+			TERM_IMAGES_COLLECTION.aggregate(
+				[
+					{
+						$match:
+							{ archived: { $exists: false } }
+					},
+					{
+						$project:
+							{ count: { $size: "$files" }, term: 1, type: 1, _id: 0 }
+					}
+				]
+			).toArray().then(
+				(count_result) => {
+					// console.log('getTermImageCounts result', count_result);
+					res.json(count_result);
+				}
+			)
+		}
+		catch (e) {
+			console.log('error getTermImageCounts', e);
+			res.status(500).json({ "error": e });
+		}
+	});
 	app.post('/terms/create_term_images', (req, res) => {
 		const { type, term } = req.body;
 		console.log('create_term_images', { type, term });
@@ -456,7 +441,8 @@ module.exports = function (dir, app, db) {
 				{
 					type: type,
 					term: term,
-					files: []
+					files: [],
+					nextNum: 1
 				}).then(
 					(insert_result) => {
 						console.log('create_term_images result', insert_result.result);
@@ -472,19 +458,20 @@ module.exports = function (dir, app, db) {
 
 	app.post('/terms/replace_term_images', (req, res) => {
 		const { type, term, previous } = req.body;
-		console.clear();
-		console.log('replace_term_images', { type, term, previous });
+		// console.clear();
+		// console.log('replace_term_images', { type, term, previous });
 		try {
 			TERM_IMAGES_COLLECTION.updateOne(
 				{
 					type: type,
-					term: previous
+					term: previous,
+					archived: { $exists: false }
 				},
 				{
 					$set: { term: term }
 				}).then(
 					(update_result) => {
-						console.log('replace_term_images update result', update_result);
+						// console.log('replace_term_images update result', update_result);
 						res.json(update_result);
 					});
 		}
@@ -494,22 +481,44 @@ module.exports = function (dir, app, db) {
 		}
 	});
 
-	app.get('/terms/get_term_image_pairs', (req, res) => {
+	app.post('/terms/remove_term_image', (req, res) => {
+		const { type, term } = req.body;
 		try {
-			TERM_IMAGES_COLLECTION.aggregate(
-				[
-					{
-						$project: { _id: 0, files: 0 }
-					}
-				]		
-			).toArray().then(
-				results => res.json(results)
-			);
-			
-		} catch (error) {
-			res.status(500).json({ error: error });
+			TERM_IMAGES_COLLECTION.updateOne(
+				{
+					type: type,
+					term: term
+				},
+				{
+					$set: { archived: true }
+				}).then(
+					(update_result) => {
+						// console.log('remove_term_image update result', update_result);
+						res.json(update_result);
+					});
+		}
+		catch (e) {
+			console.log('error remove_term_image', e);
+			res.status(500).json({ "error": e });
 		}
 	});
+
+	// app.get('/terms/get_term_image_pairs', (req, res) => {
+	// 	try {
+	// 		TERM_IMAGES_COLLECTION.aggregate(
+	// 			[
+	// 				{
+	// 					$project: { _id: 0, files: 0 }
+	// 				}
+	// 			]
+	// 		).toArray().then(
+	// 			results => res.json(results)
+	// 		);
+
+	// 	} catch (error) {
+	// 		res.status(500).json({ error: error });
+	// 	}
+	// });
 
 	app.get("/terms/terms_edit_upload", (req, res) => {
 		res.render("terms_edit.html");
@@ -525,12 +534,34 @@ module.exports = function (dir, app, db) {
 			)
 		)
 	}
-
+	app.post("/terms/status", (req, res) => {
+		const { term, type } = req.body;
+		// console.log("/terms/status", term, type);
+		TERM_IMAGES_COLLECTION.findOne(
+			{ type: type, term: term },
+			{ _id: 0, archived: 1 }).then(
+				doc => {
+					// console.log("/terms/status", doc);
+					if (doc === null) {
+						return res.json("unknown")
+					}
+					if (doc.archived === undefined) {
+						return res.json("known");
+					}
+					else {
+						return res.json("archived")
+					}
+				}
+			);
+	});
 	app.get("/terms/get_term_image_counts", (req, res) => {
 		try {
 			// console.log("/terms/get_term_image_counts");
 			TERM_IMAGES_COLLECTION.aggregate(
 				[{
+					$match: { "archived": { $exists: false } }
+				},
+				{
 					$project:
 						{ _id: 0, image_count: { $size: "$files" }, term: 1, type: 1 }
 				}]
@@ -543,6 +574,30 @@ module.exports = function (dir, app, db) {
 		} catch (error) {
 			console.log("error /terms/get_term_image_counts", error);
 			res.status(500).json({ error: error });
+		}
+	});
+
+	app.post("/terms/update_term_image_comment", async (req, res) => {
+		const { type, term, text, dir, filename } = req.body;
+		// console.log(req.body);
+		try {
+			TERM_IMAGES_COLLECTION.updateOne(
+				{ type: type, term: term },
+				{ $set: { "files.$[fref].comment": text } },
+				{
+					arrayFilters: [
+						{ $and: [{ "fref.dir": dir }, { "fref.filename": filename }] }
+					],
+					multi: false
+				}
+			)
+				.then(success => {
+					// console.log(success);
+					return res.json({ success: success.result });
+				});
+		} catch (error) {
+			// console.log(error);
+			return res.status(500).json({ error: error });
 		}
 	});
 

@@ -13,10 +13,12 @@ body {
 }
 
 .commentsave, .commentcancel {
+    position: relative;
     visibility: hidden;
     font-size: 24px;
     margin-top: 10px;
     margin-left: 20px;
+    z-index: 1000;
 }
 #fotorama {
     margin-top: -40px;

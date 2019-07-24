@@ -53,7 +53,8 @@
         <content>
             <pageheader> </pageheader>
             <horiz>
-                <form id="theForm">
+                <div id="theForm">
+                    <h3>Add A New Term</h3>
                     <ul class="termadder">
                         <li><input type="radio" name="radioType" value="function">Function</li>
                         <li><input type="radio" name="radioType" value="type">Type</li>
@@ -61,12 +62,12 @@
                     </ul>
                     <horizCenter>
                         <input id="add" class="upper" type="text" placeholder="NEW TERM..." />
-                        <button id="addTermButton">Add Term</button>
+                        <button id="addTermButton">Submit</button>
                     </horizCenter>
-                    <duplicate>
-                        This is an existing Term.
-                    </duplicate>
-                </form>
+                    <information>
+                        
+                    </information>
+                </div>
                 <!-- <ol id="toollist"></ol> -->
                 <div id="termtab">
                     <span class="filter"><i class="fas fa-filter"></i><input id="filter-value" placeholder:"Term

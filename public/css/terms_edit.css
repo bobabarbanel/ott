@@ -36,10 +36,13 @@ container {
 .dup {
     background: pink;
 }
+.archived {
+    background: rgb(192, 240, 255);
+}
 .action {
     background: yellow;
 }
-duplicate {
+information {
     visibility: hidden;
 }
 .visible {
@@ -60,11 +63,20 @@ pageheader {
 .jobTitle {
     margin-left: 2em;
 }
-
+pageheader {
+    margin-bottom: 20px;
+}
 .action {
     background: yellow !important;
 }
-
+#theForm {
+    border: 2px solid green;
+    padding: 5px;
+}
+#theForm > h3 {
+    text-align: center;
+    
+}
 input.upper {
     /* force input values to appear in uppercase */
     text-transform: uppercase;

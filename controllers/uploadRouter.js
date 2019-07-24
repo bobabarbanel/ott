@@ -33,7 +33,7 @@ function fileRef(aDir, aFname) {
 	return obj;
 }
 
-module.exports = function(dir, app, db) {
+module.exports = function (dir, app, db) {
 	// app.use(logger);
 
 	function calcFullTargetDir(machine, section) {
@@ -118,12 +118,12 @@ module.exports = function(dir, app, db) {
 			const ffn =
 				tabFragment + "_" + termFragment + "_" + pad4(tailnum + index) + tail; // _ + 0001 + ".jpg" file
 			const aRef = fileRef(ftdMedium, ffn);
-			if(setPrimary) {
+			if (setPrimary) {
 				aRef.primary = true; // only do once
 				setPrimary = false;
 			}
 			fileRefs.push(aRef);
-			
+
 			let toLarge = path.normalize(
 				addWebSitePublic(executionDir, ftdLarge, ffn)
 			);
@@ -159,6 +159,77 @@ module.exports = function(dir, app, db) {
 				success => {
 					res.json({
 						count: numberOfSpecFiles
+					});
+				},
+				err => {
+					res.json({
+						error: err
+					});
+				}
+			);
+	}
+	
+	function processTermUploads(
+		type,
+		term,
+		numberOfTermFiles,
+		tailnum,
+		myFiles,
+		[ftdSmall, ftdMedium, ftdLarge],
+		executionDir,
+		setPrimary, // a boolean
+		res
+	) {
+		const fileRefs = [];
+		
+		myFiles.forEach((aFile, index) => {
+			const fileName = aFile.name;
+			const tail = fileName.substring(fileName.lastIndexOf(".")); // just the file type
+			const termFragment = term.replace(new RegExp("\\W", "g"), "--");
+			const ffn =
+				termFragment + "_" + pad4(tailnum + index) + tail; // _ + 0001 + ".jpg" file
+			const aRef = fileRef(ftdMedium, ffn);
+			if (setPrimary) {
+				aRef.primary = true; // only do once
+				setPrimary = false;
+			}
+			fileRefs.push(aRef);
+
+			let toLarge = path.normalize(
+				addWebSitePublic(executionDir, ftdLarge, ffn)
+			);
+			// now 'toLarge' is our _large target full path
+			// save original large image in _large directory
+			fs.renameSync(aFile.path, toLarge);
+			Jimp.read(toLarge).then(image => {
+				let img = image.clone();
+				// create _small version of image in Spec_small
+				let toSmall = path.normalize(
+					addWebSitePublic(executionDir, ftdSmall, ffn)
+				);
+				img
+					.resize(Jimp.AUTO, 100) // resize height 100
+					.quality(99) // set JPEG quality
+					.write(toSmall); // save small image
+				let toMedium = path.normalize(
+					addWebSitePublic(executionDir, ftdMedium, ffn)
+				);
+				// create medium sized image in /Spec
+				image
+					.resize(300, Jimp.AUTO) // resize width 300
+					.quality(99) // set JPEG quality
+					.write(toMedium); // save medium image
+			});
+		});
+		db.collection("term_images")
+			.updateOne(
+				{ type: type, term: term },
+				{ $push: { files: { $each: fileRefs } } }
+			)
+			.then(
+				success => {
+					res.json({
+						count: numberOfTermFiles
 					});
 				},
 				err => {
@@ -272,7 +343,7 @@ module.exports = function(dir, app, db) {
 										upsert: true
 									}
 								)
-								.then(() => {});
+								.then(() => { });
 						}
 					},
 
@@ -324,7 +395,7 @@ module.exports = function(dir, app, db) {
 			// debugLog("converting", index + 1);
 			return new Promise((resolve, reject) => {
 				Jimp.read(toLarge)
-					.then(function(image) {
+					.then(function (image) {
 						let img = image.clone();
 
 						// create _small version of image in Tools_small
@@ -363,11 +434,11 @@ module.exports = function(dir, app, db) {
 								// finished
 								console.log(
 									"***uploadRouter " +
-										uploadCount +
-										" " +
-										numberOfFiles +
-										" : " +
-										key4id
+									uploadCount +
+									" " +
+									numberOfFiles +
+									" : " +
+									key4id
 								);
 								db.collection("progress")
 									.findOneAndUpdate(
@@ -775,7 +846,7 @@ module.exports = function(dir, app, db) {
 		form.multiples = true;
 		let myFiles = [];
 
-		form.parse(req, function(err, fields, files) {
+		form.parse(req, function (err, fields, files) {
 			let key4id = fields["key4"];
 			const pieces = key4id.split('|');
 			// const dept = pieces[0];
@@ -802,7 +873,7 @@ module.exports = function(dir, app, db) {
 			let tab = fields["tab"];
 
 			// let mongoKey4 = key4id; //[key4.dept, key4.partId, key4.op, key4.machine].join("|");
-			
+
 			let query = {
 				key4: key4id,
 				tab: tab,
@@ -871,13 +942,13 @@ module.exports = function(dir, app, db) {
 		// be sure we have /images directory
 		const DIRNAME = "Spec";
 		ensureDirectories(DIRNAME);
-		
+
 
 		let form = new formidable.IncomingForm();
 		form.multiples = true;
 		let myFiles = [];
 
-		form.parse(req, function(err, fields, files) {
+		form.parse(req, function (err, fields, files) {
 			let query = {
 				_id: fields.tab
 			};
@@ -917,6 +988,70 @@ module.exports = function(dir, app, db) {
 						res
 					);
 					// res.json({ count: numberOfSpecFiles });
+				},
+				err => console.error(err)
+			);
+		});
+	});
+
+	let numberOfTermFiles;
+	app.post("/term_upload", (req, res) => {
+		// be sure we have /images directory
+		const DIRNAME = "Terms";
+		ensureTermDirectories(DIRNAME);
+
+		const form = new formidable.IncomingForm();
+		form.multiples = true;
+		let myFiles;
+
+		form.parse(req, function (err, fields, files) {
+			let query = {
+				type: fields.type,
+				term: fields.term
+			};
+
+			myFiles = files["uploads[]"];
+			// console.log(JSON.stringify(myFiles));
+			// if only a single file is selected, it does NOT come in array
+			if (myFiles.length === undefined) {
+				myFiles = [myFiles];
+			}
+			//let numberOfFiles = myFiles.length;
+			numberOfTermFiles = myFiles.length;
+			
+			let ftdMedium, ftdSmall, ftdLarge;
+			ftdMedium = `${TARGETHEADSTRING}/${DIRNAME}/${fields.type}`;
+			ftdLarge = `${ftdMedium}_large`;
+			ftdSmall = `${ftdMedium}_small`;
+
+			let promise = db.collection("term_images").findOneAndUpdate(query, {
+				$inc: {
+					nextNum: numberOfTermFiles
+				}
+			});
+			let newTerm = false;
+			// TODO: IN WORK
+			promise.then(
+				doc => {
+					// console.log(doc.value.nextNum);
+					if (doc.value.nextNum === 1) {
+						// there were no images before, make first file the default
+						newTerm = true;
+					}
+					console.log("/term_upload first Term files", newTerm, doc.value);
+					processTermUploads(
+						fields.type,
+						fields.term,
+						numberOfTermFiles,
+						doc.value.nextNum, // start number for tails
+						myFiles,
+						[ftdSmall, ftdMedium, ftdLarge],
+						dir,
+						newTerm, // true if this term had no images before
+						res
+					);
+					
+					
 				},
 				err => console.error(err)
 			);
@@ -1118,9 +1253,9 @@ module.exports = function(dir, app, db) {
 						error => {
 							console.log(
 								"Unable to create tab_images document for id = " +
-									doc._id +
-									"\n" +
-									error
+								doc._id +
+								"\n" +
+								error
 							);
 							res.json({
 								error: error
@@ -1153,6 +1288,32 @@ module.exports = function(dir, app, db) {
 			}
 		});
 	}
+	function ensureTermDirectories(section) {
+		// top directory
+		let imagesPath = path.normalize(dir + "/public" + TARGETHEADSTRING);
+		if (!fs.existsSync(imagesPath)) {
+			fs.mkdirSync(imagesPath);
+		}
+		// be sure we have /images/Terms directory
+		imagesPath = path.normalize(dir + "/public" + TARGETHEADSTRING + "/" + section);
+		if (!fs.existsSync(imagesPath)) {
+			fs.mkdirSync(imagesPath);
+		}
+		// function_large, function, function_small, and same for 'type' and 'other'
+		["function", "other", "type"].forEach(
+			(termsub) => {
+				[termsub + "_large", termsub, termsub + "_small"].forEach(subdir => {
+					let aDir = TARGETHEADSTRING + "/" + section + "/" + subdir;
+					let aPath = path.normalize(dir + "/public/" + aDir);
+
+					if (!fs.existsSync(aPath)) {
+						fs.mkdirSync(aPath);
+					}
+				});
+			}
+		)
+	}
+
 	app.post("/tabUploads", (req, res) => {
 		// uploader
 		// use current nextNum for a keyid to update nextnum AND add to a single document in tab_images the new filerefs
@@ -1162,7 +1323,7 @@ module.exports = function(dir, app, db) {
 		form.multiples = true;
 		let myFiles = [];
 
-		form.parse(req, function(err, fields, files) {
+		form.parse(req, function (err, fields, files) {
 			// debugLog('known', fields['knownImageId']);
 			// let knownImageId = fields['knownImageId'] === "true";
 			// TODO: handle err

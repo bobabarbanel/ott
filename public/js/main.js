@@ -17,7 +17,69 @@ let _replace = false;
 let TABLE;
 let TOOLDATA;
 const WORDLISTS = {};
+const IMAGE_COUNTS = {};
 let SHOWIMAGES = true;
+
+$(async function () {
+	////////////////////////////////////////////////////////////
+	if ($.cookie("showImagesMode") === "false") {
+		SHOWIMAGES = false;
+	}
+	$("title").html("Main"); // browser tab title
+	const run = async () => {
+		const tabs = await Util.setUpTabs(key4id, window.name, {
+			main: true,
+			machine: true,
+			tab: true,
+			spec: true
+		});
+		const machineSpecs = await Util.getMachineSpec(key5.machine);
+		const toolInfo = await Util.getSheetTags(key5, "Tools");
+
+		// await getSuggestions(); // Fills WORDLISTS (from all TERMS in term_images collection)
+
+		await getTermImageCounts();
+
+		paintPage(machineSpecs, toolInfo, tabs);
+		startUp();
+
+	};
+	await run();
+	////////////////////////////////////////////////////////////
+});
+
+async function getTermImageCounts() {
+	return new Promise((resolve, reject) => {
+		$.get({
+			url: `/terms/getTermImageCounts`,
+			dataType: "json"
+		})
+			.done(results => { // an array
+				// alert(result);
+				results.forEach(
+					result => {
+						if (WORDLISTS[result.type] === undefined) {
+							WORDLISTS[result.type] = [];
+						}
+						if (IMAGE_COUNTS[result.type] === undefined) {
+							IMAGE_COUNTS[result.type] = {};
+						}
+						WORDLISTS[result.type].push(result.term);
+						IMAGE_COUNTS[result.type][result.term] = result.count;
+						// WORDLISTS[result._id].sort(); sorted in Mongo aggregation
+					}
+				)
+				// WORDLISTS[which] = results; 
+				resolve(null);
+			})
+
+			.fail((request, status, error) => {
+				// alert(error);
+				reject(null);
+			});
+	});
+}
+
 function setReplace(val, text = "") {
 	// console.log("set replace now:", text, '"', val + '"');
 	_replace = val;
@@ -38,7 +100,7 @@ function getReplace() {
 function toggleShowImages() {
 	SHOWIMAGES = !SHOWIMAGES;
 	$.cookie('showImagesMode', SHOWIMAGES);
-	$(".show_edit").text(SHOWIMAGES ? "Show Images" : "Edit Terms");
+	$(".show_edit").text(SHOWIMAGES ? "Showing Term Images" : "Editing Terms");
 	const columns = defineColumns();
 	if (SHOWIMAGES) {
 		$("body")
@@ -66,25 +128,32 @@ function toggleShowImages() {
 	tableBuilt();
 }
 
+function hasImages(type, term) {
+	return IMAGE_COUNTS[type][term] > 0
+}
 function displayImages(e, cell) {
 	e.preventDefault();
 	const value = cell.getValue();
 	if (value === "") return;
-	const field = cell.getColumn().getField();
+	let field = cell.getColumn().getField();
 	if (field.match(/^c\d+$/)) {
-		displayImages_support("other", value);
-	} else {
-		if (field === "function" || field === "type") {
-			displayImages_support(field, value);
-		}
+		field = "other";
 	}
+
+	displayImages_support(e, field, value);
+
 }
 
-function displayImages_support(field, value) {
-	// alert(`Show images for field ** ${field} **, term "${value}"`);
-	useSameDestination(
-		encodeURI(`/terms/terms_display?type=${field}&term=${value}`)
-	);
+function displayImages_support(e, field, value) {
+	if (!hasImages(field, value)) {
+		tinyToast.show('No Known Images', e.clientX, e.clientY).hide(1000);
+	}
+	else {
+		useSameDestination(
+			encodeURI(`/terms/terms_display?type=${field}&term=${value}`)
+		);
+	}
+
 }
 function useSameDestination(destination) {
 	openInSameTab(destination);
@@ -94,86 +163,6 @@ function openInSameTab(url) {
 }
 
 
-$(function () {
-	////////////////////////////////////////////////////////////
-	if ($.cookie("showImagesMode") === "false") {
-		SHOWIMAGES = false;
-	}
-	$("title").html("Main"); // browser tab title
-	const run = async () => {
-		const tabs = await Util.setUpTabs(key4id, window.name, {
-			main: true,
-			machine: true,
-			tab: true,
-			spec: true
-		});
-		const machineSpecs = await Util.getMachineSpec(key5.machine);
-		const toolInfo = await Util.getSheetTags(key5, "Tools");
-		await Promise.all(
-			["type", "function", "other"].map(which => {
-				return new Promise((resolve, reject) => {
-					$.get({
-						url: `/terms/${which}/getSuggestions`,
-						dataType: "json"
-					})
-						.done(results => { // an array
-							// alert(result);
-							WORDLISTS[which] = results; // have to add 's' to 'function, so do for all
-							resolve(null);
-						})
-
-						.fail((request, status, error) => {
-							// alert(error);
-							reject(null);
-						});
-				});
-			})
-		);
-		await new Promise((resolve, reject) => {
-			$.get({
-				url: '/terms/get_term_image_pairs',
-				dataType: 'json'
-			})
-				.done(pairs => { // [{type: "type", term: "term" }, ...]
-					// alert(result);
-					let changes = {
-						'function': false,
-						'type': false,
-						'other': false
-					};
-
-					pairs.forEach(
-						({type, term}, index) => {
-							
-							if (!WORDLISTS[type].includes(term)) {
-								WORDLISTS[type].push(term);
-								changes[type] = true;
-							}
-						}
-					);
-					['function', 'type', 'other'].forEach(
-						(which) => {
-							if (changes[which]) {
-								WORDLISTS[which].sort();
-							}
-						}
-					);
-
-					paintPage(machineSpecs, toolInfo, tabs);
-					startUp();
-					resolve('done');
-				})
-
-				.fail((request, status, error) => {
-					// alert(error);
-					reject('fail');
-				});
-
-		});
-	};
-	run();
-	////////////////////////////////////////////////////////////
-});
 
 function startUp() {
 	$("#navButtonDiv").css("display", "none");
@@ -185,7 +174,6 @@ function startUp() {
 	$("body").on("click", () => {
 		$("navDropDown").css("display", "none");
 	});
-	// $(".tabulator-cell").on()
 }
 
 function genLinkObj(tDoc) {
@@ -238,12 +226,12 @@ function toolsTable(machineSpecs, toolData) {
 					// tableData = data;
 					// TODO: p[ossibly use cookie to remember this state
 					caret.html(
-						`${down_caret} Tools<br/><button class="show_edit">${
-						SHOWIMAGES ? "Show Images" : "Edit Terms"
+						`${down_caret} Machine<br/>&nbsp;&nbsp;&nbsp;Tools<br/><button class="show_edit">${
+						SHOWIMAGES ? "Showing Term Images" : "Editing Terms"
 						}</button>`
 					);
 					$(".show_edit").off("click");
-					if (TABLE === undefined) {
+					if (TABLE === undefined) { // initialize TABLE
 						toolTable.show();
 
 						TABLE = await defineTable();
@@ -271,7 +259,7 @@ function toolsTable(machineSpecs, toolData) {
 				// openGroups();
 			} else {
 				$(".show_edit").hide();
-				caret.html(`${right_caret} Tools`);
+				caret.html(`${right_caret} Machine<br/>&nbsp;&nbsp;&nbsp;Tools`);
 
 				// replaceIndicator.css('visibility', 'hidden');
 				toolTable.hide(
@@ -352,9 +340,15 @@ function defineColumns() {
 		return value.toUpperCase();
 	};
 	const termFormatter = function (cell) {
-		if (cell.getValue() === "")
+		const term = cell.getValue().toUpperCase();
+		if (term === "") {
 			return '<span class="na">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n/a</span>';
-		return cell.getValue().toUpperCase(); // show in uppercase
+		}
+		let field = cell.getField();
+		if (field.match(/^c\d+$/)) {
+			field = "other";
+		}
+		return hasImages(field, term) ? term : `<span class="noimages">${term}</span>`;
 	};
 	const termEditorParams = function (which) {
 		return {
@@ -702,27 +696,6 @@ function defineTable() {
 		});
 	}
 
-	// change one 'previous' value for others field in main_table collection
-	// function change_others(data) {
-	// 	// WARNING: needs transactions for MongoDb going forward
-	// 	return new Promise((resolve, reject) => {
-	// 		delete data.list; // not needed
-	// 		data.key4id = key4id; // JOB ID for changes
-	// 		$.post({
-	// 			url: "/terms/change_others",
-	// 			dataType: "json",
-	// 			data: data
-	// 		})
-	// 			.done(result => {
-	// 				resolve(result);
-	// 			})
-
-	// 			.fail((request, status, error) => {
-	// 				reject(error);
-	// 			});
-	// 	});
-	// }
-
 	// replace a every 'previous' value for function or type field in main_table collection
 	function replace_singles({ type, previous, value, isNew }) {
 		console.log('\treplace_singles', { type, previous, value, isNew });
@@ -772,6 +745,8 @@ function defineTable() {
 		let field = data.type;
 		let value = data.value;
 		let previous = data.previous; // will NOT be ""
+		IMAGE_COUNTS[field][value] = IMAGE_COUNTS[field][previous];
+		delete IMAGE_COUNTS[field][previous];
 		if (field === "type" || field === "function") {
 			TOOLDATA.forEach(tdRow => {
 				if (tdRow[field] === previous) tdRow[field] = value;
@@ -857,7 +832,7 @@ function defineTable() {
 		});
 	}
 }
-
+/////////////////////////////////////////////////// TABS
 /// tabs display and response
 
 function tabsOutline(tabs) {

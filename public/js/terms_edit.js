@@ -11,7 +11,7 @@ let WORDLISTS;
 
 $(function () {
 
-    const STYPE = "Edit/Upload Terminology"
+    const STYPE = "Add/Delete Terms, Upload Images for Terminology"
     $("title").html(`${STYPE} Edit`);
 
     $("pageheader").append(
@@ -23,45 +23,23 @@ $(function () {
         TABLE.setFilter("term", "like", $("#filter-value").val())
     );
 
-    // const startStringMatcher = function (strs) {
-    //     return function findMatches(q, cb) {
-    //         let matches = [],
-    //             substrRegex = new RegExp("^" + q, "i");
-    //         $.each(strs, function (i, str) {
-    //             if (substrRegex.test(str)) {
-    //                 matches.push(str);
-    //             }
-    //         });
-    //         cb(matches);
-    //     };
-    // };
-
-    // const TOOLLIST = $("#toollist");
-
     Util.setUpTabs(null /*key4id*/, "", {
         tab: false,
         spec: false,
         main: false,
         machine: false,
         tabmenus: false
-    }).then(() => {
-        getAllTerms().then(
-            (data) => {
-                tableSetup();
-                pageSetup();
-            }
-        );
-    });
-
-
+    }).then(
+        () => {
+            getAllTerms().then(
+                () => {
+                    tableSetup();
+                    pageSetup();
+                }
+            )
+        }
+    );
 });
-
-// function notKnown(objArray, value) {
-//     for (let obj of objArray) {
-//         if (obj.term === value) return false;
-//     }
-//     return true;
-// }
 
 async function getAllTerms() {
     WORDLISTS = {};
@@ -127,66 +105,103 @@ async function getAllTerms() {
     });
 }
 
-function notKnown(newTerm, newType) {
-    for (let i = 0, max = DATA.length; i < max; i++) {
-        if (DATA[i].type === newType && DATA[i].term === newTerm) {
-            return false;
-        }
-    }
-    return true;
+// function notKnown(newTerm, newType) {
+//     for (let i = 0, max = DATA.length; i < max; i++) {
+//         if (DATA[i].type === newType && DATA[i].term === newTerm) {
+//             return false; // match, thus known
+//         }
+//     }
+//     return true; // not known
+// }
+function termStatus(term, type) {
+    return new Promise((resolve, reject) => {
+        $.post({
+            url: "/terms/status",
+            data: {
+                type: type,
+                term: term
+            },
+            datatype: "json"
+        })
+            .done(success => {
+                resolve(success);
+            })
+            .fail(error => {
+                reject(error);
+            });
+    });
 }
 
-function handleInputNewTerm() {
+async function handleInputNewTerm() {
     const newTerm = NEW_TERM_INPUT.val().toUpperCase();
     const newType = $('input:checked', '#theForm').val();
-    if (notKnown(newTerm, newType)) {
-        addTerm(newTerm, newType).then(
-            success => {
-                const newRowId = DATA.length
-                DATA.push(
-                    {
-                        id: newRowId,
-                        image_count: 0,
-                        mt_count: 0,
-                        term: newTerm,
-                        type: newType
-                    }
-                );
-                // TABLE is reactive so changing DATA will modify UI
-                NEW_TERM_INPUT.toggleClass("action");
-                TABLE.setSort(SORTERS);
-                const newRow = TABLE.getRow(newRowId);
+    const status = await termStatus(newTerm, newType);
 
-                newRow.pageTo()
-                    .then(function () {
-                        //run code after table has been successfuly updated
-                        $(newRow.getElement()).toggleClass("action");
-                    })
-                    .catch(function (error) {
-                        //handle error loading data
-                        alert("unable to page when adding term.");
-                    }).finally(function () {
-                        NEW_TERM_INPUT.val("");
-                        enableButton($('#addTermButton', '#theForm'), false); // since term input cleared
-                        setTimeout(() => {
-                            $(newRow.getElement()).toggleClass("action");
-                            NEW_TERM_INPUT.toggleClass("action");
-                        }, 1000);
-                    });
-            },
-            error => {
-                alert("unable to add term.");
-            }
-        );
-    } else {
-        NEW_TERM_INPUT.toggleClass("dup");
-        $('duplicate').toggleClass('visible'); // message
-        setTimeout(() => {
+    switch (status) {
+        case 'archived':
+            NEW_TERM_INPUT.toggleClass("archived");
+            $('information').text('This Term has been archived.').toggleClass('visible'); // message
+            setTimeout(() => {
+                NEW_TERM_INPUT.toggleClass("archived");
+                $('information').text('').toggleClass('visible'); // message
+            }, 1500);
+            break;
+        case 'known':
             NEW_TERM_INPUT.toggleClass("dup");
-            $('duplicate').toggleClass('visible'); // message
-        }, 1200);
+            $('information').text('This is an existing Term.').toggleClass('visible'); // message
+            setTimeout(() => {
+                NEW_TERM_INPUT.toggleClass("dup");
+                $('information').text('').toggleClass('visible'); // message
+            }, 1500);
+            break;
+        case 'unknown':
+            alert("add new term");
+            addTerm(newTerm, newType).then(
+                success => {
+                    const newRowId = DATA.length;
+                    DATA.push(
+                        {
+                            id: newRowId,
+                            image_count: 0,
+                            mt_count: 0,
+                            term: newTerm,
+                            type: newType
+                        }
+                    );
+                    // TABLE is reactive so changing DATA will modify UI
+                    NEW_TERM_INPUT.toggleClass("action");
+                    TABLE.setSort(SORTERS);
+                    const newRow = TABLE.getRow(newRowId);
+
+                    newRow.pageTo()
+                        .then(function () {
+                            //run code after table has been successfuly updated
+                            $(newRow.getElement()).toggleClass("action");
+                        })
+                        .catch(function (error) {
+                            //handle error loading data
+                            alert("unable to page when adding term.");
+                        }).finally(function () {
+                            NEW_TERM_INPUT.val("");
+                            enableButton($('#addTermButton', '#theForm'), false); // since term input cleared
+                            setTimeout(() => {
+                                $(newRow.getElement()).toggleClass("action");
+                                NEW_TERM_INPUT.toggleClass("action");
+                            }, 1000);
+                        });
+                },
+                error => {
+                    alert("unable to add term.");
+                }
+
+            );
+            break;
+        default: //error
+            alert("termStatus: improper status return");
     }
     NEW_TERM_INPUT.focus();
+    return status;
+
 }
 
 function addTerm(term, type) {
@@ -200,7 +215,7 @@ function addTerm(term, type) {
             }
         })
             .done(results => {
-                console.log('\addTerm', results);
+                console.log('/addTerm', results);
                 resolve(results);
             })
             .fail(error => {
@@ -210,18 +225,19 @@ function addTerm(term, type) {
     });
 }
 
-
-async function removeTerm(term) {
+async function removeTerm({ term, type }) {
+    // TODO: modify main_table AND term_images
     return new Promise((resolve, reject) => {
         $.post({
-            url: "/removeTerm",
+            url: "/terms/remove_term_image",
             data: {
-                type: window.name,
+                type: type,
                 term: term
             },
             datatype: "json"
         })
             .done(success => {
+                // also must remove row from table?
                 resolve(success);
             })
             .fail(error => reject(error));
@@ -250,10 +266,6 @@ function tableSetup() {
         // persistentSort:true, //Enable sort persistence
         groupBy: "type",
         groupHeader: function (value, count) {
-            //value - the value all members of this group share
-            //count - the number of rows in this group
-            //data - an array of all the row data objects in this group
-            //group - the group component for the group
             value = value.charAt(0).toUpperCase() + value.slice(1);
             return value + "<span style='color:#d00; margin-left:10px;'>(" + count + " item)</span>";
         },
@@ -262,11 +274,7 @@ function tableSetup() {
         columns: [
             {
                 field: "type",
-                visible: false,
-                // formatter:function(cell){
-                //     let string = cell.getValue();
-                //     return string.charAt(0).toUpperCase() + string.slice(1);
-                // },
+                visible: false
             },
             {
                 title: "Term by Types",
@@ -275,10 +283,6 @@ function tableSetup() {
                 widthGrow: 3,
                 headerSort: true,
                 formatter: function (cell, formatterParams, onRendered) {
-                    //cell - the cell component
-                    //formatterParams - parameters set for the column
-                    //onRendered - function to call when the formatter has been rendered
-
                     return "<b>" + cell.getValue() + "</b>";
                 },
             },
@@ -306,12 +310,10 @@ function tableSetup() {
                 headerSort: false,
                 tooltip: "Select Images to Upload",
                 formatter: function (cell, formatterParams, onRendered) {
-                    //cell - the cell component
-                    //formatterParams - parameters set for the column
-                    //onRendered - function to call when the formatter has been rendered
                     const TERM = cell.getData().term;
-                    let fup = `<input class="fileUpload" onchange="specFileUpload(this)" type="file" data="${TERM}" 
-					name="uploads[]" accept="image/jpg" multiple/>`;
+                    let fup = `<input class="fileUpload" onchange="termFileUpload(this)" 
+                        type="file" data="${TERM}" 
+                        name="uploads[]" accept="image/jpg" multiple/>`;
                     return fup;
                 }
             },
@@ -328,19 +330,21 @@ function tableSetup() {
                         .addClass("del_highlight");
                     // confirm deletion
                     const data = row.getData();
-
+                    const capType = data.type.charAt(0).toUpperCase() + data.type.slice(1)
                     $.confirm({
                         title: "<br/>Confirm Term Deletion!",
                         columnClass: "col-md-4",
                         type: "orange",
-                        content: `<div class="confirm">Term: <b>${
-                            data.term
-                            }</b>&nbsp;&nbsp;File Count: ${data.count}</div>`,
+                        content: `<div class="confirm"><u>${capType}</u>&nbsp;
+                        Term:&nbsp;&nbsp;<b>${data.term}</b><br/>
+                            &nbsp;&nbsp;Used in Job Main Tables: ${data.mt_count > 0 ? data.mt_count : "none"}<br/>
+                            &nbsp;&nbsp;Image File(s): ${data.image_count > 0 ? data.image_count : "none"}</div>`,
                         buttons: {
                             confirm: {
-                                btnClass: "btn-primary",
+                                text: 'Confirm Deletion',
+                                btnClass: "btn-warning",
                                 action: function () {
-                                    removeTerm(data.term).then(() => {
+                                    removeTerm(data).then(() => {
                                         setTimeout(() => {
                                             jqRowCells.removeClass("del_highlight");
                                             row.delete();
@@ -360,88 +364,80 @@ function tableSetup() {
     });
 }
 
-// function specFileUpload(obj) {
-//     const fup_input = $(obj);
-//     const jqRow = fup_input.parent().parent();
-//     const row = TABLE.getRow(jqRow[0]);
-//     const files = fup_input.get(0).files;
-//     if (files.length > 0) {
-//         jqRow.addClass("stripes");
-//         $(".fileUpload").hide();
-//         $("#spin").show();
-//         const current_count = row.getData().count;
-//         fupChange(files, fup_input.attr("data"), current_count)
-//             .then(success => {
-//                 const cell = row.getCell("count");
-//                 cell.setValue(cell.getValue() + success.count, false);
-//                 // alert("success");
-//             })
-//             .catch(failure => {
-//                 alert("error " + failure);
-//             })
-//             .finally(() => {
-//                 jqRow.removeClass("stripes");
-//                 $(".fileUpload").show();
-//                 $("#spin").hide();
-//             });
-//     }
-// }
+function termFileUpload(obj) {
+    const fup_input = $(obj);
+    const jqRow = fup_input.parent().parent();
+    const row = TABLE.getRow(jqRow[0]);
+    const files = fup_input.get(0).files;
+    if (files.length > 0) {
+        jqRow.addClass("stripes");
+        $(".fileUpload").hide();
+        $("#spin").show();
+        const data = row.getData();
+        // const current_count = data.count;
 
-// function fupChange(files, term, nowCount) {
-//     var formData = new FormData();
-//     formData.append("term", term);
-//     formData.append("tab", SPEC_TYPE);
-//     formData.append("setPrimary", nowCount === 0);
+        fupChange(files, fup_input.attr("data"), data.type)
+            .then(success => {
+                const cell = row.getCell("image_count");
+                cell.setValue(cell.getValue() + success.count, false);
+                // alert("success");
+            })
+            .catch(failure => {
+                alert("error " + failure);
+            })
+            .finally(() => {
+                jqRow.removeClass("stripes");
+                $(".fileUpload").show();
+                $("#spin").hide();
+            });
+    }
+}
 
-//     // loop through all the selected files and add them to the formData object
-//     for (var i = 0; i < files.length; i++) {
-//         // add the files to formData object for the data payload
-//         formData.append("uploads[]", files[i], files[i].name);
-//     }
+function fupChange(files, term, type) {
+    const formData = new FormData();
+    formData.append("term", term);
+    formData.append("type", type);
 
-//     return new Promise((resolve, reject) => {
-//         $.ajax({
-//             url: "/spec_upload",
-//             type: "post",
-//             data: formData,
-//             processData: false,
-//             contentType: false
-//         })
-//             .done(result => {
-//                 resolve(result);
-//             })
-//             .fail((request, status, error) => {
-//                 reject(error);
-//             });
-//     });
-// }
+    // loop through all the selected files and add them to the formData object
+    // warning: files is not an ordinary Array, cannot use .forEach
+    for (let i = 0; i < files.length; i++) {
+        // add the files to formData object for the data payload
+        formData.append("uploads[]", files[i], files[i].name);
+    }
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "/term_upload",
+            type: "post",
+            data: formData,
+            processData: false,
+            contentType: false
+        })
+            .done(result => {
+                resolve(result);
+            })
+            .fail((request, status, error) => {
+                reject(error);
+            });
+    });
+}
 
 function pageSetup() {
-    const button = $('#addTermButton', '#theForm');
-    enableButton(button, false);
-    button.on('click', e => {
-        handleInputNewTerm();
-        // TODO: check for dups
-        return false; // Mandatory to prevent page refresh.
+
+    const addButton = $('#addTermButton', '#theForm');
+    enableButton(addButton, false);
+
+    addButton.on('click', async (e) => {
+        await handleInputNewTerm();
+        e.preventDefault();
     });
     $('input[type=radio]').on('change', e => {
-
-        if ($('#add').val() !== '') {
-            enableButton(button, true);
-        } else {
-            enableButton(button, false);
-        }
+        enableButton(addButton, $('#add').val() !== '');
     });
     $('#add').on('keyup', e => {
-
-        if ($('input:checked', '#theForm').val()) {
-            enableButton(button, true);
-        } else {
-            enableButton(button, false);
-        }
+        enableButton(addButton, $('input:checked', '#theForm').val());
     });
     NEW_TERM_INPUT = $("input#add", '#theForm');
-
 }
 function enableButton(button, state) {
     button.attr("disabled", !state).removeClass().addClass((state) ? 'btn-primary' : 'btn-lgiht');
