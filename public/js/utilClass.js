@@ -62,7 +62,7 @@ class Util {
 		const showTabs = "tab" in include && include.tab;
 		const showSpec = "spec" in include && include.spec;
 		const showMain = "main" in include && include.main;
-		const showMachine = "machine" in include && include.main;
+		const showMachine = "machine" in include && include.machine;
 		const showTabMenus = "tabmenus" in include && include.tabmenus;
 		let topnav = $(".topnav");
 		let navDropDown = $("navDropDown");
@@ -70,7 +70,7 @@ class Util {
 			Util.getTabsData(key4id).then(
 				data => {
 					this.homeButton();
-
+					let lastTab; // used for computing x position of tabs if any in flex element being constructed
 					let nextTab;
 					if (showMain) {
 						// Main
@@ -83,11 +83,12 @@ class Util {
 								$('<a class="tabaccess" href="/tabs/main.html">Main</a>')
 							);
 						}
+						lastTab = nextTab;
 						topnav.append(nextTab);
 					}
 
 					// Tools
-					if(showMachine) {
+					if (showMachine) {
 						nextTab = $(
 							'<a tabndex="-1" class="elevate" href="/tabs/tools.html">Machine</br>Tools</a>'
 						);
@@ -103,18 +104,18 @@ class Util {
 								)
 							);
 						}
+						lastTab = nextTab;
 						topnav.append(nextTab);
 					}
-					
+
 
 					if (showSpec) {
-						// TODO:
 						// which specs does this this job have 'hand_tools' and/or 'inspection_tools'?
 						["Hand", "Inspection"].forEach(tooltype => {
 							nextTab = $(
 								`<a tabndex="-1" class="elevate" href="/tabs/spec_tools_display.html?spec_type=${tooltype}">${tooltype}</br>Tools</a>`
 							);
-							if (here === `${tooltype}`) {
+							if (here === tooltype) {
 								nextTab.addClass("active");
 								navDropDown.append(
 									$(`<span class="tabaccess_here">${tooltype} Tools</span>`)
@@ -126,25 +127,52 @@ class Util {
 									)
 								);
 							}
+							lastTab = nextTab;
 							topnav.append(nextTab);
 						});
 					}
 
 					let width = 150;
-					if (showTabs && "tabs" in data) {
-						data.tabs.forEach((tab, index) => {
-							let navItem = $(Util.definePageTab(index, tab, true));
-							let possible = tab.tabName.length * 14;
 
-							width = width < possible + 10 ? possible + 10 : width;
-							if (here === tab.tabName) {
-								navItem.addClass("active");
-								navDropDown.append($(Util.definePageTab(index, tab, false)));
-							} else {
-								navDropDown.append($(Util.definePageTab(index, tab, true)));
+					if (showTabs && ("tabs" in data)) {
+						// console.log(topnav.width(),lastTab.offset().left,lastTab.width());
+						if (data.tabs.length <= 7) {
+							data.tabs.forEach((tab, index) => {
+								let navItem = $(Util.definePageTab(index, tab, true));
+								let possible = tab.tabName.length * 14;
+
+
+								width = width < possible + 10 ? possible + 10 : width;
+								if (here === tab.tabName) {
+									// debugger;
+									navItem.addClass("active");
+									navDropDown.append($(Util.definePageTab(index, tab, false)));
+								} else {
+									navDropDown.append($(Util.definePageTab(index, tab, true)));
+								}
+								topnav.append(navItem);
+							});
+						} else {
+
+							let com = {
+								topnav: 0.9 * topnav.width(),
+								lastTab: lastTab.offset().left + lastTab.width(),
+								net: 0.9 * topnav.width() - lastTab.offset().left + lastTab.width()
 							}
-							topnav.append(navItem);
-						});
+							let width = 0.8 * (0.9 * topnav.width() - lastTab.offset().left + lastTab.width());
+							console.log(com);
+							const container = $('<div class="navcontainer"/>').css('width', width);
+							data.tabs.forEach((tab, index) => {
+								let navItem = $(Util.definePageTab(index, tab, true));
+
+								if (here === tab.tabName) {
+									navItem.addClass("active");
+								}
+								container.append(navItem);
+							});
+							topnav.append(container);
+						}
+
 					}
 
 					navDropDown.css("width", width + "px");
@@ -215,7 +243,7 @@ class Util {
 				})
 
 				.fail((request, status, error) => {
-					console.log(status);
+					console.log("get_tabs", status, error);
 					reject(error);
 				});
 		});
@@ -232,22 +260,65 @@ class Util {
 				dataType: "json"
 			})
 				.done(result => {
-					console.log(result);
+					console.log("getOneTabsData", result);
 					resolve(result);
 				})
 
 				.fail((request, status, error) => {
-					console.log(status);
+					console.log("getOneTabsData error", status, error);
 					reject(error);
 				});
 		});
 	}
 
+	static getTabCounts(key4id, tabs) {
+		return new Promise((resolve, reject) => {
+			$.post({
+				url: "/get_tab_images_counts",
+				data: {
+					_id: key4id
+				},
+				dataType: "json"
+			})
+				.done(results => {
+
+					const rcounts = Object.create({});
+					results.forEach(r => rcounts[r._id] = r.count);
+					
+					// put counts into steps of tabs' sections
+					tabs.forEach(
+						(tab) => {
+							tab.sections.forEach(
+								(section) => {
+									section.steps.forEach(
+										(step) => {
+											let count = rcounts[step.images_id];
+											step.count = ((count !== undefined) ? count : 0);
+										}
+									);
+								}
+							);
+
+						}
+					);
+					// console.log(JSON.stringify(tabs, null, 2));
+					resolve(true);
+				})
+
+				.fail((request, status, error) => {
+					console.log("getTabCounts error", status, error);
+					reject(error);
+				});
+		});
+	}
+
+
+
 	static definePageTab(num, tab, useTarget) {
 		if (useTarget) {
 			return $(
 				`<a class="tabaccess" tabndex="-1" href="/showtab/${num}/${
-					tab.tabName
+				tab.tabName
 				}"><span>${tab.tabName}</span></a>`
 			);
 		} else {

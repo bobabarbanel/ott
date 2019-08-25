@@ -2,28 +2,23 @@ body {
     background: lightblue;
 }
 
-
-
-
-#job,
-#top {
-    display: block;
+job {
+    position: fixed;
+    top: 110px;
+    left: 3em;
+    z-index: 200;
     font-size: 1.17em;
-    margin-left: 1em;
     font-weight: bold;
-    border: 30px;
-}
-
-#top {
-    font-size: 1.37em;
-    padding-left: 30px;
+    height: 85vh;
+    overflow: auto;
 }
 
 .jobul {
-    padding: 20px;
+    padding: 5px 0px 20px 0px;
     width: 500px;
     background: rgb(245, 241, 241);
 }
+
 input {
     width: 225px;
 }
@@ -100,8 +95,6 @@ li.tabname.ui-sortable-handle {
     justify-content: space-between;
 }
 
-
-
 .sectionname {
     margin-bottom: 10px;
 }
@@ -109,8 +102,6 @@ li.tabname.ui-sortable-handle {
 .sectionul {
     margin-top: 10px;
 }
-
-
 
 .trash {
     font-size: 14px;
@@ -120,6 +111,10 @@ li.tabname.ui-sortable-handle {
     outline: none;
     color: brown;
     padding: 2px;
+}
+
+.jobul {
+    padding: 20px;
 }
 
 .arrow {
@@ -138,9 +133,68 @@ li.tabname.ui-sortable-handle {
     text-align: center;
 }
 
+top {
+    position: fixed;
+    top: 70px;
+    left: 1em;
+    z-index: 200;
+    display: flex;
+    font-weight: bold;
+    align-items: center;
+}
+
+.pagetitle {
+    font-size: 24px;
+    margin-right: 1em;
+}
+
+.jobtitle {
+    font-size: 24px;
+    margin-right: 1em;
+}
+
+.controls {
+    display: flex;
+    
+}
+
+.mybtn {
+    font-size: 1.2em;
+    border-radius: 5mm;
+    margin-left: 10px;
+    width: 6em;
+    cursor: pointer;
+}
+.mybtn:hover {
+    background: rgb(194, 193, 193);
+}
+
+.mybtn.setDefaults {
+    background: palegreen;
+}
+.mybtn.setDefaults:hover {
+    background: rgb(3, 202, 3);
+}
+
+.mybtn.btn-save {
+    /* , .btn-primary:hover, .btn-primary:active, .btn-primary:visited*/
+    background-color: rgb(53, 21, 240);
+    color: white;
+    border-radius: 2mm;
+    width: 8em;
+    margin-left: 2em;
+}
+#save_button:hover {
+    background-color: rgb(27, 15, 100) !important;
+}
+
+#setDefaults {
+    visibility: hidden;
+}
+
 .addcircle {
     position: relative;
-    z-index: 200;
+    z-index: 50;
     font-size: 16px;
     cursor: pointer;
     text-decoration: none;
@@ -153,7 +207,7 @@ li.deleted {
     display: none;
 }
 
-#save_button {
+/* #save_button {
     margin-left: 30px;
     text-decoration: none;
     color: #fff;
@@ -162,10 +216,9 @@ li.deleted {
     font-size: 16px;
     border: 1px solid #163853;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+} */
 
-#save_button:hover,
-#save_button:active {
+#save_button:hover, #save_button:active {
     background: blue;
 }
 
@@ -230,71 +283,29 @@ input.stepstyle {
     margin-left: 1.5em;
 }
 
-
 .text {
     background-color: rgb(0, 255, 21);
     font-size: 12px;
     padding: 4px;
 }
 
-.pagetitle {
-    font-size: 24px;
-    margin-right: 1em;
-}
-
-#job {
-    margin-left: 2em;
-}
 hr {
     width: 92%;
     padding: 0 1em 0 1em;
 }
-start {
-    display: flex;
-    margin-bottom: 1em;
-    align-items: center;
-    align-content: flex-start;
-}
-spin {
-    font-size: 54px;
-    color: red;
-}
 
-/* navigation */
-nav {
-    display: flex;
-    align-items: center;
-    align-content: flex-start;
-    margin-left: 1.5em;
-    width: 700px;
-    height: 40px;
-    background: tan;
-}
-
-.nav.anchor img {
-    height: 28px;
-}
-
-.navCell {
-    position: relative;
-    width: 25%;
-}
-
-
-.navButton {
-    margin-left: 15%;
-    margin-right: 15%;
-    width: 70%;
+.caret {
     cursor: pointer;
-    height: 30px;
 }
 
+.caret:hover {
+    color: orange;
+}
 
 #home_button img {
     height: 30px;
     vertical-align: middle;
 }
-
 
 #home_button {
     /* uses image */
@@ -319,4 +330,3 @@ nav {
     background: blue;
     color: white;
 }
-

@@ -9,7 +9,8 @@ const dirPathToImages = "../../";
 const reverseURL = "/unArchiveTabImages";
 const COMMON = new Common();
 
-$(function() {
+
+$(function () {
 	// onload
 
 	function pageSetup() {
@@ -17,10 +18,10 @@ $(function() {
 		TV.setDeleteButtons("init");
 
 		// Captures click events of all <a> elements with href starting with #
-		$(document).on("click", 'a[href^="#"]', function(/*event*/) {
+		$(document).on("click", 'a[href^="#"]', function (/*event*/) {
 			// Click events are captured before hashchanges. Timeout
 			// causes offsetAnchor to be called after the page jump.
-			window.setTimeout(function() {
+			window.setTimeout(function () {
 				TV.offsetAnchor();
 			}, 0);
 		});
@@ -28,7 +29,10 @@ $(function() {
 		let tabNum = parseInt($("#tabnum").text());
 
 		$("#deleteMenu").hide();
-		$("job").html(`Tab ${tabName}>  ${COMMON.jobTitle()}`);
+		$("job").html(`<span class="jobtitle">${COMMON.jobTitle()}</span>
+						<br/>
+						Tab:&nbsp;
+						<span class="tabstyle"> <u>${tabName}</u></span>`);
 
 		$(TV.FLOATNAME)
 			.removeClass()
@@ -37,9 +41,10 @@ $(function() {
 		$("head title", window.parent.document).text(tabName);
 
 		Util.setUpTabs(TV.key4id, tabName, {
-			main: true,
 			tab: true,
 			spec: true,
+			main: true,
+			machine: true,
 			tabmenus: true
 		}).then(tabs => {
 			getTabImages().then(
@@ -60,32 +65,10 @@ $(function() {
 		TV.deleteImages(ev, setArchiveForTabImages, listDeleting);
 	}
 
-	// add scroll offset to fragment target (if there is one)
-	// function delayedFragmentTargetOffset() {
-	//     var url = $(":target").context.URL;
 
-	//     var hashCharPosition = url.lastIndexOf("#");
-	//     if (hashCharPosition !== -1) {
-	//         var div = $(url.substring(hashCharPosition));
-
-	//         var offset = div.offset();
-
-	//         var scrollto = offset.top - 50; // minus fixed header height
-	//         $('html, body').animate({
-	//             scrollTop: scrollto
-	//         }, 0);
-	//         div.css("background-color", "yellow");
-	//         setTimeout(function () {
-	//             div.css("background-color", "");
-	//         }, 3000);
-	//     }
-	// }
 
 	function filesByImageId(stepFilesObj, images_id) {
 		return stepFilesObj[images_id];
-		// .filter(
-		//     (item) => item.images_id === images_id
-		// );
 	}
 
 	function getTabImages() {
@@ -167,16 +150,17 @@ $(function() {
 			let group = [sect_index, section.sectionName].join("_");
 			TV.DELETEDIMAGES[group] = []; // empty to start
 
-			let section_target = ["section", sect_index].join("_");
+			let section_target = `section_${sect_index}`;
 			let sectDiv = $(
-				`<div id="${section_target}" class="headtext"><span class="sectionlabel">&nbsp;Section:&nbsp;</span>${
-					section.sectionName
-				}</div>`
+				`<div id="${section_target}" class="headtext">
+				<span class="sectionlabel">&nbsp;Section:&nbsp;&nbsp;</span>
+				<span class="sectionstyle">${section.sectionName}</span>
+				</div>`
 			);
 			let sectLink = "#" + section_target;
 			links.push([sectLink, section.sectionName]);
 
-			let anchor = $('<a class="anchor head" id="' + sectLink + '"/>');
+			let anchor = $(`<a class="anchor head" id="${section_target}"/>`);
 			pictures.append(anchor);
 			pictures.append(sectDiv);
 
@@ -186,12 +170,10 @@ $(function() {
 				section.steps.forEach((step, step_index) => {
 					let step_target = ["step", sect_index, step_index].join("_"); // like 'pic' anchor for tools
 					let stepDiv = $(
-						`<div class="step pic" id="pic${step_target}" images_id="${
-							step.images_id
-						}"></div>`
+						`<div class="step pic" id="pic${step_target}" images_id="${step.images_id}"></div>`
 					);
 					links.push(["#pic" + step_target, step.stepName]);
-
+					console.log("step", JSON.stringify(step));
 					if (curLG !== null) {
 						// have a group?
 						if (curLG.getStart() !== curLG.getStop()) {
@@ -220,7 +202,7 @@ $(function() {
 						);
 						LG = curLG;
 					}
-
+					// showLG_LINKS(LG);
 					let pItems = $("<pItems/>");
 					let stepSpan = null;
 					let fileRefs = filesByImageId(stepFilesObj, step.images_id);
@@ -228,7 +210,7 @@ $(function() {
 						let button = $(
 							'<button class="checkAllDel" type="button">&#10004; All</button>'
 						);
-						stepSpan = $('<span class="stepSpan"/>').html(
+						stepSpan = $('<span class="stepstyle"/>').html(
 							TV.SPACE + TV.SPACE2 + step.stepName
 						);
 						stepDiv.append(button, stepSpan);
@@ -282,7 +264,7 @@ $(function() {
 						});
 						stepDiv.append(pItems);
 					} else {
-						stepSpan = $('<span class="stepSpan"/>').html(
+						stepSpan = $('<span class="stepSpan_sm"/>').html(
 							TV.SPACE + TV.SPACE2 + step.stepName + " - no images"
 						);
 						stepDiv.append(stepSpan);
@@ -306,14 +288,20 @@ $(function() {
 			}
 		});
 
-		if (curLG.getStart() === curLG.getStop()) {
+		if (curLG !== null && (curLG.getStart() === curLG.getStop())) {
+			// debugger;
 			// remove last LG as it is empty
-			curLG.getPrev().setNext(null);
-			curLG = curLG.getPrev();
+			if (curLG.getStop() === null) { // no images at all
+				curLG = null;
+			} else {
+				console.log("close loop");
+				curLG.getPrev().setNext(null);
+				curLG = curLG.getPrev();
+				// form circle so that UP and DOWN arrows move in continuous circle
+				curLG.setNext(LG);
+				LG.setPrev(curLG);
+			}
 		}
-		// form circle so that UP and DOWN arrows move in continuous circle
-		curLG.setNext(LG);
-		LG.setPrev(curLG);
 
 		$("pictures img").on("click", imgClick);
 		// build floating menu
@@ -347,9 +335,16 @@ $(function() {
 				prev.append($("<li/>").append(a2));
 			}
 		});
+		console.log(links.forEach(l => console.log(l)));
 		float.append($("</ul>")).addClass("showfloat"); // hide to start
 	}
 
+	// function showLG_LINKS(lg, indent = 0) {
+	// 	console.log("\t\t\t\t\t\t\t\t".slice(0, indent), "start:", lg.start, "stop:", lg.stop, "link:", lg.link);
+	// 	if (lg.next) {
+	// 		showLG_LINKS(lg.next, indent + 1);
+	// 	}
+	// }
 	function setArchiveForTabImages(list) {
 		// list, a (jq)list of images to be marked as archived in db
 		let data = []; // construct data object for deletion route
@@ -380,9 +375,9 @@ $(function() {
 				.fail((request, status, error) => {
 					alert(
 						"setArchiveForTabImages failure: " +
-							status +
-							" " +
-							JSON.stringify(error)
+						status +
+						" " +
+						JSON.stringify(error)
 					);
 					reject(error);
 				});
@@ -413,47 +408,30 @@ $(function() {
 
 		$(".deleteButton").on("click", TV.toggleDeleteMode);
 		$(".floatButton").on("click", TV.hideShowFloat);
+		const sectAid = $('#sectnum').text().trim();
+		const stepAid = $('#stepnum').text().trim();
+		let aTag;
+
+		if (sectAid !== '-1') {
+			if (stepAid !== '-1') {
+				aTag = $(`div#${'picstep_' + sectAid + '_' + stepAid}`);
+			} else {
+				aTag = $(`a#${'section_' + sectAid}`);
+			}
+			if (aTag.length > 0) {
+				$('html,body').animate({ scrollTop: aTag.offset().top }, 'slow');
+			} 
+		}
 	}
+	
 
 	function callUndeleteImages(ev) {
 		TV.unDeleteImages(ev, reverseURL);
 	}
-	// function callDeleteImages(ev) {
-	//     TV.deleteImages(ev, setArchiveForTabImages, listDeleting);
-	// }
 
 	function callDeletionsComplete() {
 		TV.deletionsComplete();
-		// add "no images" where needed
-
-		// $("div.step.pic").each(
-		//     (z, elem) => {
-		//         let countShowing = 0;
-		//         let eligible = false;
-
-		//         $(elem).find('div.img-wrap.deleting').each((x, iw) => {
-		//             // console.log('iw ' + x + " " + $(iw).css('display'));
-		//             if ($(iw).is(':visible')) {
-		//                 countShowing++;
-		//             }
-		//             eligible = true;
-		//         });
-		//         //console.log(eligible + " " + countShowing + " " + span.html());
-		//         if(eligible && countShowing === 0) {
-		//             let span = $(elem).find('span.stepSpan');
-		//                 span.html(span.html() + " - no images");
-		//         }
-
-		//     }
-		// );
 	}
 
-	// $.getScript("tabValueCalss.js")
-	// 	.done(function(script, textStatus) {
-	// 		pageSetUp();
-	// 	})
-	// 	.fail(function(jqxhr, settings, exception) {
-	// 		alert("fail");
-	// 	});
 	pageSetup();
 });

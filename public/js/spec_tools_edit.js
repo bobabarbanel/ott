@@ -8,88 +8,107 @@ let TABLE;
 const DATA = [];
 let SPEC_TYPE;
 
-$(function() {
-	SPEC_TYPE = $("spec_type").text();
-	const STYPE = SPEC_TYPE.toUpperCase().replace("_", " ");
-	$("title").html(`${STYPE} Edit`);
-	
-	$("pageheader").append(
-		$(
-			`<h1 class="pageTitle">${STYPE}</h1>` // <h3 class="jobTitle">${jobTitle}</h3>`
-		)
-	);
-	$("#filter-value").keyup(() =>
-		TABLE.setFilter("term", "like", $("#filter-value").val())
-	);
+$(function () {
+	// guarantee two objects in db: _id = hand_tools and _id = inspection_tools
+	initSpecTerms().then(
+		() => setup(),
+		(error) => {
+			alert(error);
+		}
+	)
+	function initSpecTerms() { // mkae sure spec_tools collection has required structure
+		return new Promise((resolve, reject) => {
+			$.get({
+				url: "/initialize_spec_terms",
+				dataType: "json"
+			})
+				.done(result => {
+					resolve(result);
+				})
 
-	const startStringMatcher = function(strs) {
-		return function findMatches(q, cb) {
-			let matches = [],
-				substrRegex = new RegExp("^" + q, "i");
-			$.each(strs, function(i, str) {
-				if (substrRegex.test(str)) {
-					matches.push(str);
-				}
-			});
-			cb(matches);
-		};
-	};
-	const NEW_TERM_INPUT = $("input.upper");
-	const TOOLLIST = $("#toollist");
+				.fail((request, status, error) => {
+					reject(error);
+				})
+		});
+	}
+	function setup() {
+		SPEC_TYPE = $("spec_type").text();
 
-	Util.setUpTabs(null /*key4id*/, SPEC_TYPE, {
-		tab: false,
-		spec: false,
-		main: false,
-		machine: false,
-		tabmenus: false
-	}).then(() => {
-		getAllToolNames(SPEC_TYPE).then(async name_counts => {
-			DATA.length = 0;
-			DATA.push(...name_counts);
+		const STYPE = SPEC_TYPE.toUpperCase().replace("_", " ");
+		$("title").html(`${STYPE} Edit`);
 
-			tableSetup();
-			await TABLE.setData(DATA);
+		$("pageheader").append(
+			$(
+				`<h1 class="pageTitle">${STYPE}</h1>` // <h3 class="jobTitle">${jobTitle}</h3>`
+			)
+		);
+		$("#filter-value").keyup(() =>
+			TABLE.setFilter("term", "like", $("#filter-value").val())
+		);
 
-			NEW_TERM_INPUT.on("keydown", ev => {
-				if (ev.keyCode === ENTER || ev.keyCode === TABCHAR) {
+
+		const NEW_TERM_INPUT = $("input.upper");
+		const TOOLLIST = $("#toollist");
+
+		Util.setUpTabs(null /*key4id*/, SPEC_TYPE, {
+			tab: false,
+			spec: false,
+			main: false,
+			machine: false,
+			tabmenus: false
+		}).then(() => {
+			getAllToolNames(SPEC_TYPE).then(async name_counts => {
+				DATA.length = 0;
+				DATA.push(...name_counts);
+
+				tableSetup();
+				await TABLE.setData(DATA);
+
+				NEW_TERM_INPUT.on("keydown", ev => {
+					if (ev.keyCode === ENTER || ev.keyCode === TABCHAR) {
+						ev.preventDefault();
+						handleInputNewTerm();
+					}
+				});
+				NEW_TERM_INPUT.on("blur", ev => {
 					ev.preventDefault();
 					handleInputNewTerm();
-				}
+				});
+				NEW_TERM_INPUT.focus();
 			});
-			NEW_TERM_INPUT.focus();
 		});
-	});
 
-	function handleInputNewTerm() {
-		const newTerm = NEW_TERM_INPUT.val().toUpperCase();
-		if (notKnown(DATA, newTerm)) {
-			addTerm(newTerm).then(
-				success => {
-					DATA.push({ term: newTerm, count: 0 });
-					NEW_TERM_INPUT.addClass("action");
-					
-					TOOLLIST.empty();
-					TABLE.setData(DATA);
-					const matchedRows = TABLE.searchRows("term", "=", newTerm);
-					const jqMatch = $(matchedRows[0].getElement()).addClass("action");
-					setTimeout(() => {
-						jqMatch.removeClass("action");
-						NEW_TERM_INPUT.removeClass("action");
-					}, 700);
-					NEW_TERM_INPUT.val("");
-				},
-				error => {
-					alert("unable to add term.");
-				}
-			);
-		} else {
-			NEW_TERM_INPUT.addClass("dup");
-			setTimeout(() => {
-				NEW_TERM_INPUT.removeClass("dup");
-			}, 500);
+		function handleInputNewTerm() {
+			const newTerm = NEW_TERM_INPUT.val().toUpperCase();
+			if (newTerm === '') return;
+			if (notKnown(DATA, newTerm)) {
+				addTerm(newTerm).then(
+					success => {
+						DATA.push({ term: newTerm, count: 0 });
+						NEW_TERM_INPUT.addClass("action");
+
+						TOOLLIST.empty();
+						TABLE.setData(DATA);
+						const matchedRows = TABLE.searchRows("term", "=", newTerm);
+						const jqMatch = $(matchedRows[0].getElement()).addClass("action");
+						setTimeout(() => {
+							jqMatch.removeClass("action");
+							NEW_TERM_INPUT.removeClass("action");
+						}, 700);
+						NEW_TERM_INPUT.val("");
+					},
+					error => {
+						alert("unable to add term.");
+					}
+				);
+			} else {
+				NEW_TERM_INPUT.addClass("dup");
+				setTimeout(() => {
+					NEW_TERM_INPUT.removeClass("dup");
+				}, 500);
+			}
+			NEW_TERM_INPUT.focus();
 		}
-		NEW_TERM_INPUT.focus();
 	}
 });
 
@@ -128,12 +147,12 @@ async function addTerm(term) {
 	});
 }
 
-async function removeTerm(term) {
+function removeTerm(term) {
 	return new Promise((resolve, reject) => {
 		$.post({
 			url: "/removeTerm",
 			data: {
-				type: window.name,
+				type: SPEC_TYPE,
 				term: term
 			},
 			datatype: "json"
@@ -146,7 +165,7 @@ async function removeTerm(term) {
 }
 
 function tableSetup() {
-	$("#terms-table").css("width", "595px");
+	$("#terms-table").css("width", "775px");
 	let signal = false;
 	TABLE = new Tabulator("#terms-table", {
 		layout: "fitColumns",
@@ -163,21 +182,47 @@ function tableSetup() {
 			{
 				title: "Term",
 				field: "term",
-				width: 200,
+				width: 350,
 				headerSort: true
 			},
+
 			{
-				title: "Count",
-				field: "count",
-				width: 75,
-				headerSort: false,
+				title: 'Edit',
+				formatter: function (cell, formatterParams, onRendered) {
+					return '<i class="fas fa-edit"></i>';
+				},
+				width: 50,
 				align: "center",
-				formatter: function(cell, formatterParams, onRendered) {
-					//cell - the cell component
-					//formatterParams - parameters set for the column
-					//onRendered - function to call when the formatter has been rendered
-					const COUNTID = "COUNT_" + cell.getData().term.replace(" ", "");
-					return `<div id="${COUNTID}">${cell.getValue()}</div>`;
+				headerSort: false,
+				cellClick: function (e, cell) {
+					const termCell = cell.getRow().getCell('term');
+					const oldValue = termCell.getValue();
+					$.confirm({
+						title: "<br/>Modify Term",
+						columnClass: "col-md-5",
+						type: "green",
+						content: `<input class="termedit" value="${oldValue}"</input>`,
+						buttons: {
+							confirm: {
+								btnClass: "btn-primary",
+								action: function () {
+									const newValue = $('input.termedit').val().toUpperCase();
+									if (newValue !== oldValue && newValue !== '') {
+										modifyTerm(oldValue, newValue).then(
+											() => {
+												termCell.setValue(newValue);
+											},
+											(error) => {
+												alert("Modify Term Error: " + error);
+											}
+										);
+									}
+								},
+								keys: ["enter"]
+							},
+							cancel: function () {}
+						}
+					});
 				}
 			},
 			{
@@ -186,7 +231,7 @@ function tableSetup() {
 				width: 50,
 				align: "center",
 				headerSort: false,
-				cellClick: function(e, cell) {
+				cellClick: function (e, cell) {
 					const row = cell.getRow();
 					const jqRowCells = $(row.getElement())
 						.find(".tabulator-cell")
@@ -200,21 +245,25 @@ function tableSetup() {
 						type: "orange",
 						content: `<div class="confirm">Term: <b>${
 							data.term
-						}</b>&nbsp;&nbsp;File Count: ${data.count}</div>`,
+							}</b>&nbsp;&nbsp;File Count: ${data.count}</div>`,
 						buttons: {
 							confirm: {
 								btnClass: "btn-primary",
-								action: function() {
+								action: function () {
 									removeTerm(data.term).then(() => {
+										debugger;
 										setTimeout(() => {
 											jqRowCells.removeClass("del_highlight");
 											row.delete();
-										}, 700);
-									});
+										}, 500);
+									},
+										(error) => {
+											alert("Remove Term Error: " + error);
+										});
 								},
 								keys: ["enter"]
 							},
-							cancel: function() {
+							cancel: function () {
 								jqRowCells.removeClass("del_highlight");
 							}
 						}
@@ -222,17 +271,32 @@ function tableSetup() {
 				}
 			},
 			{
+				title: "Count",
+				field: "count",
+				width: 75,
+				headerSort: false,
+				align: "center",
+				formatter: function (cell, formatterParams, onRendered) {
+					//cell - the cell component
+					//formatterParams - parameters set for the column
+					//onRendered - function to call when the formatter has been rendered
+					const COUNTID = "COUNT_" + cell.getData().term.replace(" ", "");
+					return `<div id="${COUNTID}">${cell.getValue()}</div>`;
+				}
+			},
+			{
 				title: "Upload Images",
-				// width: 270,
+				width: 250,
 				align: "center",
 				headerSort: false,
 				tooltip: "Select Images to Upload",
-				formatter: function(cell, formatterParams, onRendered) {
+				formatter: function (cell, formatterParams, onRendered) {
 					//cell - the cell component
 					//formatterParams - parameters set for the column
 					//onRendered - function to call when the formatter has been rendered
 					const TERM = cell.getData().term;
-					let fup = `<input class="fileUpload" onchange="specFileUpload(this)" type="file" data="${TERM}" 
+					let fup = `<input class="fileUpload" onchange="specFileUpload(this)" 
+					type="file" data="${TERM}" 
 					name="uploads[]" accept="image/jpg" multiple/>`;
 					return fup;
 				}
@@ -240,7 +304,25 @@ function tableSetup() {
 		]
 	});
 }
-
+function modifyTerm(oldTerm,newTerm) {
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			url: "/modifyTerm",
+			type: "post",
+			data: {
+				oldTerm: oldTerm, // string
+				newTerm: newTerm, // string
+				type: SPEC_TYPE// hand_tools or inspection_tools
+			}
+		})
+			.done(result => {
+				resolve(result);
+			})
+			.fail((request, status, error) => {
+				reject(error);
+			});
+	});
+}
 function specFileUpload(obj) {
 	const fup_input = $(obj);
 	const jqRow = fup_input.parent().parent();
@@ -279,7 +361,7 @@ function fupChange(files, term, nowCount) {
 		// add the files to formData object for the data payload
 		formData.append("uploads[]", files[i], files[i].name);
 	}
-	
+
 	return new Promise((resolve, reject) => {
 		$.ajax({
 			url: "/spec_upload",

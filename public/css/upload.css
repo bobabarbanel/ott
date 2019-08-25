@@ -13,19 +13,20 @@ content {
     width: 60%;
     border-collapse: collapse;
 }
+.undefined {
+    color: rgb(179, 178, 178);
+}
 
 table,
 th,
 td {
     border: 1px solid black;
     text-align: center;
-    
 }
-#edit_func_type {
-    font-size: 14px;
-    border-radius: 2mm;
-    margin-top: 1em;
+.inputTable {
+    margin-top: 1.5em;
 }
+
 .digit {
     text-align: center;
     padding-left: 10px;
@@ -200,18 +201,13 @@ tr.colnames th {
 }
 
 table #eftrow {
-    height: 0.5em;
+    /* height: 2em; */
     border-bottom: 0.5em;
 }
 
 table #eftrow>td {
     border-color: transparent;
-}
-
-#edit_func_type {
-    background: blue;
-    color: white;
-    width: 100%;
+    margin-bottom: 0;
 }
 
 .changed {
@@ -243,7 +239,6 @@ tr.eftrow {
     font-weight: bold;
     text-align: center;
     width: 100%;
-    margin-top: 1em;
 }
 .fileUpload {
     margin-left: 1em;

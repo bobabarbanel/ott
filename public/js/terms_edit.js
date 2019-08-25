@@ -2,8 +2,6 @@
 /* globals Util */
 // terms_edit.js :: Term adds, delete, plus image uploads
 
-// const ENTER = 13;
-// const TABCHAR = 9;
 let TABLE;
 const DATA = [];
 let NEW_TERM_INPUT;
@@ -16,7 +14,7 @@ $(function () {
 
     $("pageheader").append(
         $(
-            `<h1 class="pageTitle">${STYPE}</h1>` // <h3 class="jobTitle">${jobTitle}</h3>`
+            `<h1 class="pageTitle">${STYPE}</h1>`
         )
     );
     $("#filter-value").keyup(() =>
@@ -44,21 +42,21 @@ $(function () {
 async function getAllTerms() {
     WORDLISTS = {};
     await Promise.all(
-        ["type", "function", "other"].map(which => {
+        ["type", "function", "other"].map(tfo => {
             return new Promise((resolve, reject) => {
                 $.get({
-                    url: `/terms/get_main_term_counts/${which}`,
+                    url: `/terms/get_main_term_counts/${tfo}`,
                     dataType: "json"
                 })
                     .done(docs => {
                         // alert(result);
-                        WORDLISTS[which] = {};
+                        WORDLISTS[tfo] = {};
                         docs.forEach(
                             doc => {
                                 doc.image_count = 0;
-                                doc.type = which;
+                                doc.type = tfo;
                                 DATA.push(doc);
-                                WORDLISTS[which][doc.term] = doc;
+                                WORDLISTS[tfo][doc.term] = doc;
                             }
                         );
                         resolve(true);
@@ -105,14 +103,6 @@ async function getAllTerms() {
     });
 }
 
-// function notKnown(newTerm, newType) {
-//     for (let i = 0, max = DATA.length; i < max; i++) {
-//         if (DATA[i].type === newType && DATA[i].term === newTerm) {
-//             return false; // match, thus known
-//         }
-//     }
-//     return true; // not known
-// }
 function termStatus(term, type) {
     return new Promise((resolve, reject) => {
         $.post({
@@ -155,7 +145,6 @@ async function handleInputNewTerm() {
             }, 1500);
             break;
         case 'unknown':
-            alert("add new term");
             addTerm(newTerm, newType).then(
                 success => {
                     const newRowId = DATA.length;
@@ -205,6 +194,7 @@ async function handleInputNewTerm() {
 }
 
 function addTerm(term, type) {
+    debugger;
     return new Promise((resolve, reject) => {
         $.post({
             url: '/terms/create_term_images',
@@ -226,7 +216,6 @@ function addTerm(term, type) {
 }
 
 async function removeTerm({ term, type }) {
-    // TODO: modify main_table AND term_images
     return new Promise((resolve, reject) => {
         $.post({
             url: "/terms/remove_term_image",
@@ -256,7 +245,6 @@ const SORTERS = [
 
 function tableSetup() {
     $("#terms-table").css("width", "800px");
-    let signal = false;
     TABLE = new Tabulator("#terms-table", {
         layout: "fitColumns",
         data: DATA,

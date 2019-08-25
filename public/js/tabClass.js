@@ -8,7 +8,7 @@ class Job {
         this.tabs = (tabs === undefined) ? [] : tabs;
     }
     getName() {
-        return this.job.split('|').join(' | ');
+        return this.job.split('|').join(' <span style="color: brown">|</span> ');
     }
     getUser() {
         return this.user;

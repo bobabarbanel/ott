@@ -285,16 +285,15 @@ class TabValues {
                 TabValues.VIEWERS[id] = new ImageViewer(container, options);
             }
         }
-        // else {
-        //     alert("old viewer");
-        // }
+
         return TabValues.VIEWERS[id];
     }
 
     static goGroup() { // move page and open first image in group
         let img = $(TabValues.ALL_IMGWARPS[TabValues.imageShowing].wrap).find('img'); // get img for this img-wrap
         let anchorName = img.attr('link'); // get link for the image group
-        let aTag = $('#' + anchorName); // set aTag to the anchor for the link
+        let aTag = $('#pic' + anchorName); // set aTag to the anchor for the link
+        
         TabValues.modeScroll(aTag);
         img.trigger('click'); // "click" on the image
     }
@@ -498,7 +497,6 @@ class TabValues {
     }
 
     static showNextSingle(direction) {
-
         TabValues.imageShowing = TabValues.imageShowing + direction;
 
         // are we rolling back over start, or beyond end?
@@ -515,8 +513,8 @@ class TabValues {
         }
         let img = $(TabValues.ALL_IMGWARPS[TabValues.imageShowing].wrap).find('img');
         let anchorName = img.attr('link');
-        let aTag = $('#' + anchorName);
-
+        let aTag = $('#pic' + anchorName);
+        
         TabValues.modeScroll(aTag);
 
         img.trigger('click');

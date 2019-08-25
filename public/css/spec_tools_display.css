@@ -17,39 +17,41 @@ spec_type {
 }
 
 .commentsave, .commentcancel {
+    position: relative;
     visibility: hidden;
     font-size: 24px;
-    margin-top: 40px;
+    margin-top: 9px;
     margin-left: 20px;
+    z-index: 1000;
+}
+.commentcancel:hover {
+    background: pink;
 }
 
-/* .commentcancel {
-    
-} */
 #pageheader {
+    margin-top: -18px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     align-content: center;
 }
-/* #solo {
-    position: absolute;
-    z-index: 50;
-    top: 200px;
-    left: 100px;
-    display: none;
-} */
+
 .ignore {
     visibility: hidden !important;
 }
+
 .primaryComment {
     border: 2px solid red;
 }
-#pageheader select {
+.pageTitle {
+    margin-left: 1em;
+}
+#pageheader>#section {
     background-color: yellow;
     margin-top: 10px;
-    margin-left: 10px;
+    margin-left: 15px;
     font-size: 18px;
+    
 }
 
 @keyframes grow-left {
@@ -61,10 +63,21 @@ spec_type {
     }
 }
 
+#magdiv {
+    z-index: 500;
+    /* border: 2px solid red; */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    height: 100%;
+}
+
 #defaultIndicator {
     width: 200px;
     border: 2px solid red;
-    display: none;
+    visibility: hidden;
     margin-left: 50px;
     margin-top: 10px;
     font-style: bold;
@@ -76,7 +89,7 @@ spec_type {
 textarea.comment {
     background: rgb(233, 233, 233);
     position: absolute;
-    top: 200px;
+    top: 226px;
     left: 50px;
     z-index: 50;
     max-height: 58%;
@@ -86,32 +99,41 @@ textarea.comment {
     height: auto;
 }
 
-#topOfPage {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    position: relative;
-    margin-top: 46px;
-}
-
-#topOfPage button {
-    border-radius: 20px;
-    margin-left: 30px;
+#pageheader > button {
+    border-radius: 10px;
+    margin-left: 20px;
     margin-top: 10px;
-    display: none;
     font-style: bold;
-    font-size: 18px;
+    font-size: 16px;
     text-align: center;
+    cursor: pointer;
+}
+#pageheader > button:hover {
+    background: rgb(248, 219, 166);
 }
 
 .fotorama__thumb-border {
     border-color: red !important;
 }
+#taSave, #taCancel {
+    position: relative;
+    top: 40px;
+}
 
-#showterm {
-    position: absolute;
-    /* display: none; */
-    z-index: 100;
-    color: white;
-    background: blue;
+/* .jobtitle {
+    margin-top: 55px;
+} */
+#section {
+    margin-left: 3em;
+    cursor: pointer;
+}
+.vert {
+    margin-top: 42px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+content > button {
+    margin-top: 30px;
 }

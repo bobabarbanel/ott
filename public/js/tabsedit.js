@@ -14,8 +14,24 @@ const key4id = new Common().getKey4id();
 
 // TODO: Implement? UNDO for Sorts and for Save (both quite hard to do) 9/12/18
 
-$(function() {
-	// example!! const key4id = 'LATHE|69-37869-2|30|ZL253-1';
+jQuery.fn.visible = function () {
+	return this.css("visibility", "visible");
+};
+
+jQuery.fn.invisible = function () {
+	return this.css("visibility", "hidden");
+};
+
+function showSave() {
+	$("#save_button").visible();
+}
+
+function hideSave() {
+	$("#save_button").invisible();
+}
+
+$(function () {
+
 	const sortableOptions = {
 		axis: "y",
 		cursor: "move",
@@ -25,83 +41,81 @@ $(function() {
 		update: showSave
 	};
 
-	function showSave() {
-		$("#save_button").css("visibility", "visible");
-	}
 
-	function hideSave() {
-		$("#save_button").css("visibility", "hidden");
+	function deleteItem(e) {
+		let li = $(e.target).closest("li");
+		li.css("background", "orange");
+		li.fadeOut();
+		showSave();
+		setTimeout(function () {
+			li.addClass("deleted");
+		}, 800);
 	}
 	////////////////////////////////////////////////////////////
-
-	$("title").text("Edit Tabs");
-
-	Util.getTabsData(key4id).then(data => {
-		paintPage(data); // also shows counts from tab_images document for the key4id
-		setup(data);
-	});
+	function startUp(base) {
+		$("title").text("Edit Tabs");
+		if (base) {
+			// clean up page
+			$('top').empty();
+			$('job').empty();
+			paintPage(base);
+			setup(base);
+			showSave();
+		}
+		else {
+			Util.getTabsData(key4id).then(data => {
+				paintPage(data); // also shows counts from tab_images document for the key4id
+				setup(data);
+			});
+		}
+	}
+	Util.setUpTabs(key4id, "", {
+		tab: false,
+		spec: false,
+		main: true,
+		machine: false,
+		tabmenus: false
+	}).then(
+		() => {
+			startUp(null);
+		}
+	);
 
 	function setup(data) {
-		$("spin").css("visibility", "hidden");
 		hideSave();
-		$("#nav_1").append(
-			$(
-				'<button id="home_button" class="navButton"><img src="/img/Ott.jpg" alt="Home" class="imageButton"></button>'
-			)
-		);
-		$("#nav_2").append(
-			$(
-				'<button id="tabupload_button" class="navButton"><i class="fas fa-upload fa-lg"></i>&nbsp;&nbsp;Upload Images</button>'
-			)
-		);
-		$("#nav_3").html("");
-		$("#nav_4").append(
-			$(
-				'<button id="run" class="navButton" type="button"><i class="fas fa-bolt fa-lg"></i>&nbsp;&nbsp;Main</button>'
-			)
-		);
-
-		$("#nav_2 .navButton").on("click", () => {
-			Util.openInSameTab("/tabs/tab_upload.html");
-		});
-		$("#nav_1 .navButton").on("click", () => {
-			Util.openInSameTab("/");
-		});
-		$("#nav_4 .navButton").on("click", () => {
-			Util.openInSameTab("/tabs/main.html");
-		});
-		if (data.tabs === undefined) {
-			$("#tabupload_button").hide();
-		}
-
 		$(".caret").on("click", e => {
 			// open/close display below
 			let that = $(e.target);
 			let openStr = that.text();
 			let ul = that.closest("li").find("ul");
 
-			if (ul.css("display") === "none") {
-				ul.slideDown("fast");
-				ul.find(".caret").each((index, element) => {
-					let str = $(element).text();
-					if (str === openStr) {
-						$(element)
-							.closest("li")
-							.find("ul")
-							.slideUp(1);
-					}
-				});
-
-				that.html(closeMark);
-			} else {
-				ul.slideUp("fast");
-				that.html(openMark);
+			if (ul.css("display") === "none") { // closed to start
+				open_ul(that, openStr, ul);
+			} else { // open to start
+				close_ul(that, ul);
 			}
 		});
 
 		$(".trash").on("click", deleteItem); // Delete element
+		function close_ul(that, ul) {
+			ul.slideUp("fast");
+			that.html(openMark);
+		}
+		function open_ul(that, openStr, ul) {
+			ul.slideDown("fast");
+			ul.find(".caret").each((index, element) => {
+				let str = $(element).text();
+				if (str === openStr) {
+					$(element)
+						.closest("li")
+						.find("ul")
+						.slideUp(1);
+				}
+			});
 
-		
+			that.html(closeMark);
+		}
+
 
 		function formatSaveErrors(status) {
 			let message = "";
@@ -175,11 +189,9 @@ $(function() {
 													.val();
 												if (stepName !== undefined && stepName !== "") {
 													// console.log("\t\tStep NOT EMPTY" + stepName);
-													let images_id;
-													if ($(stepsli).attr("images_id") === undefined) {
+													let images_id = $(stepsli).attr("images_id");
+													if (images_id === undefined) {
 														images_id = null;
-													} else {
-														images_id = $(stepsli).attr("images_id");
 													}
 													// console.log(images_id);
 													aSection.steps.push({
@@ -199,7 +211,7 @@ $(function() {
 				let status = verifyInputs(doc);
 				if (status.flag) {
 					$.confirm({
-						title: "Error on Saving Tabs",
+						title: "Verification Error on Saving Tabs",
 						icon: "fas fa-exclamation-triangle",
 						type: "red",
 						content: formatSaveErrors(status),
@@ -208,7 +220,7 @@ $(function() {
 
 						typeAnimated: true,
 						buttons: {
-							Continue: function() {
+							Continue: function () {
 								hideSave();
 							}
 						}
@@ -216,7 +228,7 @@ $(function() {
 				} else {
 					putTabsData(doc).then(
 						r => {
-							let finish = true;
+							// let finish = true;
 							if (r.error !== undefined) {
 								// caught error
 								$.confirm({
@@ -229,14 +241,14 @@ $(function() {
 
 									typeAnimated: true,
 									buttons: {
-										Cancel: function() {
-											finish = false;
+										Cancel: function () {
+											// finish = false;
 										}
 									}
 								});
 							} else {
 								// success
-
+								hideSave();
 								$.confirm({
 									title: "Tab(s) Saved",
 									icon: "fas fa-thumbs-up fa-lg",
@@ -246,20 +258,18 @@ $(function() {
 									useBootstrap: false,
 									boxWidth: "25%",
 									buttons: {
-										OK: function() {
-											finish = true;
-											$(".newJob").hide();
-											$(e.target)
-												.text("Edit Tab(s)")
-												.removeClass("createTab");
-											$("#tabupload_button").show();
+										OK: function () {
+											// finish = true;
+
+											// $(e.target)
+											// 	.text("Edit Tab(s)")
+											// 	.removeClass("createTab");
+											// $("#tabupload_button").show();
 										}
 									}
 								});
 							}
-							if (finish) {
-								hideSave();
-							}
+
 						},
 						e => {
 							$.confirm({
@@ -272,7 +282,7 @@ $(function() {
 
 								typeAnimated: true,
 								buttons: {
-									Cancel: function() {}
+									Cancel: function () { }
 								}
 							});
 						}
@@ -292,12 +302,21 @@ $(function() {
 			.find("input");
 
 		if (input.val() !== "") {
-			insertNewLiHelper(input);
+			insertNewLiHelper(input, true);
 		}
 	}
 
-	function insertNewLiHelper(that) {
-		$(".sectionul, .tabul, .jobul").sortable("destroy");
+	function insertNewLiHelper(that, scroll) {
+
+		try {
+			// $(".sectionul, .tabul, .jobul").sortable("destroy");
+		}
+		catch (issue) {
+			// ignore errors
+		}
+		// TODO: sort out scrolling for TABEDIT
+
+		that.val(that.val().toUpperCase()); // force to uppercase
 		///////////////////////////////////////////////////////////////////////////
 		let myli = that.closest("li"); // can it be null?
 		if (that.val() !== "") {
@@ -343,16 +362,19 @@ $(function() {
 				myli.before(tabli);
 				// add a section
 			}
-			// myli.closest('ul').sortable('refresh');
+
 			that.val("");
 			///////////////////////////////////////////////////////////////////////////
+
 			$(".sectionul, .tabul, .jobul").sortable(sortableOptions);
+
 			showSave();
 		}
+
 	}
 
 	function putTabsData(doc) {
-		console.log("putTabsData " + JSON.stringify(doc, null, 4));
+		// console.log("putTabsData " + JSON.stringify(doc, null, 4));
 		return new Promise((resolve, reject) => {
 			$.post({
 				url: "/set_tabs",
@@ -399,20 +421,63 @@ $(function() {
 				user: "unknown",
 				tabs: [] // no tabs to start
 			};
-			brandNew = true;
+			brandNew = true; // $("#setDefaults").visible();
 		}
 
 		// Initialize objects from data
-		let jobObj = createJobObj(key4id, jobDoc.tabs);
+		const jobObj = createJobObj(key4id, jobDoc.tabs);
 
 		// create HTML
-		$("content").empty();
+		const jobdiv = $('job');
+		const jobul = $('<ul class="jobul"></ul>');
+		let tabs = jobObj.getTabs();
+		buildPage(tabs, jobul);
 
-		let top = $('<div id="top"></div>');
+		let topinfo = $(`<span class="pagetitle">Tab Editor</span>
+					<span class="jobtitle">Job: ${jobObj.getName()}</span>`);
 
-		let jobdiv = $('<div id="job"></div>');
-		let jobul = $('<ul class="jobul"></ul>');
-		jobObj.getTabs().forEach(tab => {
+		let buttons = $(`<div class="controls">
+			<button id="save_button" class="mybtn btn-save">Save Changes</button>
+			<button id="collapse" class="mybtn control">Collapse</button>
+			<button id="openall" class="mybtn control">Open</button>
+			<button id="setDefaults" class="mybtn setDefaults">Set Defaults</button>
+		</div>`);
+
+		$('top').append(topinfo, buttons);
+		if (brandNew) $("#setDefaults").visible().on('click',
+		() => {
+			startUp(myDefaultData(key4id));
+		});
+
+		$('#openall').on('click',
+			() => {
+				$(".tabul,.sectionul").show().closest('li').find('.caret').html(closeMark);
+			});
+		$('#collapse').on('click',
+			() => {
+				$(".tabul,.sectionul").hide().closest('li').find('.caret').html(openMark);
+			});
+		$('#setDeafults').on('click',
+			() => {
+
+				$('#setDeafults').invisible();
+			});
+		let emptyTab = li(
+			"",
+			"t",
+			unique++,
+			"tabname empty",
+			false,
+			"The Tab Name"
+		);
+		// why is this needed?
+		// jobul.css("margin-top", "-40px");
+		jobdiv.append(jobul.append(emptyTab));
+
+	}
+	function buildPage(tabs, jobul) {
+		// console.log(JSON.stringify(tabs,null,2));
+		tabs.forEach(tab => {
 			let tabli = li(
 				tab.getTabName(),
 				"t",
@@ -458,36 +523,20 @@ $(function() {
 			);
 			jobul.append(tabli);
 		});
-		let pageTitle = $('<span class="pagetitle">Tab Editor</span>');
-		let jobTitle = $("<span/>").html("Job: " + jobObj.getName());
-		let button = $('<button id="save_button">Save Changes</button>');
-		let bdiv = $("<div/>");
-		if (brandNew) {
-			let rarr = $('<span class="newJob">&nbsp;&rarr;</span>');
-			button.text("Create Tabs");
-			button.addClass("createTab");
-			bdiv.append(rarr, button);
-		} else {
-			bdiv.append(button);
-			button.removeClass("createTab");
-		}
-		top.append(pageTitle, jobTitle, bdiv);
-		let emptyTab = li(
-			"",
-			"t",
-			unique++,
-			"tabname empty",
-			false,
-			"The Tab Name"
-		);
-
-		$("content").append(top, jobdiv.append(jobul.append(emptyTab)));
 	}
-
-	// function openInSameTab(url) {
-	//     let existingWindow = window.open(url, '_self');
-	//     existingWindow.focus();
-	// }
+	function blurring(e) {
+		e.preventDefault();
+		console.log("blur", e.target);
+		// debugger;
+		let target = $(e.target);
+		console.log("\ttab\t", target.hasClass('tabstyle'));
+		console.log("\tsection\t", target.hasClass('sectionstyle'));
+		console.log("\tstep\t", target.hasClass('stepstyle'));
+		if (target.hasClass('tabstyle') ||
+			target.hasClass('sectionstyle') ||
+			target.hasClass('stepstyle')) return;
+		if (e.target.tagName === 'INPUT') insertNewLiHelper(target, false);
+	}
 
 	function verifyInputs(doc) {
 		let errors = {
@@ -499,29 +548,6 @@ $(function() {
 			errors.flag = true; // tabs empty
 		}
 
-		// per Jeff, allow others to be empty -- may need other adjustments for DB
-		// TODO: check that empties work ok
-		// console.log('job has tabs');
-		// if (!errors.flag) {
-		//     doc.tabs.forEach(
-		//         (tab /*, i*/ ) => {
-		//             if (tab.sections.length === 0) {
-		//                 errors.flag = true;
-		//                 errors.tabs.push(tab.tabName); // tabs not empty
-		//             }
-		//             // console.log(i + ' has sections');
-		//             tab.sections.forEach(
-		//                 (section /*, j*/ ) => {
-		//                     if (section.steps.length === 0) {
-		//                         errors.flag = true;
-		//                         errors.sections.push(section.sectionName); // sections not empty
-		//                     }
-		//                     // console.log(j + ' has steps');
-		//                 }
-		//             );
-		//         }
-		//     );
-		// }
 		return errors;
 	}
 
@@ -550,7 +576,7 @@ $(function() {
 				place.charAt(0).toUpperCase() +
 				place.substr(1);
 			let input =
-				'<input class="emptyinput" placeholder="' +
+				'<input class="emptyinput truncate" style="text-transform: uppercase;" placeholder="' +
 				place +
 				'" type="text" title="' +
 				title +
@@ -567,7 +593,10 @@ $(function() {
 				//     result.find('input').on('keydown', insertNewLi);
 				// }
 				// console.log(result.find('input')[0]);
-				result.find("input").on("keydown", handleTabOrEnter);
+				result.find("input")
+					.on("keydown", handleTabOrEnter)
+					.on("blur", blurring);
+
 				result.find(".addcircle").on("click", insertNewLi2);
 			}
 			return result;
@@ -604,14 +633,14 @@ $(function() {
 					place.substr(1);
 
 				input =
-					'<input class="emptyinput" placeholder="' +
+					'<input class="emptyinput truncate" style="text-transform: uppercase;" placeholder="' +
 					place +
 					'" type="text" title="' +
 					title +
 					'"/>';
 			} else {
 				input =
-					'<input class="' +
+					'<input style="text-transform: uppercase;" class="truncate ' +
 					inputClass +
 					'" type="text" title="' +
 					title +
@@ -631,27 +660,25 @@ $(function() {
 			}
 
 			result += "</div>";
-            result = $(result);
-            result.find('.trash').on('click', deleteItem);
-			// result.on('keydown', insertNewLi);
+			result = $(result);
+			result.find('.trash').on('click', deleteItem);
+
 			if (result.find(".addcircle")) {
-				// if(aClass.indexOf('step') !== -1) {
-				//     result.find('input').on('keydown', insertNewLi);
-				// }
-				// console.log(result.find('input')[0]);
 				if (name === "") {
 					result.find("input").on("keydown", handleTabOrEnter);
 				} else {
-					// $('body').on('keydown', foo);
+
 					result
 						.find("input")
 						.on("click", inputClick)
 						.on("dblclick", inputDoubleClick)
 						.on("change", showSave);
-					// result.find('input').on('keydown', foo);
+
 				}
 				result.find(".addcircle").on("click", insertNewLi2);
 			}
+			result.find("input")
+				.on("blur", blurring);
 			return result;
 		}
 	}
@@ -662,19 +689,17 @@ $(function() {
 			case ENTER_KEY:
 				if ($(this).val().length > 0) {
 					ev.preventDefault();
-					insertNewLiHelper($(this));
+					insertNewLiHelper($(this), true);
 				}
-
 				break;
-
 			default:
 				// any other key is NOT Ignored
 				break;
 		}
 	}
 
-	$.fn.setCursorPosition = function(pos) {
-		this.each(function(index, elem) {
+	$.fn.setCursorPosition = function (pos) {
+		this.each(function (index, elem) {
 			if (elem.setSelectionRange) {
 				elem.setSelectionRange(pos, pos);
 			} else if (elem.createTextRange) {
@@ -687,7 +712,7 @@ $(function() {
 		});
 		return this;
 	};
-	$.fn.selectRange = function(start, end) {
+	$.fn.selectRange = function (start, end) {
 		var e = $(this);
 		if (!e) {
 			return;
@@ -709,34 +734,128 @@ $(function() {
 	function inputClick(ev) {
 		ev.stopPropagation();
 		let that = $(this);
-		// $(this).focus(); //.selectRange(0, $(this).val().length);
 		that.focus();
 		that.setCursorPosition(that.val().length);
-		// that.selectionStart = that.selectionEnd = that.val().length - 1;
-		// console.log('click ' + that.selectionStart + " " + that.selectionEnd);
-		// alert("click");
 	}
 
 	function inputDoubleClick(ev) {
 		ev.stopPropagation();
-		// $(this).focus(); //.selectRange(0, $(this).val().length);
 		$(this).focus();
 		this.setSelectionRange(0, $(this).val().length);
-		// console.log('dblclick ' + this.selectionStart + " " + this.selectionEnd);
 	}
-
-	// function foo(ev) {
-
-	//     //alert("keydown");
-	// }
+	function myDefaultData(_id) {
+		const data = {
+			"_id": "JOBID",
+			"user": "unknown",
+			"tabs": [
+				{
+					"tabName": "COMMENTS",
+					"sections": [
+						{
+							"sectionName": "COMMENTS",
+							"steps": []
+						}
+					]
+				},
+				{
+					"tabName": "DEBURR AND PART STORAGE",
+					"sections": [
+						{
+							"sectionName": "DEBURR",
+							"steps": []
+						},
+						{
+							"sectionName": "PART STORAGE",
+							"steps": []
+						}
+					]
+				},
+				{
+					"tabName": "INSPECTION",
+					"sections": [
+						{
+							"sectionName": "INSPECTION",
+							"steps": [
+								{
+									"stepName": 'PART PICTURE',
+									"images_id": null
+								}
+							]
+						},
+						{
+							"sectionName": "CHECK DEMIONSIONS",
+							"steps": []
+						}
+					]
+				},
+				{
+					"tabName": "KNOWN ISSUES",
+					"sections": [
+						{
+							"sectionName": "KNOWN ISSUES",
+							"steps": []
+						}
+					]
+				},
+				{
+					"tabName": "OFFSETS",
+					"sections": [
+						{
+							"sectionName": "OFFSETS",
+							"steps": [	
+								{
+									"stepName": 'GEOMETRY',
+									"images_id": null
+								},
+								{
+									"stepName": 'WEAR',
+									"images_id": null
+								},
+								{
+									"stepName": 'WORK',
+									"images_id": null
+								}
+							]
+						}
+					]
+				},
+				{
+					"tabName": "SET UP SHEET COMMENTS",
+					"sections": [
+						{
+							"sectionName": "M0'S",
+							"steps": []
+						},
+						{
+							"sectionName": "CYCLE TIME",
+							"steps": []
+						},
+						{
+							"sectionName": "MATERIAL",
+							"steps": []
+						}
+					]
+				},
+				{
+					"tabName": "TOOLING AND FIXTURES",
+					"sections": [
+						{
+							"sectionName": "CLAMPING TYPES",
+							"steps": []
+						},
+						{
+							"sectionName": "JOB BOX",
+							"steps": []
+						},
+						{
+							"sectionName": "PART STICK OUT",
+							"steps": []
+						}
+					]
+				}
+			]
+		};
+		data._id = _id;
+		return data;
+	}
 });
-
-function deleteItem(e) {
-    let li = $(e.target).closest("li");
-    li.css("background", "orange");
-    li.fadeOut();
-    showSave();
-    setTimeout(function() {
-        li.addClass("deleted");
-    }, 800);
-}

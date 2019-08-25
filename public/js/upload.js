@@ -7,7 +7,7 @@
 Currently - a single user effectively holds onto the entire tols file set during this page's lifetime. No check on that.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
-const SECTION = "Tools";
+// const SECTION = "Tools";
 
 // var debug = false;
 
@@ -16,37 +16,41 @@ const SECTION = "Tools";
 //         console.log(text);
 //     }
 // }
-jQuery.fn.visible = function() {
+jQuery.fn.visible = function () {
 	return this.css("visibility", "visible");
 };
 
-jQuery.fn.invisible = function() {
+jQuery.fn.invisible = function () {
 	return this.css("visibility", "hidden");
 };
 const COMMON = new Common();
 const KEY4ID = COMMON.getKey4id();
 const KEY5 = COMMON.getParsedCookie();
 
-const FTEDIT_PAGE = "/tabs/ftedits.html";
-$(function() {
+$(function () {
 	$("#spin").hide();
-	Util.setUpTabs(KEY4ID, "", {}).then(() => setupToolUpload());
-    
-	function getSheetTagsFiles(tab) {
+	Util.setUpTabs(KEY4ID, "", {
+		tab: true,
+		spec: true,
+		main: true,
+		machine: true,
+		tabmenus: false
+	}).then(() => setupToolUpload());
+
+	function getSheetTagsFiles() {
 		//debugLog("getSheetTagsFiles");
 		return new Promise((resolve, reject) => {
 			$.ajax({
-				url: "/sheetTags",
+				url: "/sheetTags_new",
 				type: "post",
 				data: {
-					key: KEY5,
-					tab: tab,
+					key4id: KEY4ID,
 					files: true // **do** retrieve files/images list
 				},
 				dataType: "json"
 			})
-				.done(result => {
-					resolve(result);
+				.done(results => {
+					resolve(results);
 				})
 				.fail((request, status, error) => reject(error));
 		});
@@ -55,12 +59,11 @@ $(function() {
 
 	////////////////////////////////////////////////////////////
 	function setupToolUpload() {
-        $('.home').on('click', () => { Util.goHome() } );
-		$("#job").text(COMMON.jobTitle());
+		$('.home').on('click', () => { Util.goHome() });
+		$("#job").html(COMMON.jobTitle());
 
-		f_t_edits(true); // edit button disabled
 		Util.getMachineSpec(KEY5.machine).then(machineSpecs => {
-			getSheetTagsFiles(SECTION).then(toolData => {
+			getSheetTagsFiles(KEY4ID).then(toolData => {
 				paintPage(machineSpecs, toolData);
 				$("#progress").hide();
 			});
@@ -69,17 +72,18 @@ $(function() {
 	////////////////////////////////////////////////////////////
 });
 
-function f_t_edits(state) {
-	$("#edit_func_type").prop("disabled", state); // enable/disable edits
-}
+
 
 function paintPage(machineSpecs, toolData) {
 	let table = $('<table class="inputTable" id="setup"/>');
 	table.append(
 		$(
-			'<tr id="eftrow"><td/><td/><td colspan="2">' +
-				'<button id="edit_func_type">Edit Functions and Types</button>' +
-				'</td><td colspan="2"><div id="progress">/div><td/></tr>'
+			`<tr id="eftrow">
+				<td colspan="4">&nbsp;</td>
+				<td colspan="2">
+					<div id="progress"></div>
+				</td>
+			</tr>`
 		)
 	);
 	let tr = $('<tr class="colnames"/>');
@@ -115,9 +119,7 @@ function paintPage(machineSpecs, toolData) {
 		}
 	});
 	$("content").append(table);
-	$("#edit_func_type").on("click", () => {
-		window.location.href = FTEDIT_PAGE;
-	});
+
 
 	function groupSeparator(table) {
 		let tr = $('<tr class="sep"/>');
@@ -147,7 +149,7 @@ function paintPage(machineSpecs, toolData) {
 		let lowS = specs[turretStr][spindleStr][0];
 		let numT = Util.numsOf(turretStr);
 		let numS = Util.numsOf(spindleStr);
-		for (var t = lowT, s = lowS; t <= highT; t++, s++) {
+		for (var t = lowT, s = lowS; t <= highT; t++ , s++) {
 			let link = [numT, t, numS, s].join("_");
 
 			let trClass = "spaced";
@@ -192,12 +194,16 @@ function paintPage(machineSpecs, toolData) {
 			td = $("<td />");
 
 			if (tData.function !== "N/A") {
-				let f_input = $('<input class="finput" name="function" type="text"/>');
+				let f_input = $('<span class="finput" name="function" type="text"/>');
 				f_input.attr("id", idStr(link, "function"));
-				f_input.val(tData.function);
+				if(tData.function === '') {
+					f_input.text('undefined');
+					f_input.addClass('undefined');
+				} else {
+					f_input.text(tData.function);
+				}
 				f_input.removeClass("noval");
 				f_input.prop("disabled", true);
-				f_t_edits(false);
 				td.append(f_input);
 			} else {
 				u_input.hide();
@@ -209,12 +215,17 @@ function paintPage(machineSpecs, toolData) {
 			td = $("<td />");
 
 			if (tData.type !== "N/A") {
-				let t_input = $('<input class="tinput" name="type" type="text"/>');
+				let t_input = $('<span class="tinput" name="type" type="text"/>');
 				t_input.attr("id", idStr(link, "type"));
-				t_input.val(tData.type);
+				if(tData.type === '') {
+					t_input.text('undefined');
+					t_input.addClass('undefined');
+				} else {
+					t_input.text(tData.type);
+				}
+				
 				t_input.removeClass("noval");
 				t_input.prop("disabled", true);
-				f_t_edits(false);
 				td.append(t_input);
 			} else {
 				u_input.hide();
@@ -222,11 +233,12 @@ function paintPage(machineSpecs, toolData) {
 
 			tr.append(td);
 
-			// Number of existing Images
+			// Number of existing Images; even if IMAGES doc does not (yet) exist
+			const len = (tData.files[0] !== undefined) ? tData.files[0].files.length : 0;
 			tr.append(
 				$("<td/>")
 					.attr("id", idStr(link, "count"))
-					.text(tData.files.length)
+					.text(len)
 			);
 
 			// Last columns has two buttons. Only one shows at a time.
@@ -308,33 +320,33 @@ function paintPage(machineSpecs, toolData) {
 		let cell = $(this).parent();
 
 		$("#spin").show();
-		$("#edit_func_type").invisible();
+
 		$("#progress")
 			.show()
 			.text("");
 
-		let id = $(this).attr("id");
+		const id = $(this).attr("id");
 
-		var idFields = id.split("_");
+		const idFields = id.split("_");
 
-		var func = $("#" + idStr(idFields, "function")).val();
-		var type = $("#" + idStr(idFields, "type")).val();
-		var button, turret, position, spindle, offset;
-		[button, turret, position, spindle, offset] = idFields;
+		// var func = $("#" + idStr(idFields, "function")).val();
+		// var type = $("#" + idStr(idFields, "type")).val();
+		let ignore, turret, position, spindle, offset;
+		[ignore, turret, position, spindle, offset] = idFields;
 
-		var tab = SECTION;
+		// var tab = SECTION;
 
-		var files = $(this).get(0).files;
+		const files = $(this).get(0).files;
 
 		if (files.length > 0) {
 			// create a FormData object which will be sent as the data payload in the
 			// AJAX request
-			var formData = new FormData();
+			const formData = new FormData();
 			// add data used to put images in database
-			formData.append("func", func);
-			formData.append("type", type);
+			// formData.append("func", func);
+			// formData.append("type", type);
 			formData.append("key4", KEY4ID); // from cookie
-			formData.append("tab", tab);
+			// formData.append("tab", tab);
 
 			formData.append("turret", turret);
 			formData.append("position", position);
@@ -350,18 +362,18 @@ function paintPage(machineSpecs, toolData) {
 
 			$(".bcolumn > *").toggleClass("hidebuttons");
 			$(cell).toggleClass("stripes");
-			let countField = "#" + idStr(idFields, "count");
+			const countField = "#" + idStr(idFields, "count");
 			$(countField).addClass("stripes");
 
 			new Promise((resolve, reject) => {
 				$.ajax({
-					url: "/upload",
+					url: "/upload_tool_images",
 					type: "post",
 					data: formData,
 					processData: false,
 					contentType: false,
 					xhr: () => {
-						let xhr = new window.XMLHttpRequest();
+						const xhr = new window.XMLHttpRequest();
 						xhr.upload.addEventListener(
 							"progress",
 							uploadProgressHandler,
@@ -380,7 +392,7 @@ function paintPage(machineSpecs, toolData) {
 						reject(error);
 					});
 			}).then(
-				success => {
+				(success) => {
 					$(".bcolumn > *").toggleClass("hidebuttons");
 					$(cell).toggleClass("stripes");
 
@@ -393,13 +405,13 @@ function paintPage(machineSpecs, toolData) {
 						.text("Processing... 100%")
 						.fadeOut("slow");
 					//$('#progress').delay(1000);
-					$("#edit_func_type").visible();
+
 				},
-				error => {
+				(error) => {
 					$(countField).removeClass("stripes");
 					$(".bcolumn > *").toggleClass("hidebuttons");
 					$("#progress").hide();
-					$("#edit_func_type").show();
+
 
 					$(cell).toggleClass("stripes");
 					$("#spin").hide();

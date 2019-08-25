@@ -22,6 +22,8 @@
 	<script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
 		integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
 		crossorigin="anonymous"></script>
+	<link href="/js/ImageViewer-master/imageviewer.css" rel="stylesheet" type="text/css" />
+	<script src="/js/ImageViewer-master/imageviewer_load_fix_113.js"></script>
 
 	<script type="application/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<link rel="stylesheet" href="/css/nav.css" />
@@ -47,15 +49,12 @@
 
 	<navDropDown></navDropDown>
 	<div class="topnav" id="myTopnav"></div>
-	<div id="topOfPage">
-		<div id="pageheader"></div>
-		<button id="switchDefault" class="btn btn-secondary btn-sm">
-			Set as Default
-		</button>
-		<div id="defaultIndicator">Default Image</div>
-	</div>
+
+	<div id="pageheader"></div>
+
 
 	<content>
+
 		<button id="taSave" class="commentsave btn-primary">Save Changed Comment</button>
 		<button id="taCancel" class="commentcancel btn-secondary">Cancel</button>
 		<textarea id="ta" class="comment"></textarea>
@@ -63,7 +62,7 @@
 			data-transition="crossfade" data-max-height="83%" data-max-width="100%">
 		</div>
 	</content>
-	<div id="showterm"></div>
+	<div id="magdiv"><img id="magimg" alt=""/></div>
 </body>
 
 </html>

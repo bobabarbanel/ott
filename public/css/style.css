@@ -39,6 +39,14 @@ a.chosen-single:not(.chosen-default) span {
 	cursor: default;
 }
 
+pageheader {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: center;
+}
+
 #container {
 	padding: 0;
 	margin: 20px;
@@ -149,8 +157,31 @@ li.horiz p {
 	margin: -37px 0 30px 30px;
 }
 
-#delete_job_action, #assign_hi_tools_to_jobs, #terms_edit_action {
+#assign_hi_tools_to_jobs {
 	margin-left: 1em;
+}
+
+#delete_job_action {
+	margin-left: 5.5em;
+}
+
+#terms_edit_action {
+	margin-left: 1em;
+}
+
+.logo {
+	margin: 10px 40px 0px 20px;
+	-webkit-box-shadow: 6px 6px 5px -1px rgba(0, 0, 0, 0.75);
+	-moz-box-shadow: 6px 6px 5px -1px rgba(0, 0, 0, 0.75);
+	box-shadow: 6px 6px 5px -1px rgba(0, 0, 0, 0.75);
+}
+
+#jobinplay {
+	margin-left: 1em;
+	font-size: 18px;
+	font-weight: bold;
+	border: 5px solid #F0AD4E;
+	display: none;
 }
 
 .trash {
@@ -175,6 +206,13 @@ li.horiz p {
 	font-size: 4.5em;
 }
 
+.showtab {
+	font-size: 75%;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
 .qname {
 	padding: 10px;
 }
@@ -185,6 +223,13 @@ li.horiz p {
 
 .qtable .qname {
 	text-align: right;
+}
+#showname {
+	position: absolute;
+	display: none;
+	width: auto;
+	background: lightgrey;
+	z-index: 200;
 }
 
 .shiftd {
@@ -253,13 +298,12 @@ li.horiz p {
 div.menutitle {
 	margin: 30px 0 0 15px;
 	font-size: 20px;
-	background:rgb(158, 193, 240);
+	background: rgb(158, 193, 240);
 	color: black;
 	font-weight: bold;
 	width: 100%;
 	text-align: center;
 }
-
 
 spin {
 	font-size: 54px;
@@ -271,6 +315,7 @@ spin {
 }
 
 /* delete job stats table in confirm dialog */
+
 #delTable {
 	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 	border-collapse: collapse;
@@ -280,6 +325,7 @@ spin {
 	border: 1px solid #ddd;
 	padding: 4px;
 }
+
 #delTable tbody td {
 	text-align: right;
 }

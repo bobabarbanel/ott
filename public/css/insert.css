@@ -71,17 +71,21 @@ button {
 	text-decoration: none;
 	margin-right: 1em;
 }
-
-
+.pnamealert {
+	background: yellow;
+}
 
 #reset {
 	background: blue;
 	color: white;
+	margin-left: 100px;
 }
 
 #submit {
 	background: green;
 	color: white;
+	margin-left: 100px;
+	visibility: hidden;
 }
 
 #reset:hover {
@@ -104,12 +108,13 @@ button {
 }
 
 #insertNotice {
-	margin-top: 2.5em;
+	margin-top: 4em;
 	margin-left: 100px;
 	color: white;
 	width: 400px;
 	font-size: 1.5em;
 	text-align: center;
+	visibility: hidden;
 }
 
 #machine_warning {
@@ -132,4 +137,5 @@ td, th {
 .ins {
 	width: 200px;
 	height: 1.7em;
+	font-size: 14px;
 }

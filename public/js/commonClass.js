@@ -17,9 +17,9 @@ class Common {
 	getKey4_ORDER() {
 		return this.KEY4_ORDER;
 	}
-	getKey5_ORDER() {
-		return this.KEY5_ORDER;
-	}
+	// getKey5_ORDER() {
+	// 	return this.KEY5_ORDER;
+	// }
 
 	getParsedCookie() {
 		this.setCookie();
@@ -61,7 +61,7 @@ class Common {
 		let key5 = this.getParsedCookie();
 		return this.getKeys()
 			.map(key => key5[key])
-			.join(" : ");
+			.join(' <span style="color: brown">|</span> ');
 	}
 
 	getCookieName() {

@@ -24,9 +24,11 @@ content {
 }
 
 .caretmarker {
+    position: relative;
     color: rgb(175, 111, 14);
-    font-size: 40px;
+    font-size: 40px !important;
     cursor: pointer;
+    z-index: 1000;
 }
 
 .tabouter {
@@ -50,15 +52,18 @@ content {
     margin-left: 2em;
     width: 90%;
 }
-
+.yellow {
+    background: yellow;
+}
 .tooldiv {
     display: flex;
     align-items: flex-start;
 }
 
-.toollink {
+.tablink, .toollink {
     margin-left: 30px;
     cursor: pointer;
+    font-size: 25px;
 }
 
 .left {
@@ -91,79 +96,59 @@ content {
     height: 500px;
     display: none;
 }
-
-/*
-.toolTable, .toolTable th, .toolTable td {
-    border: 1px solid black;
-    text-align: center;
+.long {
+    font-size: 85%;
 }
-
-.toolTable tr.colnames {
-    background-color: lightgreen;
-}
-
-.toolTable tr.greyrow {
-    background-color: grey;
-}
-
-.toolTable tr.greyrow th {
-    color: white;
-    width: 100px;
-}
-
-.toolTable tr.slightgrey {
-    background-color: #EEEEEE;
-}
-
-.toolTable tr.nogrey {
-    background-color: white;
-}
-
-.toolTable td.left a:link {
-    text-decoration: none;
-} */
-
 /* tabUL */
 
 .tabUL {
     background: white;
-    width: 60%;
+    width: auto;
     margin-left: 2em;
     margin-top: 1em;
     border: 2px solid lightgreen;
+    padding: 20px;
 }
 
 .sectionRow {
     background-color: #EEEEEE;
 }
 
-.stepRow {
+.stepRowG {
     background: #CCCCCC;
+    cursor: pointer;
+}
+.stepRowW {
+    background: white;
+    cursor: pointer;
 }
 
 /*********/
 
 pageheader {
+    position: relative;
+    left: -1em;
+    padding-left: 30px;
     display: flex;
     align-items: baseline;
     justify-content: flex-start;
-    width: 60%;
-    border-bottom: 2px solid black;
+    width: auto;
+    border: 2px solid black;
+    background:  rgb(175, 203, 204);
 }
-
+.stitle {
+    background: lightgrey;
+}
 .jobTitle {
     margin-left: 7em;
     font-size: 24px;
     font-weight: bold;
 }
 
-.tablink, .sectionlink, .steplink {
-    cursor: pointer;
+.tablink, .sectionlink {
+    cursor: pointer; /* not using as link at this time 8/4/19 */
 }
 
-.tablink {
-    margin-left: 30px;
-}
 
 .bottomborder {
     border-bottom: 1px solid black;

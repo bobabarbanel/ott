@@ -14,7 +14,7 @@ $(function () { // onload
     TV.setDeleteButtons('init');
 
     // Captures click events of all <a> elements with href starting with #
-    $(document).on('click', 'a[href^="#"]', function ( /*event*/ ) {
+    $(document).on('click', 'a[href^="#"]', function ( /*event*/) {
         // Click events are captured before hashchanges. Timeout
         // causes offsetAnchor to be called after the page jump.
         window.setTimeout(function () {
@@ -24,44 +24,52 @@ $(function () { // onload
     $('#doDelete').on('click', callDeleteImages);
     $(TV.floatName).removeClass().addClass('showfloat'); // start with menu not showing
 
-    $('head title', window.parent.document).text("Tools for " + TV.key5.partId);
+    $('head > title', window.parent.document).text("Tools for " + TV.key5.partId);
 
-    Util.setUpTabs(TV.key4id, pageName, {main: true, machine: true, tab: true, spec: true, tabmenus: true}).then(
-        () => {
-            Util.getMachineSpec(TV.key5.machine)
-                .then(machineSpecs => {
-                    getToolImages(false).then((toolData) => {
-                        if (toolData.length === 0) {
-                            alert("No images available.");
-                        } else {
-                            paintPage(machineSpecs, toolData);
-                            startUp();
-                        }
-                    });
-                });
-        });
+    Util.setUpTabs(TV.key4id, pageName,
+        {
+            main: true,
+            machine: true,
+            tab: true,
+            spec: true,
+            tabmenus: true
+        }).then(
+            () => {
+                // Util.getMachineSpec(TV.key5.machine)
+                //     .then(machineSpecs => {
+                        getToolImages(false).then((toolData) => {
+
+                            if (toolData.length === 0) {
+                                alert("No images available.");
+                            } else {
+                                paintPage(toolData);
+                                startUp();
+                            }
+                        });
+                    // });
+            });
 });
 
 function callDeleteImages(ev) {
-    TV.deleteImages(ev,setArchiveForToolImages, listDeleting);
+    TV.deleteImages(ev, setArchiveForToolImages, listDeleting);
 }
 
 const COMMON = new Common();
-function getToolImages(archived) {
-    let data = {
-        "key4id": COMMON.getKey4id(),
-        "tab": pageName,
-        "archived": archived
-    };
+function getToolImages() {
+    //debugLog("getSheetTagsFiles");
     return new Promise((resolve, reject) => {
         $.ajax({
-                url: "/tool_images",
-                type: 'post',
-                data: data,
-                dataType: 'json'
-            })
-            .done((result) => {
-                resolve(result);
+            url: "/sheetTags_new",
+            type: "post",
+            data: {
+                key4id: COMMON.getKey4id(),
+                files: true, // **do** retrieve files/images list
+                images_id: true
+            },
+            dataType: "json"
+        })
+            .done(results => {
+                resolve(results);
             })
             .fail((request, status, error) => reject(error));
     });
@@ -111,7 +119,7 @@ function listDeleting(images) {
     return str;
 }
 
-function paintPage(toolSpecs, toolData) {
+function paintPage(toolData) {
     let links = []; // for float menu
     let pictures = $('pictures');
     let currentTurret = 0;
@@ -121,9 +129,12 @@ function paintPage(toolSpecs, toolData) {
     let curLG = null;
     toolData.forEach(
         item => {
+
             let link = [item.turret, item.position, item.spindle, item.offset].join('_');
             TV.DELETEDIMAGES[link] = []; // empty to start
-            let _id = item._id;
+            // console.log(item, item.files);
+
+            let _id = (item.files.length > 0) ? item.files[0]._id : "none"; // _id of IMAGES linked document
             if (curLG !== null) { // have a group?
                 if (curLG.getStart() !== curLG.getStop()) { // ignore groups with no images
                     curLG.setNext(new LinkGroup(curLG, null, TV.maxImageShowing, null, link));
@@ -137,17 +148,17 @@ function paintPage(toolSpecs, toolData) {
             }
 
             let text = item.position + '-' + item.offset + ") " +
-                item.function+":  " + item.type;
+                item.function + ":  " + item.type;
             let tag = item.position + '-' + item.offset;
 
 
             if (currentTurret !== item.turret || currentSpindle !== item.spindle) {
-                let headText = "Turret" + item.turret + " " + "Spindle" + item.spindle;
+                let headText = "&nbsp;&nbsp;Turret&nbsp;" + item.turret + "&nbsp;&nbsp;&nbsp;&nbsp;" + "Spindle&nbsp;" + item.spindle;
                 let headLink = [item.turret, item.spindle].join('-');
 
                 let anchor = $('<a class="anchor head" id="' + headLink + '"/>');
                 pictures.append(anchor);
-                pictures.append($('<div class="headtext"/>').text(headText));
+                pictures.append($('<div class="headtext"/>').html(headText));
 
                 links.push(['#' + headLink, headText]);
                 // set current values so can detect need for next UL on change
@@ -160,19 +171,30 @@ function paintPage(toolSpecs, toolData) {
             pictures.append(anchor);
             let pic = $('<div class="pic" id="pic' + link + '" collection="' + _id + '">');
             let div = $('<div/>');
-            let p = $('<p/>');
+            let p = $('<p class="boldindent"/>');
 
             let buttonHTML =
-                '<button class="checkAllDel" type="button">' +
-                '&#10004; All</button>';
+                '<button class="checkAllDel" type="button">&#10004; All</button>';
 
-            p.html(buttonHTML + " " + TV.SPACE2 + text);
 
-            div.append(p);
             let pItems = $('<pItems/>');
             //let count = 0;
-            if (item.files.length > 0) {
-                item.files.forEach(
+            if (item.files.length === 0) {
+                let classText = '';
+                if (item.function === "" || item.type === "") {
+                    classText = 'class="noimages"';
+                }
+                p.html(`<span ${classText}>${text} - 0 images</span>`);
+
+                div.append(p);
+                pictures.append(div);
+
+            }
+            else {
+                p.html(buttonHTML + " " + TV.SPACE2 + text);
+
+                div.append(p);
+                item.files[0].files.forEach(
                     (path, index) => {
                         let small = path.dir.replace('/' + pageName + '/',
                             '/' + pageName + '_small/');
@@ -185,7 +207,7 @@ function paintPage(toolSpecs, toolData) {
                         // add handlers for video
                         let img = $('<img/>', {
                             height: "100px",
-                            alt: item.function+": " + item.type,
+                            alt: item.function + ": " + item.type,
                             link: link,
                             tag: item.position + '-' + item.offset,
                             src: small + '/' + path.filename,
@@ -228,21 +250,24 @@ function paintPage(toolSpecs, toolData) {
                 pic.append(div);
                 div.append(pItems);
                 pictures.append(pic);
-            } else {
-                div.append($("<p>" + TV.SPACE2 + "No Images</p>"));
-                pictures.append(div);
             }
 
             curLG.setStop(TV.maxImageShowing);
         });
-    if (curLG.getStart() === curLG.getStop()) {
+
+    if (curLG !== null && (curLG.getStart() === curLG.getStop())) {
         // remove last LG as it is empty
-        curLG.getPrev().setNext(null);
-        curLG = curLG.getPrev();
+        if (curLG.getStop() === null) { // no images at all
+            curLG = null; // new LinkGroup(null, null, 0, null, "");;
+        } else {
+            curLG.getPrev().setNext(null);
+            curLG = curLG.getPrev();
+            // form circle so that UP and DOWN arrows move in continuous circle
+            curLG.setNext(LG);
+            LG.setPrev(curLG);
+        }
     }
-    // form circle so that UP and DOWN arrows move in continuous circle
-    curLG.setNext(LG);
-    LG.setPrev(curLG);
+
 
     $("pictures img").on("click", imgClick);
 
@@ -278,6 +303,7 @@ function paintPage(toolSpecs, toolData) {
 function setArchiveForToolImages(list) {
     // list, a (jq)list of images to be marked as archived in db
     let data = {}; // construct data object for deletion route
+
     list.each(
         (index, img) => {
             let image = $(img);
@@ -287,6 +313,7 @@ function setArchiveForToolImages(list) {
             allIW.wrap.css('display', 'none');
 
             let _id = image.closest('.pic').attr('collection');
+            console.log("list img collection", _id);
             let filename = image.attr('filename');
             if (data[_id] === undefined) {
                 data[_id] = [];
@@ -299,13 +326,13 @@ function setArchiveForToolImages(list) {
 
     return new Promise((resolve, reject) => {
         $.ajax({
-                url: "/archiveToolImages",
-                type: 'post',
-                data: {
-                    "fileinfo": data
-                },
-                dataType: 'json'
-            })
+            url: "/archiveToolImages",
+            type: 'post',
+            data: {
+                "fileinfo": data
+            },
+            dataType: 'json'
+        })
             .done(result => {
                 // alert("setArchiveForImages success: " + JSON.stringify(result));
                 resolve(result);
@@ -331,9 +358,9 @@ function setTitlesForSingle(img) {
 function scrollToElement() {
     const hash = location.hash;
     const jq = $(hash);
-    
-    if(jq.offset()) {
-        let start = jq.offset().top-120;
+
+    if (jq.offset()) {
+        let start = jq.offset().top - 120;
         start = (start > 0) ? start : 0;
         $(window).scrollTop(start).scrollLeft(0);
         $(hash + "+ div").addClass('highlight');
@@ -342,13 +369,13 @@ function scrollToElement() {
 
 function startUp() {
     $('body').on('click', () => $("navDropDown").hide());
-    
-    setTimeout( () => scrollToElement(), 500);
-    
+
+    setTimeout(() => scrollToElement(), 500);
+
     $('.checkAllDel').hide();
-    
-    $('job').text(COMMON.jobTitle());
-    
+
+    $('job').html(COMMON.jobTitle());
+
     //setTimeout(delayedFragmentTargetOffset, 500);
 
     $('#taButtonCancel').on("click", () => {

@@ -9,9 +9,14 @@
     top: 0;
     z-index: 99;
     height: 4em;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    align-items: center;
+    align-content: center;
 }
 
-.topnav a {
+.topnav>a {
     float: left;
     display: block;
     color: #f2f2f2;
@@ -20,8 +25,27 @@
     text-decoration: none;
     font-size: 17px;
     font-family: "Times New Roman", Times, serif;
-   
 }
+
+div.navcontainer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    width: 1000px;
+}
+
+div.navcontainer>a {
+    font-size: 16px;
+    padding: 3px 4px;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    text-decoration: none;
+    font-family: "Times New Roman", Times, serif;
+}
+
 .elevate {
     margin-top: -0.5em
 }
@@ -31,10 +55,9 @@
     margin-left: -1em;
 }
 
-
 /* Change the color of links on hover */
 
-.topnav a:hover, navDropDown a:hover{
+.topnav a:hover, navDropDown a:hover {
     background-color: #ddd;
     color: black;
 }
@@ -52,12 +75,10 @@
     display: none;
 }
 
-
 #home_button {
     color: red;
     padding-right: 0;
 }
-
 
 /* .navButton {
     margin-left: 15%;
@@ -66,9 +87,6 @@
     
     height: 30px;
 } */
-
-
-
 
 #navButtonDiv {
     position: fixed;
@@ -79,7 +97,6 @@
     height: 50px;
     background-color: #333;
 }
-
 
 .navButtons {
     position: absolute;
@@ -102,7 +119,6 @@
     vertical-align: middle;
 }
 
-
 #home_button {
     /* uses image */
     background: transparent;
@@ -116,13 +132,14 @@
 .navButtons {
     display: flex;
 }
+
 .tabaccess {
     text-decoration: none;
 }
+
 .tabaccess_here {
     background: green;
 }
-
 
 /* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
 
@@ -178,37 +195,48 @@ navDropDown {
 }
 
 @media screen and (max-width: 1225px) {
-
     .topnav {
         display: none;
     }
     #navButtonDiv {
         display: block;
     }
-
     navDropDown {
         position: fixed;
         top: 50px;
         left: 50px;
         z-index: 900;
-        width: 86px;
+        /* width: 7em; */
         background-color: #333;
-        color: #f2f2f2;
+        color: white;
         padding: 10px;
         border: 2px solid black;
         flex-direction: column;
-        font-size: 20px;
+        font-size: 14px;
         justify-content: space-evenly;
         align-items: center;
+        flex-wrap: no-wrap;
+        max-width: 15em !important;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
-    navDropDown > * {
+    navDropDown>* {
         padding: 3px;
     }
-    navDropDown .home_link {
+    navDropDown>a {
+        color: white;
+        border-bottom: 1px dotted #ccc;
+        
+        border-bottom-width: 100%;
+    }
+    /* navDropDown .tabaccess_here {
+        background-color: blue;
+    } */
+    navDropDown>.home_link {
         color: red;
     }
     .navDropDownButton {
         display: block;
     }
-
 }

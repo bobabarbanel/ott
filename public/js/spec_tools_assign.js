@@ -23,7 +23,7 @@ function getUrlVars() {
 	}
 	return vars;
 }
-$(function() {
+$(function () {
 	SPEC_TYPE = getUrlVars()["spec_type"]; // 'Hand' or 'Inspection'
 	if (SPEC_TYPE === undefined) {
 		SPEC_TYPE = $("spec_type").text();
@@ -32,7 +32,7 @@ $(function() {
 	spec_type = SPEC_TYPE.toLowerCase() + "_tools"; // hand_tools or inspection_tools
 	$("title").html(`${STYPE} Assign`);
 	const jobTitle = COMMON.jobTitle();
-		
+
 	$("pageheader").append(
 		$(
 			`<h1 class="pageTitle">Assign <u>${STYPE}</u> Terms</h1>
@@ -55,7 +55,37 @@ $(function() {
 				terms.push($(ele).text())
 			);
 			updateJobToolTerms(terms).then(() => {
-				// confirm;
+				$.confirm({
+					title: "Terms Saved for Job",
+					icon: "fas fa-thumbs-up fa-lg",
+					type: "green",
+					content: "",
+					autoClose: "OK|3000",
+					useBootstrap: false,
+					boxWidth: "25%",
+					buttons: {
+						OK: function () {
+
+						}
+					}
+				}),
+					(error) => {
+						$.confirm({
+							title: "Error on Saving Terms for Job",
+							icon: "fas fa-exclamation-triangle fa-lg",
+							type: "red",
+							content: "Contact Supervisor",
+							useBootstrap: false,
+							boxWidth: "25%",
+
+							typeAnimated: true,
+							buttons: {
+								Cancel: function () {
+
+								}
+							}
+						});
+					}
 			});
 		});
 		$("#reset").on("click", e => {
@@ -89,7 +119,7 @@ function setup() {
 			jobTerms[spec_type] = [];
 		}
 		name_counts.forEach(item => {
-			if (!jobTerms[spec_type].includes(item.term)) { // pout "other" terms on left
+			if (!jobTerms[spec_type].includes(item.term)) { //  "other" terms on left
 				const option = $(`<option value="${index++}">${item.term}</option>`);
 				left.append(option);
 			}
@@ -137,8 +167,10 @@ function updateJobToolTerms(terms) {
 				terms: terms
 			}
 		}).done(success => {
-			console.log("updateJobToolTerms", success);
+			// console.log("updateJobToolTerms", success);
 			resolve(success);
+		}).fail((jqXHR, textStatus, errorThrown) => {
+			reject({ error: errorThrown, text: textStatus });
 		});
 	});
 }

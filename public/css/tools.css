@@ -25,10 +25,13 @@ one {
 
 .headtext {
     background: rgb(240, 220, 194);
+    font-weight: bold;
+    font-size: 125%;
+    margin-top: 1em;
 }
 
 job {
-    font-size: 1em;
+    font-size: 130%;
     font-weight: bold;
     overflow-x: hidden;
     overflow-y: hidden;
@@ -224,6 +227,7 @@ pitems {
     justify-content: flex-start;
     flex-wrap: wrap;
     /* max-width:40%; */
+    margin-left: 1em;
     flex-direction: row;
     border-bottom: 1px solid black;
 }
@@ -269,7 +273,13 @@ two {
     flex-direction: row;
     margin-top: 10px;
 }
-
+.noimages {
+    background: rgb(230, 228, 228);
+}
+.boldindent {
+    font-weight: bold;
+    margin-left: 1em;
+}
 single {
     margin-left: 3em;
 }
@@ -339,8 +349,8 @@ div.img-wrap.redborder {
     color:rgba(252, 252, 252, 0.8);;
 }
 #expand {
-    top: 0px;
-    left: 2px;
+    top: 2px;
+    left: 0px;
     cursor: zoom-in;
     color: yellow;
 }

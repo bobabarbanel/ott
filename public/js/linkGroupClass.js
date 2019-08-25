@@ -11,6 +11,7 @@ class LinkGroup {
         this.prev = prev;
         this.next = next;
         this.link = link;
+        console.log({prev, next, start, stop, link});
     }
 
     getPrev() {
@@ -46,5 +47,11 @@ class LinkGroup {
     }
     setStop(n) {
         this.stop = n;
+    }
+    show() {
+        if(prev) { console.log("prev", prev.link);}
+        if(prev) { console.log("next", next.link);}
+        const {start,stop,link} = this;
+        console.log("\t", {start, stop, link});
     }
 }

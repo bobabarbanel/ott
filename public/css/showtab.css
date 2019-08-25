@@ -1,4 +1,5 @@
 /* showtab.css */
+
 body>title {
     font-size: 32px;
     color: black;
@@ -30,6 +31,8 @@ one {
 }
 
 job {
+    margin-top: .5em;
+    margin-bottom: .5em;
     font-size: 1.3em;
     font-weight: bold;
     overflow-x: hidden;
@@ -84,6 +87,12 @@ pictures {
     text-decoration: none;
 }
 
+.tabname {
+    /* font-size: 1.3em; */
+    font-weight: bold;
+    background: rgb(194, 225, 240);
+}
+
 .headtext {
     background: rgb(240, 220, 194);
     margin-top: 1em;
@@ -92,6 +101,7 @@ pictures {
     display: flex;
     align-items: center;
 }
+
 .showfloat {
     display: none;
 }
@@ -118,6 +128,11 @@ pitems {
     color: #222;
     font-size: 1.0em;
     font-weight: bold;
+}
+
+.stepSpan_sm {
+    font-size: 80%;
+    border-bottom: 1px solid black;
 }
 
 div.img-wrap.redborder {
@@ -165,6 +180,7 @@ button.floatButton {
 .highlight {
     background: rgb(240, 240, 131);
 }
+
 .wide {
     display: none;
 }
@@ -233,30 +249,37 @@ singleFlexC {
     position: relative;
     top: 25px;
 }
+
 #out_single span {
     position: absolute;
     z-index: 99;
 }
+
 .direction {
     cursor: pointer;
-    color:rgba(252, 252, 252, 0.8);;
+    color: rgba(252, 252, 252, 0.8);
+    ;
 }
+
 #expand {
-    top: 0px;
-    left: 2px;
+    top: 2px;
+    left: 0px;
     cursor: zoom-in;
     color: yellow;
 }
 
-#left {  
+#left {
     left: -2px;
 }
+
 #right {
-    right: -2px;  
+    right: -2px;
 }
+
 #up {
     top: -18px;
 }
+
 #down {
     bottom: -10px;
 }
@@ -265,6 +288,7 @@ singleFlexC {
     margin-top: -32px;
     display: inline-block;
 }
+
 .wide {
     display: none;
 }
@@ -292,9 +316,11 @@ singleFlexC {
     left: 400;
     z-index: 300;
 }
+
 .floathead {
     padding-right: 1em;
 }
+
 .floattag {
     padding-left: 1em;
     padding-right: 1em;
@@ -307,6 +333,7 @@ singleFlexC {
 .deleting {
     border: 3px solid red;
 }
+
 #delButtons {
     display: flex;
     justify-content: space-around;
@@ -341,35 +368,44 @@ singleFlexC {
     font-weight: bold;
 }
 
+span.jobtitle {
+    margin-left: 2em;
+}
+
+.tabstyle {
+    color: red;
+}
+
+.sectionstyle {
+    color: rgb(35, 110, 103);
+}
+
+.stepstyle {
+    color: blue;
+}
 
 @media screen and (max-width: 1225px) {
-
     single {
         position: relative;
     }
-
     container {
         flex-direction: column;
         padding-top: 80px;
     }
-
     two {
         order: 0;
         margin-top: 30px;
     }
-
     one {
         order: 1;
         width: 100%;
     }
-
     #deleteMenu {
         position: fixed;
         top: 20px;
         left: 100px;
         width: 340px;
     }
-
     .navDropDownButton {
         display: block;
     }

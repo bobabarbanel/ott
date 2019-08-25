@@ -35,6 +35,12 @@ function fileRef(aDir, aFname) {
 
 module.exports = function (dir, app, db) {
 	// app.use(logger);
+	const TERM_IMAGES = db.collection("term_images");
+	const PROGRESS = db.collection('progress');
+	const SPEC_TERMS = db.collection("spec_terms");
+	const TAB_IMAGES = db.collection("tab_images");
+	const TABS = db.collection("tabs");
+	const IMAGES = db.collection("images");
 
 	function calcFullTargetDir(machine, section) {
 		// Directory path determined using first+second letter of Machine name,
@@ -150,7 +156,7 @@ module.exports = function (dir, app, db) {
 					.write(toMedium); // save medium image
 			});
 		});
-		db.collection("spec_terms")
+		SPEC_TERMS
 			.updateOne(
 				{ _id: tab, "terms.term": term },
 				{ $push: { "terms.$.files": { $each: fileRefs } } }
@@ -168,7 +174,7 @@ module.exports = function (dir, app, db) {
 				}
 			);
 	}
-	
+
 	function processTermUploads(
 		type,
 		term,
@@ -181,7 +187,7 @@ module.exports = function (dir, app, db) {
 		res
 	) {
 		const fileRefs = [];
-		
+
 		myFiles.forEach((aFile, index) => {
 			const fileName = aFile.name;
 			const tail = fileName.substring(fileName.lastIndexOf(".")); // just the file type
@@ -221,7 +227,7 @@ module.exports = function (dir, app, db) {
 					.write(toMedium); // save medium image
 			});
 		});
-		db.collection("term_images")
+		TERM_IMAGES
 			.updateOne(
 				{ type: type, term: term },
 				{ $push: { files: { $each: fileRefs } } }
@@ -248,39 +254,40 @@ module.exports = function (dir, app, db) {
 		tailnum,
 		numberOfFiles,
 		myFiles,
-		idirs,
+		[ftdLarge, ftdMedium, ftdSmall],
 		executionDir,
 		res
 	) {
-		let ftdLarge, ftdMedium, ftdSmall;
-		[ftdLarge, ftdMedium, ftdSmall] = idirs;
-		// let key4id = ["dept", "partId", "op", "machine"]
-		// 	.map(k => key4[k])
-		// 	.join("|"); // can we use common somehow??
+		// console.log({
+		// 	tailnum,
+		// 	numberOfFiles
+		// });
+
+
 		uploadCount = 0;
 		myFiles.forEach((aFile, index) => {
-			let fileName = aFile.name;
-			// console.log(index + "> " + fileName);
-			let tail = fileName.substring(fileName.lastIndexOf(".")); // file type
+			const fileName = aFile.name;
+			// console.log("myFiles", index + "> " + fileName);
+			const tail = fileName.substring(fileName.lastIndexOf(".")); // file type
 			//  public/images/Tools_large/img/MLetter/Lathe_A251A4802-1_30_LC40-2A_10_10.jpg,
-			let ffn = base + "_" + pad4(tailnum + index) + tail; // _ + 0001 + ".jpg" file
-			let toLarge = path.normalize(
+			const ffn = base + "_" + pad4(tailnum + index) + tail; // + _ + 0001 + ".jpg" file
+			const toLarge = path.normalize(
 				addWebSitePublic(executionDir, ftdLarge, ffn)
 			);
 			// now 'toLarge' is our _large target full path
 			// save original large image in _large directory
 			fs.renameSync(aFile.path, toLarge);
 			Jimp.read(toLarge).then(image => {
-				let img = image.clone();
+				const img = image.clone();
 				// create _small version of image in Tools_small
-				let toSmall = path.normalize(
+				const toSmall = path.normalize(
 					addWebSitePublic(executionDir, ftdSmall, ffn)
 				);
 				img
 					.resize(Jimp.AUTO, 100) // resize height 100
 					.quality(99) // set JPEG quality
 					.write(toSmall); // save small image
-				let toMedium = path.normalize(
+				const toMedium = path.normalize(
 					addWebSitePublic(executionDir, ftdMedium, ffn)
 				);
 				// create medium sized image in /Tools
@@ -289,27 +296,32 @@ module.exports = function (dir, app, db) {
 					.quality(99) // set JPEG quality
 					.write(toMedium); // save medium image
 				// update Mongo entry for this job
-				let query = {
+				const query = {
 					// use id for finding document
 					_id: _id
 				};
-				let updates = {
+				// console.log("query",query);
+				const updates = {
 					// adding one file reference
 					$push: {
 						files: fileRef(ftdMedium, ffn)
 					}
 				};
-				let key4query = {
+				// console.log("updates",updates);
+				const key4query = {
 					_id: key4id
 				};
+				//TODO: remove collection
 				// the actual updates of filerefs in the iamges collection
-				let promise = db.collection("images").findOneAndUpdate(query, updates);
+
+				let promise = IMAGES.findOneAndUpdate(query, updates);
 				promise.then(
-					() => {
+					(doc) => {
+						// console.log("\nIMAGES.findOneAndUpdate",doc);
 						// progress reporting
 						if (++uploadCount === numberOfFiles) {
 							// console.log("***uploadRouter " + uploadCount + " " + numberOfFiles + " : " + key4id);
-							db.collection("progress")
+							PROGRESS
 								.findOneAndUpdate(
 									key4query,
 									{
@@ -330,7 +342,7 @@ module.exports = function (dir, app, db) {
 								});
 						} else {
 							// can we not clear the counter here??
-							db.collection("progress")
+							PROGRESS
 								.findOneAndUpdate(
 									key4query,
 									{
@@ -371,6 +383,8 @@ module.exports = function (dir, app, db) {
 	) {
 		// result from route
 		// debugLog("tab_processUploads", "true");
+
+		tab_uploadCount = 0;
 		let key4query = {
 			_id: key4id
 		};
@@ -432,15 +446,15 @@ module.exports = function (dir, app, db) {
 							// progress reporting
 							if (++tab_uploadCount === numberOfFiles) {
 								// finished
-								console.log(
-									"***uploadRouter " +
-									uploadCount +
-									" " +
-									numberOfFiles +
-									" : " +
-									key4id
-								);
-								db.collection("progress")
+								// console.log(
+								// 	"***uploadRouter " +
+								// 	uploadCount +
+								// 	" " +
+								// 	numberOfFiles +
+								// 	" : " +
+								// 	key4id
+								// );
+								PROGRESS
 									.findOneAndUpdate(
 										key4query,
 										{
@@ -466,7 +480,7 @@ module.exports = function (dir, app, db) {
 							} else {
 								// in progress
 
-								db.collection("progress")
+								PROGRESS
 									.findOneAndUpdate(
 										key4query,
 										{
@@ -500,7 +514,8 @@ module.exports = function (dir, app, db) {
 
 	function updateTabImages(key4id, fileRefs) {
 		// returns a promise
-		return db.collection("tab_images").updateOne(
+
+		return TAB_IMAGES.updateOne(
 			{
 				_id: key4id
 			},
@@ -515,7 +530,8 @@ module.exports = function (dir, app, db) {
 	}
 
 	app.get("/get_progress/:_id", (req, res) => {
-		db.collection("progress")
+
+		PROGRESS
 			.findOne(req.params)
 			.then(
 				v => {
@@ -531,8 +547,9 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.get("/clear_progress/:_id", (req, res) => {
-		debugLog("clear ", true);
-		db.collection("progress")
+		// debugLog("clear ", true);
+
+		PROGRESS
 			.deleteOne(req.params)
 			.then(
 				v => {
@@ -548,10 +565,12 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/archiveToolImages", (req, res) => {
-		let col = db.collection("images");
+
+
 		let promises = Object.keys(req.body.fileinfo).map(identifier => {
 			let p = new Promise((resolve, reject) => {
 				let _id = new ObjectId(identifier);
+				console.log('/archiveToolImages', identifier);
 				let filenames = req.body.fileinfo[identifier];
 
 				let query = {
@@ -573,7 +592,7 @@ module.exports = function (dir, app, db) {
 						}
 					]
 				};
-				col
+				IMAGES
 					.updateMany(query, update, other)
 					.then(result => resolve(result), error => reject(error));
 			});
@@ -599,7 +618,8 @@ module.exports = function (dir, app, db) {
 	//     console.log(name + ': ' + JSON.stringify(obj));
 	// }
 	app.post("/archiveTabImages", (req, res) => {
-		db.collection("tab_images")
+
+		TAB_IMAGES
 			.updateOne(
 				{
 					_id: req.body.job_id
@@ -636,7 +656,8 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/unArchiveTabImages", (req, res) => {
-		db.collection("tab_images")
+
+		TAB_IMAGES
 			.updateOne(
 				{
 					_id: req.body.job_id
@@ -673,7 +694,7 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/unArchiveToolImages", (req, res) => {
-		let col = db.collection("images");
+
 		let promises = Object.keys(req.body.fileinfo).map(identifier => {
 			let p = new Promise((resolve, reject) => {
 				let _id = new ObjectId(identifier);
@@ -698,7 +719,7 @@ module.exports = function (dir, app, db) {
 						}
 					]
 				};
-				col
+				IMAGES
 					.updateMany(query, update, other)
 					.then(result => resolve(result), error => reject(error));
 			});
@@ -719,7 +740,7 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/updateImageComment", (req, res) => {
-		db.collection("images")
+		IMAGES //TODO: remove collection
 			.updateOne(
 				{
 					_id: new ObjectId(req.body._id)
@@ -784,7 +805,7 @@ module.exports = function (dir, app, db) {
 			}
 		};
 
-		db.collection("images")
+		IMAGES //TODO: remove collection
 			.update(query, updates)
 			.then(
 				doc => {
@@ -798,8 +819,7 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/countImages", (req, res) => {
-		let myPromise = db
-			.collection("images")
+		let myPromise = IMAGES //TODO: remove collection
 			.aggregate([
 				{
 					$match: {
@@ -832,13 +852,15 @@ module.exports = function (dir, app, db) {
 			err => res.json(err)
 		);
 	});
-	// rma test
-	// let numberOfFiles;
-	let tab_numberOfFiles;
-	//
-	let numberOfFiles;
 
-	app.post("/upload", (req, res) => {
+	let tab_numberOfFiles;
+	let numberOfFiles;
+	function asNumber(fields, key) {
+		return typeof fields[key] === "string"
+			? parseInt(fields[key])
+			: fields[key];
+	}
+	app.post("/upload_tool_images", (req, res) => {
 		// be sure we have /images directory
 		ensureDirectories(SECTION);
 
@@ -848,35 +870,17 @@ module.exports = function (dir, app, db) {
 
 		form.parse(req, function (err, fields, files) {
 			let key4id = fields["key4"];
-			const pieces = key4id.split('|');
-			// const dept = pieces[0];
-			const partId = pieces[1];
-			const op = pieces[2];
-			const machine = pieces[3];
 
-			let turret =
-				typeof fields["turret"] === "string"
-					? parseInt(fields["turret"])
-					: fields["turret"];
-			let spindle =
-				typeof fields["spindle"] === "string"
-					? parseInt(fields["spindle"])
-					: fields["spindle"];
-			let position =
-				typeof fields["position"] === "string"
-					? parseInt(fields["position"])
-					: fields["position"];
-			let offset =
-				typeof fields["offset"] === "string"
-					? parseInt(fields["offset"])
-					: fields["offset"];
-			let tab = fields["tab"];
+			const [dept, partId, op, machine] = key4id.split('|');
+			// dept always is DEPT
 
-			// let mongoKey4 = key4id; //[key4.dept, key4.partId, key4.op, key4.machine].join("|");
+			const turret = asNumber(fields, "turret");
+			const spindle = asNumber(fields, "spindle");
+			const position = asNumber(fields, "position");
+			const offset = asNumber(fields, "offset");
 
 			let query = {
 				key4: key4id,
-				tab: tab,
 				position: position,
 				offset: offset,
 				turret: turret,
@@ -906,25 +910,58 @@ module.exports = function (dir, app, db) {
 			});
 
 			// transaction ??
-			let promise = db.collection("images").findOneAndUpdate(query, {
-				$inc: {
-					nextNum: numberOfFiles
+			//TODO: remove collection
+			let promise = IMAGES.findOneAndUpdate(query,
+				{
+					$inc: {
+						nextNum: numberOfFiles
+					},
+				},
+				{
+					upsert: true,
+					returnOriginal: true,
 				}
-			});
-			// const key4 = {};
-			// const pieces = key4id.split('|');
-			// key["dept"] = pieces[0];
-			// key["partId"] = pieces[1];
-			// key["op"] = pieces[2];
-			// key["machine"] = pieces[3];
+			);
 
 			promise.then(
-				doc => {
+				(doc) => {
+					// console.log("doc", doc);
+
+					let nextNum;
+					// if (doc.lastErrorObject) { // if we have new doc
+					// 	// console.log("new doc _id", doc.lastErrorObject.upserted);
+					// 	_id = doc.lastErrorObject.upserted;
+					// 	nextNum = 0; // important: first image of this group must get number zero
+					// } else {
+					// 	// console.log("old doc _id", doc.value._id);
+					let _id;
+					if (doc.lastErrorObject !== undefined
+						&&
+						doc.lastErrorObject.updatedExisting === false) {
+						// console.warn('1 updatedExisting', false);
+						nextNum = 0;
+						_id = doc.lastErrorObject.upserted;
+						// console.warn('_id', _id);
+					} else {
+						// console.warn('2 updatedExisting', true);
+						nextNum = doc.value.nextNum;
+						_id = doc.value._id;
+					}
+					// nextNum = doc.value.nextNum;
+					// console.log("*******setting nextNum", nextNum);
+					// }
 					processUploads(
 						key4id,
-						doc.value._id,
-						calcFullTargetBaseFileName(partId, op, machine, turret, position, spindle, offset),
-						doc.value.nextNum, // critical: the starting number for files to make unique
+						_id, // for quick access to same document
+						calcFullTargetBaseFileName(
+							partId,
+							op,
+							machine,
+							turret,
+							position,
+							spindle,
+							offset),
+						nextNum, // critical: the starting number for files to make unique
 						numberOfFiles,
 						myFiles,
 						[ftdLarge, ftdMedium, ftdSmall],
@@ -967,20 +1004,42 @@ module.exports = function (dir, app, db) {
 			ftdLarge = `${ftdMedium}_large`;
 			ftdSmall = `${ftdMedium}_small`;
 
-			let promise = db.collection("spec_terms").findOneAndUpdate(query, {
+			let promise = SPEC_TERMS.findOneAndUpdate(query, {
 				$inc: {
 					nextNum: numberOfSpecFiles
 				}
-			});
+			},
+				{
+					upsert: true,
+					returnOriginal: true,
+				}
+
+			);
 			promise.then(
 				doc => {
-					// console.log(doc.value.nextNum);
-
+					console.log(doc);
+					let nextNum;
+					
+					let _id;
+					if (doc.lastErrorObject !== undefined
+						&&
+						doc.lastErrorObject.updatedExisting === false) {
+						console.warn('1 updatedExisting', false);
+						nextNum = 0;
+						_id = doc.lastErrorObject.upserted;
+						console.warn('_id', _id);
+					} else {
+						console.warn('2 updatedExisting', true);
+						nextNum = doc.value.nextNum;
+						_id = doc.value._id;
+					}
+					console.log({_id,nextNum});
+					
 					processSpecUploads(
 						fields.tab,
 						fields.term,
 						numberOfSpecFiles,
-						doc.value.nextNum, // start number for tails
+						nextNum, // start number for tails
 						myFiles,
 						[ftdSmall, ftdMedium, ftdLarge],
 						dir,
@@ -1018,13 +1077,13 @@ module.exports = function (dir, app, db) {
 			}
 			//let numberOfFiles = myFiles.length;
 			numberOfTermFiles = myFiles.length;
-			
+
 			let ftdMedium, ftdSmall, ftdLarge;
 			ftdMedium = `${TARGETHEADSTRING}/${DIRNAME}/${fields.type}`;
 			ftdLarge = `${ftdMedium}_large`;
 			ftdSmall = `${ftdMedium}_small`;
 
-			let promise = db.collection("term_images").findOneAndUpdate(query, {
+			let promise = TERM_IMAGES.findOneAndUpdate(query, {
 				$inc: {
 					nextNum: numberOfTermFiles
 				}
@@ -1038,7 +1097,7 @@ module.exports = function (dir, app, db) {
 						// there were no images before, make first file the default
 						newTerm = true;
 					}
-					console.log("/term_upload first Term files", newTerm, doc.value);
+					// console.log("/term_upload first Term files", newTerm, doc.value);
 					processTermUploads(
 						fields.type,
 						fields.term,
@@ -1050,8 +1109,8 @@ module.exports = function (dir, app, db) {
 						newTerm, // true if this term had no images before
 						res
 					);
-					
-					
+
+
 				},
 				err => console.error(err)
 			);
@@ -1060,8 +1119,7 @@ module.exports = function (dir, app, db) {
 
 	app.post("/imagefiles", (req, res) => {
 		let rq = req.body;
-		let myPromise = db
-			.collection("images")
+		let myPromise = IMAGES //TODO: remove collection
 			.aggregate([
 				{
 					$match: {
@@ -1125,7 +1183,7 @@ module.exports = function (dir, app, db) {
 				files: [],
 				nextNum: 1
 			};
-			db.collection("images")
+			IMAGES //TODO: remove collection
 				.insert(doc)
 				.then(
 					() =>
@@ -1155,7 +1213,7 @@ module.exports = function (dir, app, db) {
 				}
 			};
 
-			db.collection("images")
+			IMAGES //TODO: remove collection
 				.findOneAndUpdate(doc, update, {
 					upsert: false, // if cannot find, do not create a new document
 					returnNewDocument: true // return new doc
@@ -1191,7 +1249,7 @@ module.exports = function (dir, app, db) {
 			files: []
 		};
 
-		db.collection("images")
+		IMAGES //TODO: remove collection
 			.insertOne(document)
 			.then(
 				result => {
@@ -1217,26 +1275,18 @@ module.exports = function (dir, app, db) {
 
 		convertImageIds(doc); // modify the doc inserting Object Ids for new images_id fields
 
-		const tabsCollection = db.collection("tabs");
-		const tab_imagesCollection = db.collection("tab_images");
-
-		let myPromise = tabsCollection.replaceOne(query, doc, {
+		let myPromise = TABS.replaceOne(query, doc, {
 			upsert: true // will create new tabs document if not found by key4id
 		});
 		myPromise.then(
 			r => {
 				// TODO: enclose this update in a Xact and create a NumberInt() and use for $setOnInsert
-				tab_imagesCollection
+				TAB_IMAGES
 					.updateOne(
 						{
 							_id: doc._id
 						},
 						{
-							// $addToSet: {
-							//     stepFiles: {
-							//         $each: newStepFiles
-							// }
-							// },
 							$setOnInsert: {
 								nextStepNum: 1,
 								stepFiles: []
@@ -1361,7 +1411,7 @@ module.exports = function (dir, app, db) {
 				}
 			});
 
-			let inc_promise = db.collection("tab_images").findOneAndUpdate(
+			let inc_promise = TAB_IMAGES.findOneAndUpdate(
 				query,
 				{
 					$inc: {
@@ -1442,7 +1492,8 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/countTabImages", (req, res) => {
-		db.collection("tab_images")
+
+		TAB_IMAGES
 			.aggregate([
 				{
 					$match: /** * query - The query in MQL. */ {

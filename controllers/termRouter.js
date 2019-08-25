@@ -44,7 +44,7 @@ const colNames = [
 	"Mori Seiki_Command Point",
 	"Okuma_TNRC X",
 	"Okuma_TNRC Z",
-	"Misc Info****",
+	"Misc Info",
 	"Restart_N#",
 	"Turret_Model Holder",
 	"Collet_Size/Model",
@@ -58,40 +58,44 @@ module.exports = function (dir, app, db) {
 		console.log(new Date(), req.method, req.url);
 		next();
 	}
-	const MAIN_TABLE_COLLECTION = db.collection("main_table");
-	const TERM_IMAGES_COLLECTION = db.collection("term_images");
+	const MAIN_TABLE = db.collection("main_table");
+	const MAIN = db.collection("main");
+	const TERM_IMAGES = db.collection("term_images");
+	const SPEC_TERMS = db.collection("spec_terms");
 
-	function createMainTable(result, { main, machineSpecs }, res) {
-		const doc = {
+	function createMainTable({ main, machineSpecs }, res) {
+		console.log({ main, machineSpecs });
+		const main_table_doc = {
 			_id: main._id,
 			rows: []
 		};
+
 		["Turret1", "Turret2"].forEach(turretStr => {
 			if (machineSpecs[turretStr] !== undefined) {
-				doRows(doc.rows, machineSpecs, turretStr, "Spindle1");
+				doRows(main_table_doc.rows,
+					machineSpecs,
+					turretStr, "Spindle1"
+				);
 				if (machineSpecs[turretStr].Spindle2 !== undefined) {
-					doRows(doc.rows, machineSpecs, turretStr, "Spindle2");
+					doRows(main_table_doc.rows,
+						machineSpecs,
+						turretStr, "Spindle2"
+					);
 				}
 			}
 		});
-		// save doc
-		MAIN_TABLE_COLLECTION.insertOne(doc)
-			.then(() => {
-				// console.log("new main_table for", doc._id);
-				res.json(result);
-			})
-			.catch(reason => {
-				console.error(reason);
-				res.status(500).send({
-					error: reason
-				});
-			});
+		MAIN_TABLE.insertOne(main_table_doc).then(
+			(result) => res.json(result),
+			(error) => res.status(500).json({ "error": error })
+		)
+
 	}
+
 	function numsOf(str) {
 		return parseInt(str.replace(/[^\d]/g, ""));
 	}
 
-	function doRows(rows, specs, turretStr, spindleStr) {
+	function doRows(main_table_rows, specs, turretStr, spindleStr) {
 		let lowT = parseInt(specs[turretStr].range[0]);
 		let highT = parseInt(specs[turretStr].range[1]);
 		let lowS = parseInt(specs[turretStr][spindleStr][0]);
@@ -99,34 +103,36 @@ module.exports = function (dir, app, db) {
 		let numS = numsOf(spindleStr);
 
 		for (
-			var position = lowT, offset = lowS;
+			let position = lowT, offset = lowS;
 			position <= highT;
 			position++ , offset++
 		) {
-			const array = new Array(colNames.length);
-			array.fill(""); // all terms initially empty
-			rows.push({
+			const colArray = new Array(colNames.length);
+			colArray.fill(""); // all terms initially empty
+			main_table_rows.push({
 				turret: numT,
 				spindle: numS,
 				position: position,
 				offset: offset,
 				function: "", // initially empty
 				type: "", // initially empty
-				cols: array
+				cols: colArray
 			});
 		}
 	}
 
 	app.post("/addkey", (req, res) => {
 		req.body.lastUpdated = new Date(); // timestamp for jobs
-		db.collection("main")
+		MAIN
 			.insertOne(req.body.main)
-			.then(result => {
-				return createMainTable(result, req.body, res);
-			})
-			.catch(reason => {
-				res.send({
-					error: reason
+			.then(
+				() => {
+					createMainTable(req.body, res);
+				}
+			)
+			.catch(error => {
+				res.status(500).json({
+					error: error
 				});
 			});
 	});
@@ -134,7 +140,7 @@ module.exports = function (dir, app, db) {
 	app.post("/terms/getMainTable", (req, res) => {
 		const key4id = req.body.key4id;
 		// console.log(key4id);
-		MAIN_TABLE_COLLECTION.findOne(
+		MAIN_TABLE.findOne(
 			{
 				_id: key4id
 			},
@@ -149,11 +155,24 @@ module.exports = function (dir, app, db) {
 		);
 	});
 
+	app.get("/terms/getAllMainTable", (req, res) => {
+		// const key4id = req.body.key4id;
+		// console.log(key4id);
+		const cursor = MAIN_TABLE.find({});
+
+		const results = [];
+		cursor.forEach(
+			(item, index) => { if (index < 10) results.push(item); }
+		)
+
+		res.json(results);
+	});
+
 
 
 	app.get("/terms/getSuggestions", (req, res) => {
 		try {
-			TERM_IMAGES_COLLECTION.aggregate(
+			TERM_IMAGES.aggregate(
 				[
 					// Stage 0 - exclude archived terms
 					{
@@ -205,7 +224,7 @@ module.exports = function (dir, app, db) {
 		const af = {};
 		af[`elem.${req.params.which}`] = req.body.previous;
 		console.log('replace_singles', { setItem, af });
-		MAIN_TABLE_COLLECTION.updateMany(
+		MAIN_TABLE.updateMany(
 			{}, // query (all)
 			{ $set: setItem },
 			{ arrayFilters: [af], multi: true }
@@ -231,7 +250,7 @@ module.exports = function (dir, app, db) {
 	app.post("/terms/replace_others", async (req, res) => {
 		let count = 0;
 		try {
-			const allDocs = await MAIN_TABLE_COLLECTION.find({
+			const allDocs = await MAIN_TABLE.find({
 				"rows.cols": { $elemMatch: { $eq: req.body.previous } }
 			}).toArray();
 			// console.log("replace_others");
@@ -251,7 +270,7 @@ module.exports = function (dir, app, db) {
 				});
 
 				if (changed) {
-					promises.push(MAIN_TABLE_COLLECTION.updateOne(
+					promises.push(MAIN_TABLE.updateOne(
 						{ _id: doc._id },
 						{ $set: { rows: doc.rows } }
 					));
@@ -298,7 +317,7 @@ module.exports = function (dir, app, db) {
 			_id: req.body.key4id
 		};
 		// console.dir(query);
-		MAIN_TABLE_COLLECTION.updateOne(
+		MAIN_TABLE.updateOne(
 			query, // one job id
 			update, // single field set new value
 			af
@@ -320,27 +339,27 @@ module.exports = function (dir, app, db) {
 
 
 	app.post("/terms/get_term_image_filerefs", (req, res) => {
-		const {type, term} = req.body;
+		const { type, term } = req.body;
 		// console.log('get_term_image_filerefs',req.body);
 		try {
 
-			TERM_IMAGES_COLLECTION.aggregate(
+			TERM_IMAGES.aggregate(
 				[{
 					$match:
-						{ 
-							type: type, 
-							term: term, 
-							archived: { $exists: false } 
-						}
+					{
+						type: type,
+						term: term,
+						archived: { $exists: false }
+					}
 				},
 				{
 					$project:
-						{ 
-							_id: 0, 
-							type: 0, 
-							term: 0, 
-							nextNum: 0 
-						}
+					{
+						_id: 0,
+						type: 0,
+						term: 0,
+						nextNum: 0
+					}
 				},
 				{
 					$project:
@@ -373,7 +392,7 @@ module.exports = function (dir, app, db) {
 	app.post("/terms/set_term_primary", (req, res) => {
 		const { type, term, filename, dir } = req.body;
 		// console.log(req.body);
-		TERM_IMAGES_COLLECTION.findOne({
+		TERM_IMAGES.findOne({
 			type: type,
 			term: term,
 			archived: { $exists: false }
@@ -392,7 +411,7 @@ module.exports = function (dir, app, db) {
 			});
 
 			try {
-				TERM_IMAGES_COLLECTION.replaceOne(
+				TERM_IMAGES.replaceOne(
 					{ type: type, term: term },
 					doc,
 					{ upsert: true }
@@ -408,9 +427,78 @@ module.exports = function (dir, app, db) {
 			}
 		});
 	});
+
+	app.post("/terms/set_spec_term_primary", (req, res) => {
+		const { type, term, filename, dir } = req.body;
+
+		try {
+			SPEC_TERMS.aggregate([
+				{
+					$match:
+					{
+						_id: type.toLowerCase() + "_tools"
+					}
+				},
+				{
+					$project:
+					{
+						terms: {
+							$filter: {
+								input: "$terms",
+								as: "item",
+								cond:
+									{ $eq: ["$$item.term", term] }
+							}
+						}
+					}
+				}]).toArray().then(
+
+					(docs) => {
+						// move primary marker to correct aRef
+						docs[0].terms[0].files.forEach((aRef, index) => {
+							if (aRef.dir !== dir || aRef.filename !== filename) {
+								delete aRef.primary; // remove any previous
+							} else {
+								aRef.primary = true; // set one primary
+							}
+						});
+
+						try {
+							// replace term in spec_terms collection
+							SPEC_TERMS.updateOne(
+								{ _id: type.toLowerCase() + "_tools" },
+								{
+									$set: {
+										"terms.$[item]": docs[0].terms[0]
+									}
+								},
+								{
+									arrayFilters: [{
+										"item.term": term
+									}
+									]
+								}
+
+							).then(
+								(success) => {
+									return res.json(success);
+								}
+							);
+
+						} catch (error) {
+							return res.status(500).json(error);
+						}
+
+					}
+				);
+		} catch (error) {
+			return res.status(500).json(error);
+		}
+	});
+
 	app.get('/terms/getTermImageCounts', (req, res) => {
 		try {
-			TERM_IMAGES_COLLECTION.aggregate(
+			TERM_IMAGES.aggregate(
 				[
 					{
 						$match:
@@ -419,6 +507,9 @@ module.exports = function (dir, app, db) {
 					{
 						$project:
 							{ count: { $size: "$files" }, term: 1, type: 1, _id: 0 }
+					},
+					{
+						$sort: { type: 1, term: 1 }
 					}
 				]
 			).toArray().then(
@@ -437,7 +528,7 @@ module.exports = function (dir, app, db) {
 		const { type, term } = req.body;
 		console.log('create_term_images', { type, term });
 		try {
-			TERM_IMAGES_COLLECTION.insertOne(
+			TERM_IMAGES.insertOne(
 				{
 					type: type,
 					term: term,
@@ -445,6 +536,7 @@ module.exports = function (dir, app, db) {
 					nextNum: 1
 				}).then(
 					(insert_result) => {
+						// NOTE: should never fail due to duplicate; checked before invocation
 						console.log('create_term_images result', insert_result.result);
 						res.json(insert_result.result);
 					}
@@ -461,7 +553,7 @@ module.exports = function (dir, app, db) {
 		// console.clear();
 		// console.log('replace_term_images', { type, term, previous });
 		try {
-			TERM_IMAGES_COLLECTION.updateOne(
+			TERM_IMAGES.updateOne(
 				{
 					type: type,
 					term: previous,
@@ -482,9 +574,10 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post('/terms/remove_term_image', (req, res) => {
+		// TOODO: remove terms from main_table also
 		const { type, term } = req.body;
 		try {
-			TERM_IMAGES_COLLECTION.updateOne(
+			TERM_IMAGES.updateOne(
 				{
 					type: type,
 					term: term
@@ -494,7 +587,10 @@ module.exports = function (dir, app, db) {
 				}).then(
 					(update_result) => {
 						// console.log('remove_term_image update result', update_result);
-						res.json(update_result);
+						remove_term_main_table(type, term).then(
+							(done) => res.json(update_result)
+						);
+
 					});
 		}
 		catch (e) {
@@ -503,22 +599,62 @@ module.exports = function (dir, app, db) {
 		}
 	});
 
-	// app.get('/terms/get_term_image_pairs', (req, res) => {
-	// 	try {
-	// 		TERM_IMAGES_COLLECTION.aggregate(
-	// 			[
-	// 				{
-	// 					$project: { _id: 0, files: 0 }
-	// 				}
-	// 			]
-	// 		).toArray().then(
-	// 			results => res.json(results)
-	// 		);
+	function remove_term_main_table(fto, term) {
+		// NEEDS TRANSACTION
+		if (fto === 'function' || fto === 'type') {
+			const af = {};
+			af[`item.${fto}`] = term;
 
-	// 	} catch (error) {
-	// 		res.status(500).json({ error: error });
-	// 	}
-	// });
+			const setter = {};
+			setter[`rows.$[item].${fto}`] = "";
+
+			return MAIN_TABLE.updateMany(
+				{}, // all docs
+				{
+					$set: setter
+				},
+				{
+					arrayFilters: [af],
+					multi: true
+				}
+			);
+		} else {
+			return MAIN_TABLE.find(
+				{ "rows.cols": { $elemMatch: { $in: [term] } } },
+			).toArray().then(
+				async (docs) => {
+					// console.log("docs count", docs.length);
+					await docs.forEach(
+						async (doc) => {
+							let changed = false;
+							doc.rows.forEach(
+								row => {
+									row.cols.forEach(
+										(item, index) => {
+											if (item === term) {
+												// console.log(item, index);
+												row.cols[index] = "";
+												changed = true;
+											}
+										}
+									)
+								}
+							);
+							if (changed) {
+								// console.log("update of", doc._id)
+								await MAIN_TABLE.updateOne(
+									{ _id: doc._id },
+									{ $set: { rows: doc.rows } }
+								);
+								// console.log("done update of", doc._id)	
+							}
+						}
+					)
+				}
+			);
+		}
+	}
+
 
 	app.get("/terms/terms_edit_upload", (req, res) => {
 		res.render("terms_edit.html");
@@ -537,7 +673,7 @@ module.exports = function (dir, app, db) {
 	app.post("/terms/status", (req, res) => {
 		const { term, type } = req.body;
 		// console.log("/terms/status", term, type);
-		TERM_IMAGES_COLLECTION.findOne(
+		TERM_IMAGES.findOne(
 			{ type: type, term: term },
 			{ _id: 0, archived: 1 }).then(
 				doc => {
@@ -557,7 +693,7 @@ module.exports = function (dir, app, db) {
 	app.get("/terms/get_term_image_counts", (req, res) => {
 		try {
 			// console.log("/terms/get_term_image_counts");
-			TERM_IMAGES_COLLECTION.aggregate(
+			TERM_IMAGES.aggregate(
 				[{
 					$match: { "archived": { $exists: false } }
 				},
@@ -581,7 +717,7 @@ module.exports = function (dir, app, db) {
 		const { type, term, text, dir, filename } = req.body;
 		// console.log(req.body);
 		try {
-			TERM_IMAGES_COLLECTION.updateOne(
+			TERM_IMAGES.updateOne(
 				{ type: type, term: term },
 				{ $set: { "files.$[fref].comment": text } },
 				{
@@ -609,7 +745,7 @@ module.exports = function (dir, app, db) {
 				p[`rows.${which}`] = 1;
 				const m = {};
 				m[`rows.${which}`] = { $ne: "" };
-				MAIN_TABLE_COLLECTION.aggregate(
+				MAIN_TABLE.aggregate(
 					[{ $project: p },
 					{ $unwind: { path: "$rows", } },
 					{ $match: m },
@@ -632,7 +768,7 @@ module.exports = function (dir, app, db) {
 		}
 		else {
 			try {
-				MAIN_TABLE_COLLECTION.aggregate(
+				MAIN_TABLE.aggregate(
 					[{ $project: { _id: 0, "rows.cols": 1 } },
 					{
 						$unwind:
