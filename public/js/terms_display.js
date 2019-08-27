@@ -172,18 +172,18 @@ $(function () {
 		});
 
 		let hideThumbs = false;
-		if (FRAMES.length === 1) {
-			// fix crash in fotorama when only one image, add "fake" last image
-			// and then hide thumbnails after rendering
-			FRAMES.push({
-				img: "/img/placeholder.png",
-				thumb: "/img/empty.png",
-				comment: null,
-				term: TERM,
-				primary: null
-			});
-			hideThumbs = true;
-		}
+		// if (FRAMES.length === 1) {
+		// 	// fix crash in fotorama when only one image, add "fake" last image
+		// 	// and then hide thumbnails after rendering
+		// 	FRAMES.push({
+		// 		img: "/img/placeholder.png",
+		// 		thumb: "/img/empty.png",
+		// 		comment: null,
+		// 		term: TERM,
+		// 		primary: null
+		// 	});
+		// 	hideThumbs = true;
+		// }
 		fotorama.load(FRAMES);
 		fotorama.show(THE_PRIMARY);
 

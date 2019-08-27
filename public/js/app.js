@@ -3,7 +3,6 @@
 // Character ASCII Codes
 const ENTER = 13;
 const TAB = 9;
-window.name = "HOME";
 let COMMON;
 jQuery.fn.visible = function () {
 	return this.css("visibility", "visible");
@@ -34,8 +33,6 @@ const STATUS = {
 const QUERY = {};
 
 $(function () {
-	window.name = "HOME";
-	// Verify that spec_terms have been initialized.
 	setup();
 
 	function setup() {
@@ -75,13 +72,6 @@ $(function () {
 			e.preventDefault();
 			openInSameTab("/terms/terms_edit_upload");
 		});
-
-		// $("#hand_tools_action_upload").on("click", e => {
-		// 	useSameDestination(e, "/spec_tools_upload/hand_tools");
-		// });
-		// $("#inspection_tools_action_upload").on("click", e => {
-		// 	useSameDestination(e, "/spec_tools_upload/inspection_tools");
-		// });
 
 		$("#hand_tools_action_edit").on("click", e => {
 			useSameDestination(e, "/spec_tools_edit/hand_tools");
@@ -150,10 +140,7 @@ $(function () {
 
 			if (isFullySelected()) {
 				pageComplete();
-				//r = TABLE.getRowFromPosition(0,true)
-				//c = r.getCells()[0]
-				// $(c.getElement()).find("input[type=radio]")[0]
-				//$("#radio_1").prop("checked", true);
+				
 				const cell = TABLE.getRowFromPosition(0, true).getCells()[0];
 				$(cell.getElement()).find("input[type=radio]").prop("checked", true);
 
@@ -166,7 +153,6 @@ $(function () {
 function initPage() {
 	COMMON = new Common(); // fresh read of cookie, if any
 	const existing_cookie = COMMON.getParsedCookie();
-	// alert('initPage ' + JSON.stringify(existing_cookie));
 	if (existing_cookie) {
 		refreshFromDB().then(() => {
 			// let r = TABLE.getRows();
@@ -175,6 +161,7 @@ function initPage() {
 			});
 			let row = TABLE.searchRows(searchParams);
 			if (row.length === 1) {
+				
 				TABLE.setPage(existing_cookie.page); // page must be visible to find radio input element
 				const cell = row[0].getCell("row");
 
@@ -217,16 +204,12 @@ function cookieSetter() { // cookie contains all 5 fields:
 	// partId, dept, machine, op, and pName
 	if (TABLE) QUERY.page = TABLE.getPage();
 	Cookies.set(COMMON.getCookieName(), JSON.stringify(QUERY), { expires: 1 });
-	// console.log("now", Cookies.get(COMMON.getCookieName()));
-	// debugger;
 }
 
 function resetPage() {
 	Cookies.remove(COMMON.getCookieName());
-	//$.removeCookie();
 	location.href = "/";
 }
-//function resetVars() {}
 
 function openInSameTab(url) {
 	window.open(url, "_self");
@@ -239,10 +222,11 @@ function updateTable(rows) {
 }
 
 function refreshFilterTable() {
-	// set new (reduced) jsonData in table, uses QUERY
-	// let data = (fresh) ? jsonData : );
-	updateTable(jsonData.filter(row => rowMatchesQuery(row)));
-	// return (data.length === 1) ? data[0] : null;
+	const data = jsonData.filter(row => rowMatchesQuery(row));
+	
+	console.log(data);
+	// debugger;
+	updateTable(data);
 }
 
 function setUpTable() {
@@ -252,7 +236,7 @@ function setUpTable() {
 		pagination: "local",
 		paginationSize: 15,
 		initialSort: [{ column: "partId", dir: "asc" }],
-		//rowClick:function(e, row){			alert('row');			},
+		
 		columns: [
 			//Define Table Columns
 			// first column is checkbox for choosing all the values in the row
@@ -359,10 +343,14 @@ function annotateTableCount(count) {
 
 function rowMatchesQuery(row) {
 	// does a table row match current selectors
+	
 	if (Object.keys(QUERY).length === 0) {
 		return true;
 	}
-	return Object.keys(QUERY).every(key => row[key] === QUERY[key]);
+	return Object.keys(QUERY).every(key => {
+		console.log('rowMatchesQuery', key, row[key], QUERY[key]);
+		return row[key] === QUERY[key];
+	});
 }
 
 function isFullySelected() {
@@ -374,7 +362,7 @@ function rowSelected(e, rowData) {
 	setJobInPlay();
 
 	Object.keys(STATUS)
-		.filter(key => (!fullySelected ? STATUS[key] !== 1 : true)) // if fully selected, replace all values
+		.filter(key => (!fullySelected ? STATUS[key] !== 1 : true)) // if fully selected, replace all values in Query
 		.forEach(fName => {
 			var val = rowData[fName];
 			QUERY[fName] = val;
@@ -405,15 +393,17 @@ function rowSelected(e, rowData) {
 		$(".chosen-single")
 			.closest(".chosen-container")
 			.removeClass("flash");
-	}, 500);
+	}, 800);
+	
 	pageComplete();
+	
 }
 
 async function deleteAJob(/*event*/) {
 	// gather stats on job
 	cookieSetter();
 
-	const jobId = COMMON.jobTitle();
+
 	const stats = await getJobStats();
 
 	const rows = ["Tool", "Tab"]
@@ -437,7 +427,7 @@ async function deleteAJob(/*event*/) {
 	// }
 
 	$.confirm({
-		title: `Confirm Job Deletion:<p class="deletejob">${jobId}</p>`,
+		title: `Confirm Job Deletion:<p class="deletejob">${COMMON.jobTitle()}</p>`,
 		icon: "fas fa-trash-alt trash",
 		type: "orange",
 		content: report,
@@ -447,11 +437,11 @@ async function deleteAJob(/*event*/) {
 				text: "&nbsp;&nbsp;&nbsp;&nbsp;Delete&nbsp;&nbsp;&nbsp;",
 				btnClass: "btn-primary",
 				action: async function () {
-					const deleteResult = await performJobDeletion(jobId);
+					const deleteResult = await performJobDeletion(COMMON.getKey4id());
 
 					if (deleteResult.nModified === 1) {
-						//$.removeCookie(COMMON.getCookieName(), { path: "/" });
 						Cookies.remove(COMMON.getCookieName());
+						$('#jobinplay').text('').hide();
 						initPage();
 					}
 				}
@@ -466,7 +456,8 @@ async function deleteAJob(/*event*/) {
 	});
 }
 
-async function performJobDeletion(jobId) {
+function performJobDeletion(jobId) {
+
 	return new Promise((resolve, reject) => {
 		$.ajax({
 			url: "/archiveJob",
@@ -478,6 +469,7 @@ async function performJobDeletion(jobId) {
 			}
 		})
 			.done(result => {
+
 				resolve(result);
 			})
 
@@ -658,7 +650,7 @@ function getJobTabs() {
 function cellSingleClick(e, cell) {
 	//e - the click event object
 	//cell - the DOM element of the cell
-
+	if(isFullySelected()) return;
 	var fName = cell.getColumn().getField();
 	QUERY[fName] = cell.getValue();
 	STATUS[fName] = 1;
@@ -688,7 +680,15 @@ function cellSingleClick(e, cell) {
 	refreshFilterTable();
 
 	if (isFullySelected()) {
+		
 		pageComplete();
+		try {
+			const cell = TABLE.getRowFromPosition(0, true).getCells()[0];
+			$(cell.getElement()).find("input[type=radio]").prop("checked", true);
+		} catch(e) {
+			// ignore this issue 
+		}
+		
 		setJobInPlay();
 	}
 }
@@ -820,7 +820,4 @@ function updateField(fName) {
 
 	// update Table too
 	refreshFilterTable();
-
-	//console.log(STATUS);
-	// return howMany;
 }

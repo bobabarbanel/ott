@@ -68,7 +68,7 @@ module.exports = function (dir, app, db) {
 		const term = req.body.term;
 		const modified_text = req.body.text;
 
-		console.log({ spec_type, term, filename, dir, modified_text });
+		// console.log({ spec_type, term, filename, dir, modified_text });
 		try {
 			SPEC_TERMS
 				.updateOne(
@@ -335,7 +335,7 @@ module.exports = function (dir, app, db) {
 			);
 	});
 	app.post("/removeTerm", (req, res) => {
-		console.log("/removeTerm", JSON.stringify(req.body));
+		// console.log("/removeTerm", JSON.stringify(req.body));
 		SPEC_TERMS
 			.updateOne(
 				{ _id: req.body.type },
@@ -343,18 +343,18 @@ module.exports = function (dir, app, db) {
 			)
 			.then(
 				successA => {
-					console.log("/removeTerm successA", successA.result);
+					// console.log("/removeTerm successA", successA.result);
 					const query = {}; // all jobs
 					query[req.body.type] = req.body.term; // having term value
 					const update = {}
 					update[req.body.type] = req.body.term;
-					console.log({query,update});
+					// console.log({query,update});
 					TOOL_TERMS.updateMany(
 						query,
 						{ $pull: update }
 					).then(
 						successB => {
-							console.log('removeTerm success', successB.result);
+							// console.log('removeTerm success', successB.result);
 							return res.status(200).json(successB.result);
 						},
 						error => {
@@ -371,7 +371,7 @@ module.exports = function (dir, app, db) {
 			);
 	});
 	app.post("/modifyTerm", (req, res) => {
-		console.log("/modifyTerm", JSON.stringify(req.body));
+		// console.log("/modifyTerm", JSON.stringify(req.body));
 		// TODO: transaction (two updates)
 		SPEC_TERMS
 			.updateOne(
@@ -380,7 +380,7 @@ module.exports = function (dir, app, db) {
 			)
 			.then(
 				successA => {
-					console.log("/modifyTerm successA", successA.result);
+					// console.log("/modifyTerm successA", successA.result);
 					const query = {}; // all jobs
 					query[req.body.type] = req.body.oldTerm;
 					const update = {}
@@ -391,7 +391,7 @@ module.exports = function (dir, app, db) {
 						{ $set: update }
 					).then(
 						successB => {
-							console.log('modifyTerm successB', successB.result);
+							// console.log('modifyTerm successB', successB.result);
 							return res.status(200).json(successB.result);
 						},
 						error => {
@@ -794,7 +794,7 @@ module.exports = function (dir, app, db) {
 		myPromise.then(
 			r => {
 				if (r.length > 0) {
-					console.log(r[0]);
+					// console.log(r[0]);
 					if (req.body.index !== undefined) {
 						// limit to a single element
 						r[0].tabs = r[0].tabs.slice(req.body.index, req.body.index + 1);
@@ -824,7 +824,7 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.get("/showtab/:tabnum/:tabname/:sectnum/:stepnum", (req, res) => {
-		console.log(req.params);
+		// console.log(req.params);
 		res.render("showtab.html", req.params);
 	});
 
@@ -983,8 +983,8 @@ module.exports = function (dir, app, db) {
 	app.post("/archiveJob", (req, res) => {
 		// TODO: should also archive all images for tools and tabs
 		const jobId = req.body.key4id;
-		const action = req.body.action;
-
+		const action = req.body.action; // true -> archive, false, unArchive
+console.log("/archiveJob", {jobId,action});
 		if (action) {
 			MAIN
 				.updateOne(
