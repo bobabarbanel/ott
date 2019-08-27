@@ -1,8 +1,0 @@
-1. No doughut for material, it just barely fits in spindle
-2. Keep an eye on O.A.L, When c/o gets dull it gets smaller
-3. Dip in Oil
-4. I.D. is Net HFT (Hold for tooling)
-5. M0 is for p/c to grab part
-6. To restart n3,3 =>write=>sequence restart
-7. Get mandril for LC40-4A op to make sure part fits
-8. Drill does not break a chip

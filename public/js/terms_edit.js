@@ -194,7 +194,6 @@ async function handleInputNewTerm() {
 }
 
 function addTerm(term, type) {
-    debugger;
     return new Promise((resolve, reject) => {
         $.post({
             url: '/terms/create_term_images',

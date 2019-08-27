@@ -251,7 +251,6 @@ function tableSetup() {
 								btnClass: "btn-primary",
 								action: function () {
 									removeTerm(data.term).then(() => {
-										debugger;
 										setTimeout(() => {
 											jqRowCells.removeClass("del_highlight");
 											row.delete();
