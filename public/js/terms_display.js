@@ -5,8 +5,6 @@
 const COMMON = new Common();
 const key4id = COMMON.getKey4id();
 
-
-
 $(function () {
 	// let TYPE, TERM;
 
@@ -190,6 +188,7 @@ $(function () {
 		if (hideThumbs) {
 			$(".fotorama__nav-wrap").addClass("ignore"); // hides thumbnails
 		}
+		
 
 	}
 	const startMagImg = (e) => {
@@ -331,8 +330,8 @@ $(function () {
 		
 		ta.hide();
 
-		getImages(cType, TERM);
+		getImages(cType, TERM).then(
+			() => true
+		);
 	});
-
-
 });

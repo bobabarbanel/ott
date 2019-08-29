@@ -102,8 +102,8 @@ module.exports = function (dir, app, db) {
 
 		try {
 			job_terms = await TOOL_TERMS.findOne({ _id: jobId });
-
-			if (job_terms === null || job_terms[type] === undefined) {
+console.log({job_terms});
+			if (job_terms === null || job_terms[type] === undefined || job_terms[type] === null) {
 				res.json(null);
 			} else {
 				let myPromise = SPEC_TERMS
@@ -146,10 +146,11 @@ module.exports = function (dir, app, db) {
 					.toArray();
 				myPromise.then(
 					result => {
+						console.log({result})
 						return res.json(result);
 					},
 					error => {
-						// console.log("/get_spec_image_filerefs", error);
+						console.log("/get_spec_image_filerefs", error);
 						return res.status(500).json(error);
 					}
 				);

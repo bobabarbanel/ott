@@ -76,8 +76,7 @@ $(function () {
 
 		getImages(key4id).then(async termsArray => {
 			// [{term, [fileRefs]}]
-
-			if (termsArray === null) {
+			if (termsArray === null || termsArray.length === 0) {
 				$("body").append(
 					$(
 						`<h1 class="no_image_message">There are no ${STYPE} images<br/>for this Job.</h1>`
@@ -112,8 +111,7 @@ $(function () {
 						dir: af.dir
 					}
 				})
-					.done(result => {
-						// debugger;
+					.done(() => {
 						// modify local cache to mark primary
 						IMAGES[af.term].forEach(
 							// reset primary image in IMAGES object, and in the fileRefs array
@@ -228,7 +226,7 @@ $(function () {
 	}
 
 	async function loadStuff(section) {
-		let primary = 0; // default image to show if primary is not identified
+		// let primary = 0; // default image to show if primary is not identified
 		$("content").empty().append(`
 			<button id="taSave" class="commentsave btn-primary">Save Changed Comment</button>
 			<button id="taCancel" class="commentcancel btn-secondary">Cancel</button>

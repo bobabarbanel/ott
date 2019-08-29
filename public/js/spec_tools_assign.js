@@ -106,7 +106,7 @@ function setup() {
 		let jobTerms = await getJobToolTerms();
 		let haveData = false;
 		if (jobTerms) {
-			if (jobTerms[spec_type] !== undefined) {
+			if (jobTerms[spec_type] !== undefined && jobTerms[spec_type] !== null) {
 				jobTerms[spec_type].forEach(rightTerm => {
 					const option = $(`<option value="${index++}">${rightTerm}</option>`);
 					right.append(option);

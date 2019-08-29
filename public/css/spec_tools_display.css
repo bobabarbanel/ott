@@ -137,3 +137,6 @@ textarea.comment {
 content > button {
     margin-top: 30px;
 }
+#fotorama {
+    margin-top: -15px;
+}

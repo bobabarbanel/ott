@@ -136,42 +136,43 @@ class Util {
 
 					if (showTabs && ("tabs" in data)) {
 						// console.log(topnav.width(),lastTab.offset().left,lastTab.width());
-						if (data.tabs.length <= 7) {
-							data.tabs.forEach((tab, index) => {
-								let navItem = $(Util.definePageTab(index, tab, true));
-								let possible = tab.tabName.length * 14;
+						// if (false && data.tabs.length <= 7) {
+						// 	data.tabs.forEach((tab, index) => {
+						// 		let navItem = $(Util.definePageTab(index, tab, true));
+						// 		let possible = tab.tabName.length * 14;
 
 
-								width = width < possible + 10 ? possible + 10 : width;
-								if (here === tab.tabName) {
-									// debugger;
-									navItem.addClass("active");
-									navDropDown.append($(Util.definePageTab(index, tab, false)));
-								} else {
-									navDropDown.append($(Util.definePageTab(index, tab, true)));
-								}
-								topnav.append(navItem);
-							});
-						} else {
+						// 		width = width < possible + 10 ? possible + 10 : width;
+						// 		if (here === tab.tabName) {
+						// 			// debugger;
+						// 			navItem.addClass("active");
+						// 			navDropDown.append($(Util.definePageTab(index, tab, false)));
+						// 		} else {
+						// 			navDropDown.append($(Util.definePageTab(index, tab, true)));
+						// 		}
+						// 		topnav.append(navItem);
+						// 	});
+						// } else {
 
-							let com = {
-								topnav: 0.9 * topnav.width(),
-								lastTab: lastTab.offset().left + lastTab.width(),
-								net: 0.9 * topnav.width() - lastTab.offset().left + lastTab.width()
+						// let com = {
+						// 	topnav: 0.9 * topnav.width(),
+						// 	lastTab: lastTab.offset().left + lastTab.width(),
+						// 	net: 0.9 * topnav.width() - lastTab.offset().left + lastTab.width()
+						// }
+						const containerWidth =
+							0.9 * (0.9 * topnav.width() - lastTab.offset().left + lastTab.width());
+						// console.log(com);
+						const container = $('<div class="navcontainer"/>').css('width', containerWidth);
+						data.tabs.forEach((tab, index) => {
+							let navItem = $(Util.definePageTab(index, tab, true));
+
+							if (here === tab.tabName) {
+								navItem.addClass("active");
 							}
-							let width = 0.8 * (0.9 * topnav.width() - lastTab.offset().left + lastTab.width());
-							console.log(com);
-							const container = $('<div class="navcontainer"/>').css('width', width);
-							data.tabs.forEach((tab, index) => {
-								let navItem = $(Util.definePageTab(index, tab, true));
-
-								if (here === tab.tabName) {
-									navItem.addClass("active");
-								}
-								container.append(navItem);
-							});
-							topnav.append(container);
-						}
+							container.append(navItem);
+						});
+						topnav.append(container);
+						// }
 
 					}
 
@@ -187,13 +188,15 @@ class Util {
 							)
 						);
 
-						$("body").append($('<div id="navButtonDiv"/>').append(buttons));
+						topnav.append($('<div id="navButtonDiv"/>').append(buttons));
+
+
 					}
 
 					resolve(data.tabs);
 				},
 				error => {
-					console.log("setUpTabs error: " + error);
+					console.log("getTabsData error: " + error);
 					reject([]);
 				}
 			);
@@ -284,9 +287,9 @@ class Util {
 
 					const rcounts = Object.create({});
 					results.forEach(r => rcounts[r._id] = r.count);
-					
+
 					// put counts into steps of tabs' sections
-					tabs.forEach(
+					if (tabs) tabs.forEach(
 						(tab) => {
 							tab.sections.forEach(
 								(section) => {

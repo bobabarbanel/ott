@@ -256,8 +256,11 @@ li.horiz p {
 	font-weight: bold;
 }
 
-.rowChosen .tabulator-cell, .flash {
+.rowChosen .tabulator-cell {
 	background: rgb(158, 193, 240) !important;
+}
+.flash {
+	background: orange !important;
 }
 
 #this_job_menu, #job_menu {
@@ -272,7 +275,7 @@ li.horiz p {
 
 #this_job_menu {
 	margin-top: 0.5em;
-	width: 190px;
+	width: 210px;
 }
 
 .truncate {
@@ -340,4 +343,10 @@ spin {
 	text-align: center;
 	background-color: #4CAF50;
 	color: white;
+}
+
+.ui-menu {
+	background: white !important;
+	border: 2px solid grey !important;
+	padding: 2px;
 }

@@ -140,7 +140,7 @@ $(function () {
 
 			if (isFullySelected()) {
 				pageComplete();
-				
+
 				const cell = TABLE.getRowFromPosition(0, true).getCells()[0];
 				$(cell.getElement()).find("input[type=radio]").prop("checked", true);
 
@@ -153,6 +153,7 @@ $(function () {
 function initPage() {
 	COMMON = new Common(); // fresh read of cookie, if any
 	const existing_cookie = COMMON.getParsedCookie();
+
 	if (existing_cookie) {
 		refreshFromDB().then(() => {
 			// let r = TABLE.getRows();
@@ -161,13 +162,24 @@ function initPage() {
 			});
 			let row = TABLE.searchRows(searchParams);
 			if (row.length === 1) {
-				
+
 				TABLE.setPage(existing_cookie.page); // page must be visible to find radio input element
 				const cell = row[0].getCell("row");
-
-				$(cell.getElement())
+				const jqCell = $(cell.getElement());
+				jqCell
 					.find("input")
 					.trigger("click");
+
+				setJobInPlay();
+				let rowData = cell.getData();
+				Object.keys(STATUS)
+					// .filter(key => (!fullySelected ? STATUS[key] !== 1 : true)) // if fully selected, replace all values in Query
+					.forEach(fName => {
+						setSelectors(fName, rowData);
+					});
+				setRowChosen(jqCell);
+
+
 			}
 		});
 	} else {
@@ -177,9 +189,30 @@ function initPage() {
 		for (let member in STATUS) STATUS[member] = 0; // reset values in STATUS
 
 		refreshFromDB().then(
-			() => { return null; }
+			() => {
+				return null;
+			}
 		);
 	}
+}
+function setRowChosen(jqCell) {
+	// show change in selected values using background class flash = orange (12/18/18)
+	$(".chosen-single")
+		.closest(".chosen-container")
+		.addClass("flash");
+
+	$(".tabulator-row").removeClass("rowChosen");
+	// remove radio button set if any
+	jqCell
+		.closest(".tabulator-row")
+		.addClass("rowChosen");
+	setTimeout(() => {
+		// show change in selected values using background back to normal
+		$(".chosen-single")
+			.closest(".chosen-container")
+			.removeClass("flash");
+	}, 800);
+	pageComplete();
 }
 async function refreshFromDB() {
 	await getData().then(
@@ -203,10 +236,12 @@ async function refreshFromDB() {
 function cookieSetter() { // cookie contains all 5 fields: 
 	// partId, dept, machine, op, and pName
 	if (TABLE) QUERY.page = TABLE.getPage();
+	
 	Cookies.set(COMMON.getCookieName(), JSON.stringify(QUERY), { expires: 1 });
 }
 
 function resetPage() {
+	
 	Cookies.remove(COMMON.getCookieName());
 	location.href = "/";
 }
@@ -223,8 +258,8 @@ function updateTable(rows) {
 
 function refreshFilterTable() {
 	const data = jsonData.filter(row => rowMatchesQuery(row));
-	
-	console.log(data);
+
+	// console.log(data);
 	// debugger;
 	updateTable(data);
 }
@@ -236,7 +271,7 @@ function setUpTable() {
 		pagination: "local",
 		paginationSize: 15,
 		initialSort: [{ column: "partId", dir: "asc" }],
-		
+
 		columns: [
 			//Define Table Columns
 			// first column is checkbox for choosing all the values in the row
@@ -343,12 +378,12 @@ function annotateTableCount(count) {
 
 function rowMatchesQuery(row) {
 	// does a table row match current selectors
-	
+
 	if (Object.keys(QUERY).length === 0) {
 		return true;
 	}
 	return Object.keys(QUERY).every(key => {
-		console.log('rowMatchesQuery', key, row[key], QUERY[key]);
+		// console.log('rowMatchesQuery', key, row[key], QUERY[key]);
 		return row[key] === QUERY[key];
 	});
 }
@@ -358,45 +393,35 @@ function isFullySelected() {
 }
 
 function rowSelected(e, rowData) {
+
 	let fullySelected = isFullySelected();
 	setJobInPlay();
-
+	const jqCell = $(e.target);
 	Object.keys(STATUS)
 		.filter(key => (!fullySelected ? STATUS[key] !== 1 : true)) // if fully selected, replace all values in Query
 		.forEach(fName => {
-			var val = rowData[fName];
-			QUERY[fName] = val;
-			var selector = "#" + fName + "_select";
-			$(selector, "#container").empty();
-			setNum(fName, 1);
-
-			var option = $("<option>")
-				.val(val)
-				.text(val);
-			$(selector, "#container").append(option);
-			STATUS[fName] = 1;
-			$(selector, "#container")
-				.prop("disabled", true)
-				.trigger("chosen:updated");
+			setSelectors(fName, rowData);
 		});
-	// show change in selected values using background class flash = orange (12/18/18)
-	$(".chosen-single")
-		.closest(".chosen-container")
-		.addClass("flash");
-	$(".tabulator-row").removeClass("rowChosen");
-	// remove radio button set if any
-	$(e.target)
-		.closest(".tabulator-row")
-		.addClass("rowChosen");
-	setTimeout(() => {
-		// show change in selected values using background back to normal
-		$(".chosen-single")
-			.closest(".chosen-container")
-			.removeClass("flash");
-	}, 800);
-	
+	setRowChosen(jqCell);
+
 	pageComplete();
-	
+
+}
+function setSelectors(fName, rowData) {
+	const val = rowData[fName];
+	QUERY[fName] = val;
+	const selector = "#" + fName + "_select";
+	$(selector, "#container").empty();
+	setNum(fName, 1);
+
+	const option = $("<option>")
+		.val(val)
+		.text(val);
+	$(selector, "#container").append(option);
+	STATUS[fName] = 1;
+	$(selector, "#container")
+		.prop("disabled", true)
+		.trigger("chosen:updated");
 }
 
 async function deleteAJob(/*event*/) {
@@ -650,7 +675,7 @@ function getJobTabs() {
 function cellSingleClick(e, cell) {
 	//e - the click event object
 	//cell - the DOM element of the cell
-	if(isFullySelected()) return;
+	if (isFullySelected()) return;
 	var fName = cell.getColumn().getField();
 	QUERY[fName] = cell.getValue();
 	STATUS[fName] = 1;
@@ -680,15 +705,15 @@ function cellSingleClick(e, cell) {
 	refreshFilterTable();
 
 	if (isFullySelected()) {
-		
+
 		pageComplete();
 		try {
 			const cell = TABLE.getRowFromPosition(0, true).getCells()[0];
 			$(cell.getElement()).find("input[type=radio]").prop("checked", true);
-		} catch(e) {
+		} catch (e) {
 			// ignore this issue 
 		}
-		
+
 		setJobInPlay();
 	}
 }

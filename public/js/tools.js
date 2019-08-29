@@ -257,7 +257,7 @@ function paintPage(toolData) {
 
     if (curLG !== null && (curLG.getStart() === curLG.getStop())) {
         // remove last LG as it is empty
-        if (curLG.getStop() === null) { // no images at all
+        if (curLG.getStop() === null || curLG.getStop() === 0) { // no images at all
             curLG = null; // new LinkGroup(null, null, 0, null, "");;
         } else {
             curLG.getPrev().setNext(null);

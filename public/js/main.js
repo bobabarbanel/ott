@@ -18,14 +18,15 @@ let TABLE;
 let TOOLDATA;
 const WORDLISTS = {};
 const IMAGE_COUNTS = {};
-let SHOWIMAGES = true;
+let SHOWIMAGES;
 const WORDTYPES = ['function', 'type', 'other'];
 
 $(async function () {
 	////////////////////////////////////////////////////////////
-	if ($.cookie("showImagesMode") === "false") {
-		SHOWIMAGES = false;
-	}
+	
+	SHOWIMAGES = Cookies.get("showImagesMode") !== "false";
+	
+	
 	$("title").html("Main"); // browser tab title
 	const run = async () => {
 		const tabs = await Util.setUpTabs(key4id, "Main", {
@@ -101,8 +102,10 @@ function getReplace() {
 	return _replace;
 }
 function toggleShowImages() {
+	
 	SHOWIMAGES = !SHOWIMAGES;
-	$.cookie('showImagesMode', SHOWIMAGES);
+	Cookies.set('showImagesMode', SHOWIMAGES);
+	
 	$(".show_edit").text(SHOWIMAGES ? "Showing Term Images" : "Editing Terms").toggleClass('yellow');
 	setTimeout(
 		() => $(".show_edit").toggleClass('yellow'), 1000
@@ -865,7 +868,7 @@ function tabsOutline(tabs) {
 
 function tabs_route(ev) {
 	ev.preventDefault();
-	console.log("tabs_route ", JSON.stringify(ev.data));
+	// console.log("tabs_route ", JSON.stringify(ev.data));
 	openTab(ev.data)
 	return false;
 }
@@ -873,8 +876,7 @@ function openInSameTab(url) {
 	window.open(url, "_self");
 }
 function openTab(args) {
-	console.log(`/showtab/${args.tabnum}/${args.tabName}/${args.sectnum}/${args.stepnum}`)
-	debugger;
+	// console.log(`/showtab/${args.tabnum}/${args.tabName}/${args.sectnum}/${args.stepnum}`)
 	openInSameTab(`/showtab/${args.tabnum}/${args.tabName}/${args.sectnum}/${args.stepnum}`);
 }
 
