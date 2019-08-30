@@ -61,7 +61,7 @@ module.exports = function (dir, app, db) {
 		res.render("spec_tools_assign.html", { spec_type: req.params.spec_type });
 	});
 
-	app.post("/update_spec_image_comment", async (req, res) => {
+	app.post("/update_spec_image_comment", (req, res) => {
 		const spec_type = req.body.spec_type;
 		const filename = req.body.filename;
 		const dir = req.body.dir;
