@@ -49,7 +49,7 @@ async function getAllTerms() {
                     dataType: "json"
                 })
                     .done(docs => {
-                        // alert(result);
+                        console.log({tfo, docs});
                         WORDLISTS[tfo] = {};
                         docs.forEach(
                             doc => {
@@ -68,6 +68,7 @@ async function getAllTerms() {
             });
         })
     );
+    
     return new Promise((resolve, reject) => {
         $.get({
             url: '/terms/get_term_image_counts',
@@ -93,6 +94,7 @@ async function getAllTerms() {
                         doc.id = index;
                     }
                 )
+                
                 resolve(true);
             })
 
@@ -101,6 +103,7 @@ async function getAllTerms() {
                 reject(false);
             });
     });
+    
 }
 
 function termStatus(term, type) {
