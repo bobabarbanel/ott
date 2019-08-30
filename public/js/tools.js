@@ -7,7 +7,7 @@ const TV = TabValues; // constants and variables
 const pageName = "Tools";
 const dirPathToImages = "../";
 const reverseURL = "/unArchiveToolImages";
-
+const COMMON = new Common();
 
 $(function () { // onload
 
@@ -54,7 +54,7 @@ function callDeleteImages(ev) {
     TV.deleteImages(ev, setArchiveForToolImages, listDeleting);
 }
 
-const COMMON = new Common();
+
 function getToolImages() {
     //debugLog("getSheetTagsFiles");
     return new Promise((resolve, reject) => {

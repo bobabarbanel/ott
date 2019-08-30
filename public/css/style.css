@@ -46,6 +46,9 @@ pageheader {
 	flex-wrap: nowrap;
 	align-items: center;
 }
+pageheader > button {
+	height: 35px;
+}
 
 #container {
 	padding: 0;
@@ -139,11 +142,6 @@ li.horiz p {
 	color: red;
 }
 
-/* #buttons {
-	margin-top: 20px;
-	display: inline-block;
-} */
-
 #controls {
 	margin-left: 30px;
 	margin-top: 30px;
@@ -156,6 +154,11 @@ li.horiz p {
 	align-self: center;
 	margin: -37px 0 30px 30px;
 }
+#reset:hover {
+	background: rgb(219, 214, 247);
+	cursor: pointer;
+	color: black;
+}
 
 #assign_hi_tools_to_jobs {
 	margin-left: 1em;
@@ -164,9 +167,24 @@ li.horiz p {
 #delete_job_action {
 	margin-left: 5.5em;
 }
+#delete_job_action:hover {
+	background: rgb(241, 218, 173);
+	cursor: pointer;
+	color: black;
+}
+#insert_action:hover {
+	background: rgb(180, 240, 180);
+	cursor: pointer;
+	color: black;
+}
 
 #terms_edit_action {
 	margin-left: 1em;
+}
+#terms_edit_action:hover {
+	background: rgb(238, 173, 173);
+	cursor: pointer;
+	color: white;
 }
 
 .logo {

@@ -34,9 +34,12 @@ spec_tools {
 
 pageheader {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    width: 80%;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1em;
+}
+#assign {
+    margin-left: 6em;
 }
 
 .jobTitle {
@@ -59,6 +62,7 @@ horiz {
     justify-content: flex-start;
     align-items: flex-start;
     flex-direction: row;
+    margin-left: 2em;
 }
 #termtab {
     margin-left: 2em;

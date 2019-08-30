@@ -7,6 +7,8 @@ const TABCHAR = 9;
 let TABLE;
 const DATA = [];
 let SPEC_TYPE;
+const COMMON = new Common();
+const key4id = COMMON.getKey4id();
 
 $(function () {
 	// guarantee two objects in db: _id = hand_tools and _id = inspection_tools
@@ -31,6 +33,13 @@ $(function () {
 				})
 		});
 	}
+	function useSameDestination(event, destination) {
+		event.preventDefault();
+		openInSameTab(destination);
+	}
+	function openInSameTab(url) {
+		window.open(url, "_self");
+	}
 	function setup() {
 		SPEC_TYPE = $("spec_type").text();
 
@@ -39,9 +48,27 @@ $(function () {
 
 		$("pageheader").append(
 			$(
-				`<h1 class="pageTitle">${STYPE}</h1>` // <h3 class="jobTitle">${jobTitle}</h3>`
+				`<h1 class="pageTitle">${STYPE}</h1>
+				<button id="assign" class="btn btn-primary">Assign Terms to Current Job</button>`
 			)
 		);
+		$("#assign").on('click', (e) => {
+			if(SPEC_TYPE === 'hand_tools') {
+				useSameDestination(e, "/spec_tools_assign/Hand");
+			} else if(SPEC_TYPE === 'inspection_tools') {
+				useSameDestination(e, "/spec_tools_assign/Inspection");
+			}
+			else {}
+		});
+		$("#upload").on('click', (e) => {
+			if(SPEC_TYPE === 'hand_tools') {
+				useSameDestination(e, "/spec_tools_assign/Hand");
+			} else if(SPEC_TYPE === 'inspection_tools') {
+				useSameDestination(e, "/spec_tools_assign/Inspection");
+			}
+			else {}
+		});
+		
 		$("#filter-value").keyup(() =>
 			TABLE.setFilter("term", "like", $("#filter-value").val())
 		);
@@ -50,11 +77,11 @@ $(function () {
 		const NEW_TERM_INPUT = $("input.upper");
 		const TOOLLIST = $("#toollist");
 
-		Util.setUpTabs(null /*key4id*/, SPEC_TYPE, {
-			tab: false,
-			spec: false,
-			main: false,
-			machine: false,
+		Util.setUpTabs(key4id, SPEC_TYPE, {
+			tab: true,
+			spec: true,
+			main: true,
+			machine: true,
 			tabmenus: false
 		}).then(() => {
 			getAllToolNames(SPEC_TYPE).then(async name_counts => {

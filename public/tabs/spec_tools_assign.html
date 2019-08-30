@@ -1,143 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
-		<link rel="icon" href="/img/favicon.ico" type="image/x-icon" />
-		<title>Tools Edit</title>
-		<script type="text/javascript" src="/js/jquery_min_3.4.1.js"></script>
-		<link
-			rel="stylesheet"
-			href="/css/jquery-ui-1.12.1.custom/jquery-ui.theme.min.css"
-			/>
-		<link rel="stylesheet" href="/css/spec_tools_assign.css" />
-		
-		<!-- Bootstrap -->
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
+	<link rel="icon" href="/img/favicon.ico" type="image/x-icon" />
+	<title>Tools Edit</title>
+	<script type="text/javascript" src="/js/jquery_min_3.4.1.js"></script>
+	<link rel="stylesheet" href="/css/jquery-ui-1.12.1.custom/jquery-ui.min.css" />
+	<link rel="stylesheet" href="/css/jquery-ui-1.12.1.custom/jquery-ui.theme.min.css" />
+	<script src="/css/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/css/spec_tools_assign.css" />
+
+	<!-- Bootstrap -->
 	<link rel="stylesheet" href="/bootstrap_3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/bootstrap_3.3.7/css/bootstrap-theme.min.css">
 	<script src="/bootstrap_3.3.7/js/bootstrap.min.js"></script>
-		
 
-		<script defer src="/fontawesome-free-5.10.2-web/js/all.min.js"></script>
 
-		
-		<link rel="stylesheet" href="/css/jquery-confirm.css">
-		<script src="/js/jquery-confirm.js"></script>
-		
+	<script defer src="/fontawesome-free-5.10.2-web/js/all.min.js"></script>
 
-		<link rel="stylesheet" href="/css/multiselect/style.css" />
-		<script
-			type="application/javascript"
-			src="/js/multiselect/multiselect.min.js"
-		></script>
 
-		<script type="application/javascript" src="/js/commonClass.js"></script>
-		<script type="application/javascript" src="/js/tabClass.js"></script>
-		<script type="application/javascript" src="/js/utilClass.js"></script>
+	<link rel="stylesheet" href="/css/jquery-confirm.css">
+	<script src="/js/jquery-confirm.js"></script>
 
-		<link rel="stylesheet" href="/css/nav.css" />
 
-		<script
-			type="application/javascript"
-			src="/js/spec_tools_assign.js"
-		></script>
-	</head>
+	<link rel="stylesheet" href="/css/multiselect/style.css" />
+	<script type="application/javascript" src="/js/multiselect/multiselect.min.js"></script>
 
-	<body>
-		<spec_type><%= spec_type %></spec_type>
-		<div class="navDropDownButton"></div>
-		<navDropDown></navDropDown>
-		<div class="topnav" id="myTopnav"></div>
-		<container>
-			<!-- <spin id="spin" class="rotating"><i class="fas fa-spinner fa-pulse"></i></spin> -->
+	<script type="application/javascript" src="/js/commonClass.js"></script>
+	<script type="application/javascript" src="/js/tabClass.js"></script>
+	<script type="application/javascript" src="/js/utilClass.js"></script>
 
-			<pageheader> </pageheader>
-			<hr class="bar"/>
-			<div id="wrap" class="container">
-				<!-- <h4 id="demo-undo-redo">Undo / Redo</h4> -->
-				<div class="row">
-					<div class="col-xs-3">
-                        <div class="collabel">ALL Terms</div>
-						<select
-							name="from[]"
-							id="undo_redo"
-							class="form-control"
-							size="25"
-							multiple="multiple"
-						>
-						</select>
-					</div>
+	<link rel="stylesheet" href="/css/nav.css" />
 
-					<div class="col-xs-2 controls">
-						<button
-							type="button"
-							id="undo_redo_undo"
-							class="btn btn-lightblue btn-block"
-						>
-							undo
-						</button>
-						<button
-							type="button"
-							id="undo_redo_rightAll"
-							class="btn btn-default btn-block"
-						>
-							<i class="glyphicon glyphicon-forward"></i>
-						</button>
-						<button
-							type="button"
-							id="undo_redo_rightSelected"
-							class="btn btn-default btn-block"
-						>
-							<i class="glyphicon glyphicon-chevron-right"></i>
-						</button>
-						<button
-							type="button"
-							id="undo_redo_leftSelected"
-							class="btn btn-default btn-block"
-						>
-							<i class="glyphicon glyphicon-chevron-left"></i>
-						</button>
-						<button
-							type="button"
-							id="undo_redo_leftAll"
-							class="btn btn-default btn-block"
-						>
-							<i class="glyphicon glyphicon-backward"></i>
-						</button>
-						<button
-							type="button"
-							id="undo_redo_redo"
-							class="btn btn-warning btn-block"
-						>
-							redo
-						</button>
-					</div>
+	<script type="application/javascript" src="/js/spec_tools_assign.js"></script>
+</head>
 
-					<div class="col-xs-3">
-                            <div class="collabel">Terms for this JOB</div>
-						<select
-							name="to[]"
-							id="undo_redo_to"
-							class="form-control"
-							size="25"
-							multiple="multiple"
-						></select>
-					</div>
+<body>
+	<spec_type><%= spec_type %></spec_type>
+	<div class="navDropDownButton"></div>
+	<navDropDown></navDropDown>
+	<div class="topnav" id="myTopnav"></div>
+	<container>
+		<!-- <spin id="spin" class="rotating"><i class="fas fa-spinner fa-pulse"></i></spin> -->
+
+		<pageheader> </pageheader>
+		<hr class="bar" />
+		<div id="wrap" class="container">
+			<!-- <h4 id="demo-undo-redo">Undo / Redo</h4> -->
+			<div class="row">
+				<div class="col-xs-3">
+					<div class="collabel">ALL Terms</div>
+					<select name="from[]" id="undo_redo" class="form-control" size="25" multiple="multiple">
+					</select>
+				</div>
+
+				<div class="col-xs-2 controls">
+					<button type="button" id="undo_redo_undo" class="btn btn-lightblue btn-block">
+						undo
+					</button>
+					<button type="button" id="undo_redo_rightAll" class="btn btn-default btn-block">
+						<i class="glyphicon glyphicon-forward"></i>
+					</button>
+					<button type="button" id="undo_redo_rightSelected" class="btn btn-default btn-block">
+						<i class="glyphicon glyphicon-chevron-right"></i>
+					</button>
+					<button type="button" id="undo_redo_leftSelected" class="btn btn-default btn-block">
+						<i class="glyphicon glyphicon-chevron-left"></i>
+					</button>
+					<button type="button" id="undo_redo_leftAll" class="btn btn-default btn-block">
+						<i class="glyphicon glyphicon-backward"></i>
+					</button>
+					<button type="button" id="undo_redo_redo" class="btn btn-warning btn-block">
+						redo
+					</button>
+				</div>
+
+				<div class="col-xs-3">
+					<div class="collabel">Terms for this JOB</div>
+					<select name="to[]" id="undo_redo_to" class="form-control" size="25" multiple="multiple"></select>
 				</div>
 			</div>
+		</div>
 
-			<actions>
-				<button type="button" id="submit" class="btn btn-primary ">
-					Submit
-                </button>
-                <button type="button" id="reset" class="btn btn-warning ">
-                        Reset
-                    </button>
-				<button type="button" id="cancel" class="btn btn-danger ">
-					Cancel
-				</button>
-			</actions>
-		</container>
-	</body>
+		<actions>
+			<button type="button" id="submit" class="btn btn-primary ">
+				Submit
+			</button>
+			<button type="button" id="reset" class="btn btn-warning ">
+				Reset
+			</button>
+			<button type="button" id="cancel" class="btn btn-danger ">
+				Cancel
+			</button>
+		</actions>
+	</container>
+</body>
+
 </html>

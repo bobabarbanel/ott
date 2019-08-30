@@ -706,9 +706,9 @@ TabValues.deleteCount = 0;
 TabValues.imageShowing = -1; // an integer, no image visible
 TabValues.keystate = null;
 
-const common = new Common();
-TabValues.key4id = common.getKey4id();
-TabValues.key5 = common.getParsedCookie();
+const LOCAL_COMMON = new Common();
+TabValues.key4id = LOCAL_COMMON.getKey4id();
+TabValues.key5 = LOCAL_COMMON.getParsedCookie();
 
 TabValues.do_once = function () {
     TabValues.do_once = function () {}; // prevents a second execution

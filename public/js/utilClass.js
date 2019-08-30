@@ -44,8 +44,6 @@ class Util {
 	}
 
 	static goHome() {
-		// window.close();
-		// alert('goHome ' + JSON.stringify(COMMON.getParsedCookie()));
 		window.location.href = "/";
 	}
 	static setUpShortNav() {

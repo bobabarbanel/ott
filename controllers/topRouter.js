@@ -54,9 +54,9 @@ module.exports = function (dir, app, db) {
 	app.get("/spec_tools_display/:spec_type", (req, res) => {
 		res.render("spec_tools_display.html", { spec_type: req.params.spec_type });
 	});
-	app.get("/spec_tools_upload/:spec_type", (req, res) => {
-		res.render("spec_tools_upload.html", { spec_type: req.params.spec_type });
-	});
+	// app.get("/spec_tools_upload/:spec_type", (req, res) => {
+	// 	res.render("spec_tools_upload.html", { spec_type: req.params.spec_type });
+	// });
 	app.get("/spec_tools_assign/:spec_type", (req, res) => {
 		res.render("spec_tools_assign.html", { spec_type: req.params.spec_type });
 	});
