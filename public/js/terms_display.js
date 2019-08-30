@@ -63,13 +63,10 @@ $(function () {
 		});
 	};
 
-	function taInput(e) {
-		if ($(this).hasClass("initial")) {
-			// console.log("ta change initial");
-			$(this).removeClass("initial");
-			// show save button
-			$(".commentsave, .commentcancel").css("visibility", "visible");
-		}
+	function taInput() {
+		const ta = $(this);
+		$(".commentsave, .commentcancel").css("visibility", "visible");
+		ta.css("height", ta.css("max-height")).removeClass("initial");
 	}
 
 	const commentToDb = (text) => {
@@ -109,23 +106,21 @@ $(function () {
 		} else if (fa.comment !== ta.val()) {
 			ta.val(fa.comment);
 		}
-		afterCommentEdit();
+		afterCommentEdit(ta);
 	}
 
 	function saveComment(e) {
-		// $('fotorama__arr fotorama__arr--prev').attr("disabled", true);
-
-		commentToDb($("#ta").val()).then(() => {
-			afterCommentEdit();
-
+		const ta = $("#ta")
+		commentToDb(ta.val()).then(() => {
+			afterCommentEdit(ta);
 		});
 		e.preventDefault();
 		return false;
 	}
 
-	function afterCommentEdit() {
+	function afterCommentEdit(ta) {
 		$(".commentsave, .commentcancel").css("visibility", "hidden");
-		$("#ta").addClass("initial");
+		ta.addClass("initial");
 	}
 
 	function loadStuff() {

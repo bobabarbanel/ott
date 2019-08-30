@@ -68,9 +68,9 @@ $(function () {
 		machine: true,
 		tabmenus: false
 	}).then(tabs => {
-		
 
-		
+
+
 		$('#magdiv').on('contextmenu', startMagImg);
 		ta.hide();
 
@@ -94,12 +94,12 @@ $(function () {
 			// process all the terms with fileRefs
 			$("#makeDefault").on('click', e => {
 				// make an image the Primary
-	
+
 				e.preventDefault();
 				const af = fotorama.activeFrame;
 				const old_primary = THE_PRIMARY;
 				THE_PRIMARY = fotorama.activeIndex;
-	
+
 				$.post({
 					// reset primary image in database
 					url: "/terms/set_spec_term_primary",
@@ -119,10 +119,10 @@ $(function () {
 								aRef.primary = index === THE_PRIMARY;
 							}
 						);
-	
+
 						fotorama.data[old_primary].primary = false;
 						fotorama.data[THE_PRIMARY].primary = true;
-	
+
 						setActive(true);
 					})
 					.fail(error => {
@@ -157,16 +157,11 @@ $(function () {
 				.trigger("change");
 		});
 	});
-	function taInput(e) {
-		if ($(this).hasClass("initial")) {
-			// console.log("ta change initial");
-			$(this).removeClass("initial");
-			// show save button
-			$(".commentsave, .commentcancel").css("visibility", "visible");
-		}
-		// else {
-		// 	console.log("ta input");
-		// }
+
+	function taInput() {
+		const ta = $(this);
+		$(".commentsave, .commentcancel").css("visibility", "visible");
+		ta.css("height", ta.css("max-height")).removeClass("initial");
 	}
 
 	const spec_type_id = () => SPEC_TYPE.toLowerCase() + "_tools";
@@ -199,18 +194,19 @@ $(function () {
 	};
 
 	function saveComment(e) {
-		const comment = $('#ta').val();
+		const ta = $('#ta')
+		const comment = ta.val();
 		const fa = fotorama.activeFrame;
 
 		commentToDb(comment).then(() => {
 			fa.comment = comment;
-			afterCommentEdit()
+			afterCommentEdit(ta)
 		});
 	}
 
-	function afterCommentEdit() {
+	function afterCommentEdit(ta) {
 		$(".commentsave, .commentcancel").css("visibility", "hidden");
-		$("#ta").addClass("initial");
+		ta.addClass("initial");
 	}
 
 	function restoreComment(e) {
@@ -222,7 +218,7 @@ $(function () {
 		} else if (fa.comment !== ta.val()) {
 			ta.val(fa.comment);
 		}
-		afterCommentEdit();
+		afterCommentEdit(ta);
 	}
 
 	async function loadStuff(section) {
@@ -237,7 +233,7 @@ $(function () {
 						data-nav="thumbs" 
 						data-width="100%" 
 						data-transition="crossfade" 
-						data-max-height="79%" 
+						data-max-height="81%" 
 						data-max-width="100%">
 					</div>`);
 		const ta = $("#ta").on("input", taInput);

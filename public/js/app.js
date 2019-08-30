@@ -624,14 +624,9 @@ function enable_menu(...theArgs) {
 				break;
 		}
 	});
-	//
-
-	// setup hand_tools menu
-	// setup inspection_tools menu
 }
 function showName(text, mleft, mtop) {
-	// const {top} = $element.position();
-	// console.log(parseInt($element.attr('item'))*21, mtop);
+
 	$('#showname').css('left', mleft + 5).css('top', mtop).text(text).show();
 }
 function hideName() {
