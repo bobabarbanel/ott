@@ -278,12 +278,14 @@ module.exports = function (dir, app, db) {
 			});
 			try {
 				// console.log(`running ${promises.length} updateOne promises`);;
-				const results = Promise.all(promises).then(
+				Promise.all(promises).then(
 					(results) => {
 						return { success: { changes: count } };
-					});
+					}
+					
+				)
 				// console.log("replace_others changes total", results.length);
-
+				
 			}
 			catch (error) {
 				console.error("replace_others updateOne", error);
@@ -625,9 +627,9 @@ module.exports = function (dir, app, db) {
 			return MAIN_TABLE.find(
 				{ "rows.cols": { $elemMatch: { $in: [term] } } },
 			).toArray().then(
-				 (docs) => {
+				async (docs) => {
 					// console.log("docs count", docs.length);
-					docs.forEach(
+					await docs.forEach(
 						async (doc) => {
 							let changed = false;
 							doc.rows.forEach(

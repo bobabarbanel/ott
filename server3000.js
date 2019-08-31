@@ -29,7 +29,7 @@ const port = process.env.port || 3000;
 const topRouter = require("./controllers/topRouter");
 // const fs = require('fs-extra');
 
-MongoClient.connect(url, {useNewUrlParser: true}, 
+MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true}, 
   (err, database) => {
     if (err) { return console.log("Mongo Error: " + err); }
     console.log("Mongo connected. Starting services.")
