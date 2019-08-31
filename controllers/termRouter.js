@@ -250,47 +250,48 @@ module.exports = function (dir, app, db) {
 	app.post("/terms/replace_others", (req, res) => {
 		let count = 0;
 		try {
-			const allDocs = MAIN_TABLE.find({
+			MAIN_TABLE.find({
 				"rows.cols": { $elemMatch: { $eq: req.body.previous } }
-			}).toArray();
-			// console.log("replace_others");
-			const promises = [];
+			}).toArray().then(
+				(allDocs) => {
+					const promises = [];
 
-			allDocs.forEach((doc) => {
-				// console.log("doc _id", doc._id);
-				let changed = false;
-				doc.rows.forEach((row) => {
-					let cols = row.cols;
-					for (let i = 0, max = cols.length; i < max; i++) {
-						if (cols[i] === req.body.previous) {
-							cols[i] = req.body.value;
-							changed = true;
+					allDocs.forEach((doc) => {
+						// console.log("doc _id", doc._id);
+						let changed = false;
+						doc.rows.forEach((row) => {
+							let cols = row.cols;
+							for (let i = 0, max = cols.length; i < max; i++) {
+								if (cols[i] === req.body.previous) {
+									cols[i] = req.body.value;
+									changed = true;
+								}
+							}
+						});
+
+						if (changed) {
+							promises.push(MAIN_TABLE.updateOne(
+								{ _id: doc._id },
+								{ $set: { rows: doc.rows } }
+							));
 						}
-					}
-				});
+					});
+					try {
+						// console.log(`running ${promises.length} updateOne promises`);;
+						Promise.all(promises).then(
+							(results) => {
+								return { success: { changes: count } };
+							}
+						)
+						// console.log("replace_others changes total", results.length);
 
-				if (changed) {
-					promises.push(MAIN_TABLE.updateOne(
-						{ _id: doc._id },
-						{ $set: { rows: doc.rows } }
-					));
+					}
+					catch (error) {
+						console.error("replace_others updateOne", error);
+						return { error: error };
+					}
 				}
-			});
-			try {
-				// console.log(`running ${promises.length} updateOne promises`);;
-				Promise.all(promises).then(
-					(results) => {
-						return { success: { changes: count } };
-					}
-
-				)
-				// console.log("replace_others changes total", results.length);
-
-			}
-			catch (error) {
-				console.error("replace_others updateOne", error);
-				return { error: error };
-			}
+			)
 		}
 		catch (error) {
 			console.error("replace_others overall", error);
