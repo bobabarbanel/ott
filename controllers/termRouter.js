@@ -627,10 +627,10 @@ module.exports = function (dir, app, db) {
 			return MAIN_TABLE.find(
 				{ "rows.cols": { $elemMatch: { $in: [term] } } }
 			).toArray().then(
-				async (docs) => {
+				(docs) => {
 					// console.log("docs count", docs.length);
-					await docs.forEach(
-						async (doc) => {
+					docs.forEach(
+						(doc) => {
 							let changed = false;
 							doc.rows.forEach(
 								row => {
@@ -647,9 +647,11 @@ module.exports = function (dir, app, db) {
 							);
 							if (changed) {
 								// console.log("update of", doc._id)
-								await MAIN_TABLE.updateOne(
+								MAIN_TABLE.updateOne(
 									{ _id: doc._id },
 									{ $set: { rows: doc.rows } }
+								).then(
+									() => { }
 								);
 								// console.log("done update of", doc._id)	
 							}
