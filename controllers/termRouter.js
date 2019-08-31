@@ -593,7 +593,8 @@ module.exports = function (dir, app, db) {
 					(update_result) => {
 						// console.log('remove_term_image update result', update_result);
 						remove_term_main_table(type, term).then(
-							(done) => res.json(update_result)
+							() => res.json(update_result),
+							(error) => res.json({ error: error })
 						);
 
 					});
@@ -606,6 +607,7 @@ module.exports = function (dir, app, db) {
 
 	function remove_term_main_table(fto, term) {
 		// NEEDS TRANSACTION
+
 		if (fto === 'function' || fto === 'type') {
 			const af = {};
 			af[`item.${fto}`] = term;
@@ -613,7 +615,7 @@ module.exports = function (dir, app, db) {
 			const setter = {};
 			setter[`rows.$[item].${fto}`] = "";
 
-			return MAIN_TABLE.updateMany(
+			MAIN_TABLE.updateMany(
 				{}, // all docs
 				{
 					$set: setter
@@ -624,7 +626,7 @@ module.exports = function (dir, app, db) {
 				}
 			);
 		} else {
-			return MAIN_TABLE.find(
+			MAIN_TABLE.find(
 				{ "rows.cols": { $elemMatch: { $in: [term] } } }
 			).toArray().then(
 				(docs) => {
@@ -650,8 +652,6 @@ module.exports = function (dir, app, db) {
 								MAIN_TABLE.updateOne(
 									{ _id: doc._id },
 									{ $set: { rows: doc.rows } }
-								).then(
-									() => { }
 								);
 								// console.log("done update of", doc._id)	
 							}

@@ -96,30 +96,24 @@ module.exports = function (dir, app, db) {
 		const spec_type = req.body.spec_type;
 		const jobId = req.body.jobId;
 		const type = spec_type.toLowerCase() + "_tools";
-		// console.log('/get_spec_image_filerefs jobId', jobId);
-		// console.log('/get_spec_image_filerefs type', type);
-		let job_terms;
 
 		try {
 			TOOL_TERMS.findOne({ _id: jobId }).then(
 				(job_terms) => {
-
-
-
 					if (job_terms === null || job_terms[type] === undefined || job_terms[type] === null) {
 						res.json(null);
 					} else {
 						let myPromise = SPEC_TERMS
 							.aggregate([
-								{ $match: /** * query - The query in MQL. */ { _id: type } },
+								{ $match:  { _id: type } },
 								{
-									$project: /** * specifications - The fields to *   include or exclude. */ {
+									$project:  {
 										_id: 0,
 										nextNum: 0
 									}
 								},
 								{
-									$unwind: /** * path - Path to the array field. * includeArrayIndex - Optional name for index. * preserveNullAndEmptyArrays - Optional *   toggle to unwind null and empty values. */ {
+									$unwind:  {
 										path: "$terms"
 									}
 								},

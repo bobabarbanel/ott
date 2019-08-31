@@ -532,7 +532,7 @@ function defineTable() {
 	return new Tabulator("#toolDataTable", {
 		pagination: "local",
 		paginationSize: 18,
-
+		
 		// TODO:
 		// first column is a button/trigger for diaply of the tools, starting at this
 		// turret,spindle,position,offset

@@ -85,7 +85,9 @@ content {
     margin-left: 2em;
     margin-top: 1em;
 }
-
+#toolDataTable {
+    width: 45%;
+}
 /* toolTable */
 
 .toolTable {
