@@ -53,16 +53,11 @@ pageheader > button {
 #container {
 	padding: 0;
 	margin: 20px;
-	width: auto;
+	/* width: auto; */
 	list-style: none;
 	border: 1px solid silver;
-	-ms-box-orient: horizontal;
-	display: -webkit-box;
-	display: -moz-box;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: -webkit-flex;
 	display: flex;
+	justify-content: flex-start;
 }
 
 .wrap {
