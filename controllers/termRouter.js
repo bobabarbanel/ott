@@ -720,7 +720,7 @@ module.exports = function (dir, app, db) {
 		}
 	});
 
-	app.post("/terms/update_term_image_comment", async (req, res) => {
+	app.post("/terms/update_term_image_comment", (req, res) => {
 		const { type, term, text, dir, filename } = req.body;
 		// console.log(req.body);
 		try {
