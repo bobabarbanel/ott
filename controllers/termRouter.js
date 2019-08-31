@@ -282,10 +282,10 @@ module.exports = function (dir, app, db) {
 					(results) => {
 						return { success: { changes: count } };
 					}
-					
+
 				)
 				// console.log("replace_others changes total", results.length);
-				
+
 			}
 			catch (error) {
 				console.error("replace_others updateOne", error);
@@ -625,7 +625,7 @@ module.exports = function (dir, app, db) {
 			);
 		} else {
 			return MAIN_TABLE.find(
-				{ "rows.cols": { $elemMatch: { $in: [term] } } },
+				{ "rows.cols": { $elemMatch: { $in: [term] } } }
 			).toArray().then(
 				async (docs) => {
 					// console.log("docs count", docs.length);
@@ -654,7 +654,7 @@ module.exports = function (dir, app, db) {
 								// console.log("done update of", doc._id)	
 							}
 						}
-					)
+					);
 				}
 			);
 		}
