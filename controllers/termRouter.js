@@ -247,10 +247,10 @@ module.exports = function (dir, app, db) {
 
 
 
-	app.post("/terms/replace_others", async (req, res) => {
+	app.post("/terms/replace_others", (req, res) => {
 		let count = 0;
 		try {
-			const allDocs = await MAIN_TABLE.find({
+			const allDocs = MAIN_TABLE.find({
 				"rows.cols": { $elemMatch: { $eq: req.body.previous } }
 			}).toArray();
 			// console.log("replace_others");
@@ -278,9 +278,12 @@ module.exports = function (dir, app, db) {
 			});
 			try {
 				// console.log(`running ${promises.length} updateOne promises`);;
-				const results = await Promise.all(promises);
+				const results = Promise.all(promises).then(
+					(results) => {
+						return { success: { changes: count } };
+					});
 				// console.log("replace_others changes total", results.length);
-				return { success: { changes: count } };
+
 			}
 			catch (error) {
 				console.error("replace_others updateOne", error);
@@ -622,9 +625,9 @@ module.exports = function (dir, app, db) {
 			return MAIN_TABLE.find(
 				{ "rows.cols": { $elemMatch: { $in: [term] } } },
 			).toArray().then(
-				async (docs) => {
+				 (docs) => {
 					// console.log("docs count", docs.length);
-					await docs.forEach(
+					docs.forEach(
 						async (doc) => {
 							let changed = false;
 							doc.rows.forEach(

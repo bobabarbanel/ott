@@ -92,7 +92,7 @@ module.exports = function (dir, app, db) {
 
 
 
-	app.post("/get_spec_image_filerefs", async (req, res) => {
+	app.post("/get_spec_image_filerefs", (req, res) => {
 		const spec_type = req.body.spec_type;
 		const jobId = req.body.jobId;
 		const type = spec_type.toLowerCase() + "_tools";
@@ -101,60 +101,65 @@ module.exports = function (dir, app, db) {
 		let job_terms;
 
 		try {
-			job_terms = await TOOL_TERMS.findOne({ _id: jobId });
-console.log({job_terms});
-			if (job_terms === null || job_terms[type] === undefined || job_terms[type] === null) {
-				res.json(null);
-			} else {
-				let myPromise = SPEC_TERMS
-					.aggregate([
-						{ $match: /** * query - The query in MQL. */ { _id: type } },
-						{
-							$project: /** * specifications - The fields to *   include or exclude. */ {
-								_id: 0,
-								nextNum: 0
+			TOOL_TERMS.findOne({ _id: jobId }).then(
+				(job_terms) => {
+
+
+
+					if (job_terms === null || job_terms[type] === undefined || job_terms[type] === null) {
+						res.json(null);
+					} else {
+						let myPromise = SPEC_TERMS
+							.aggregate([
+								{ $match: /** * query - The query in MQL. */ { _id: type } },
+								{
+									$project: /** * specifications - The fields to *   include or exclude. */ {
+										_id: 0,
+										nextNum: 0
+									}
+								},
+								{
+									$unwind: /** * path - Path to the array field. * includeArrayIndex - Optional name for index. * preserveNullAndEmptyArrays - Optional *   toggle to unwind null and empty values. */ {
+										path: "$terms"
+									}
+								},
+								{
+									$match: {
+										"terms.term": { $in: job_terms[type] }
+									}
+								},
+								{
+									$project: /** * specifications - The fields to *   include or exclude. */ {
+										term: "$terms.term",
+										size_of_files: { $size: "$terms.files" },
+										files: "$terms.files"
+									}
+								},
+								{
+									$match: /** * query - The query in MQL. */ {
+										size_of_files: { $gt: 0 }
+									}
+								},
+								{
+									$sort: /** * Provide any number of field/order pairs. */ {
+										term: 1
+									}
+								}
+							])
+							.toArray();
+						myPromise.then(
+							result => {
+								console.log({ result })
+								return res.json(result);
+							},
+							error => {
+								console.log("/get_spec_image_filerefs", error);
+								return res.status(500).json(error);
 							}
-						},
-						{
-							$unwind: /** * path - Path to the array field. * includeArrayIndex - Optional name for index. * preserveNullAndEmptyArrays - Optional *   toggle to unwind null and empty values. */ {
-								path: "$terms"
-							}
-						},
-						{
-							$match: {
-								"terms.term": { $in: job_terms[type] }
-							}
-						},
-						{
-							$project: /** * specifications - The fields to *   include or exclude. */ {
-								term: "$terms.term",
-								size_of_files: { $size: "$terms.files" },
-								files: "$terms.files"
-							}
-						},
-						{
-							$match: /** * query - The query in MQL. */ {
-								size_of_files: { $gt: 0 }
-							}
-						},
-						{
-							$sort: /** * Provide any number of field/order pairs. */ {
-								term: 1
-							}
-						}
-					])
-					.toArray();
-				myPromise.then(
-					result => {
-						console.log({result})
-						return res.json(result);
-					},
-					error => {
-						console.log("/get_spec_image_filerefs", error);
-						return res.status(500).json(error);
+						);
 					}
-				);
-			}
+				}
+			);
 		} catch (err) {
 			// console.log("/get_spec_image_filerefs", error);
 			return res.status(500).json("error: finding tool_terms for job");
@@ -985,7 +990,7 @@ console.log({job_terms});
 		// TODO: should also archive all images for tools and tabs
 		const jobId = req.body.key4id;
 		const action = req.body.action; // true -> archive, false, unArchive
-console.log("/archiveJob", {jobId,action});
+		console.log("/archiveJob", { jobId, action });
 		if (action) {
 			MAIN
 				.updateOne(
