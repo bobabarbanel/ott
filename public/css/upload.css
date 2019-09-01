@@ -15,6 +15,13 @@ content {
 }
 .undefined {
     color: rgb(179, 178, 178);
+    font-weight: lighter;
+}
+.finput, .tinput {
+    font-weight: bold;
+}
+.td_defined {
+    background: #EEE;
 }
 
 table,

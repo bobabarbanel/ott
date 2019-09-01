@@ -192,19 +192,22 @@ function paintPage(machineSpecs, toolData) {
 
 			// Function Name
 			td = $("<td />");
-
+			let hasVal = false;
 			if (tData.function !== "N/A") {
 				let f_input = $('<span class="finput" name="function" type="text"/>');
 				f_input.attr("id", idStr(link, "function"));
-				if(tData.function === '') {
+				if (tData.function === '') {
 					f_input.text('undefined');
 					f_input.addClass('undefined');
+
 				} else {
 					f_input.text(tData.function);
+					hasVal = true;
 				}
 				f_input.removeClass("noval");
 				f_input.prop("disabled", true);
 				td.append(f_input);
+				if (hasVal) td.addClass('td_defined');
 			} else {
 				u_input.hide();
 			}
@@ -213,20 +216,22 @@ function paintPage(machineSpecs, toolData) {
 
 			// Type Name
 			td = $("<td />");
-
+			hasVal = false;
 			if (tData.type !== "N/A") {
 				let t_input = $('<span class="tinput" name="type" type="text"/>');
 				t_input.attr("id", idStr(link, "type"));
-				if(tData.type === '') {
+				if (tData.type === '') {
 					t_input.text('undefined');
 					t_input.addClass('undefined');
 				} else {
 					t_input.text(tData.type);
+					hasVal = true;
 				}
-				
+
 				t_input.removeClass("noval");
 				t_input.prop("disabled", true);
 				td.append(t_input);
+				if (hasVal) td.addClass('td_defined');
 			} else {
 				u_input.hide();
 			}
