@@ -4,7 +4,7 @@ body {
 
 job {
     position: fixed;
-    top: 110px;
+    top: 125px;
     left: 3em;
     z-index: 200;
     font-size: 1.17em;
@@ -150,7 +150,7 @@ top {
 
 .jobtitle {
     font-size: 24px;
-    margin-right: 1em;
+    margin-right: 6em;
 }
 
 .controls {
