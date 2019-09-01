@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"parts.spec_terms"},{"v":2,"key":{"terms.term":1},"name":"terms_term","ns":"parts.spec_terms"}],"uuid":"87a4c5a9e8e9457aa90236325f99def8"}
