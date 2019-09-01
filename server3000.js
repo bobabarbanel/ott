@@ -53,11 +53,6 @@ MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true},
     // loads routers, and provides access there to these variables
     topRouter(dir, app, db);
 
-    /////////////DEBUG
-    // const today = new Date();
-    // fs.writeFileSync('undoLog.txt', '---------' + today.toString() + "\n");
-    /////////////DEBUG
-
     app.listen(port, () => {
       console.log('Listening on ' + port + '. Mongo "parts" is connected');
     });

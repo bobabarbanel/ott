@@ -60,14 +60,6 @@ $(function () {
 			}
 			else {}
 		});
-		$("#upload").on('click', (e) => {
-			if(SPEC_TYPE === 'hand_tools') {
-				useSameDestination(e, "/spec_tools_assign/Hand");
-			} else if(SPEC_TYPE === 'inspection_tools') {
-				useSameDestination(e, "/spec_tools_assign/Inspection");
-			}
-			else {}
-		});
 		
 		$("#filter-value").keyup(() =>
 			TABLE.setFilter("term", "like", $("#filter-value").val())
