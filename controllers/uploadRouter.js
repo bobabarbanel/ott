@@ -570,7 +570,7 @@ module.exports = function (dir, app, db) {
 		let promises = Object.keys(req.body.fileinfo).map(identifier => {
 			let p = new Promise((resolve, reject) => {
 				let _id = new ObjectId(identifier);
-				console.log('/archiveToolImages', identifier);
+				// console.log('/archiveToolImages', identifier);
 				let filenames = req.body.fileinfo[identifier];
 
 				let query = {
@@ -1017,23 +1017,23 @@ module.exports = function (dir, app, db) {
 			);
 			promise.then(
 				doc => {
-					console.log(doc);
+					// console.log(doc);
 					let nextNum;
 					
 					let _id;
 					if (doc.lastErrorObject !== undefined
 						&&
 						doc.lastErrorObject.updatedExisting === false) {
-						console.warn('1 updatedExisting', false);
+						// console.warn('1 updatedExisting', false);
 						nextNum = 0;
 						_id = doc.lastErrorObject.upserted;
-						console.warn('_id', _id);
+						// console.warn('_id', _id);
 					} else {
-						console.warn('2 updatedExisting', true);
+						// console.warn('2 updatedExisting', true);
 						nextNum = doc.value.nextNum;
 						_id = doc.value._id;
 					}
-					console.log({_id,nextNum});
+					// console.log({_id,nextNum});
 					
 					processSpecUploads(
 						fields.tab,

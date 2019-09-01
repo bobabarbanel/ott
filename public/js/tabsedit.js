@@ -526,12 +526,12 @@ $(function () {
 	}
 	function blurring(e) {
 		e.preventDefault();
-		console.log("blur", e.target);
+		// console.log("blur", e.target);
 		// debugger;
 		let target = $(e.target);
-		console.log("\ttab\t", target.hasClass('tabstyle'));
-		console.log("\tsection\t", target.hasClass('sectionstyle'));
-		console.log("\tstep\t", target.hasClass('stepstyle'));
+		// console.log("\ttab\t", target.hasClass('tabstyle'));
+		// console.log("\tsection\t", target.hasClass('sectionstyle'));
+		// console.log("\tstep\t", target.hasClass('stepstyle'));
 		if (target.hasClass('tabstyle') ||
 			target.hasClass('sectionstyle') ||
 			target.hasClass('stepstyle')) return;

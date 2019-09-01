@@ -313,7 +313,7 @@ function setArchiveForToolImages(list) {
             allIW.wrap.css('display', 'none');
 
             let _id = image.closest('.pic').attr('collection');
-            console.log("list img collection", _id);
+            // console.log("list img collection", _id);
             let filename = image.attr('filename');
             if (data[_id] === undefined) {
                 data[_id] = [];

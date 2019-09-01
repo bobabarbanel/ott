@@ -296,8 +296,8 @@ $(function () {
 			$("#magimg").css({
 				width: src_width + 20
 			});
-			console.log('small', src_small);
-			console.log('large', src_large);
+			// console.log('small', src_small);
+			// console.log('large', src_large);
 
 			VIEWER.load(src_small, src_large);
 		}

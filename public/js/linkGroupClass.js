@@ -11,7 +11,7 @@ class LinkGroup {
         this.prev = prev;
         this.next = next;
         this.link = link;
-        console.log({prev, next, start, stop, link});
+        // console.log({prev, next, start, stop, link});
     }
 
     getPrev() {

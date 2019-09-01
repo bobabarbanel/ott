@@ -261,7 +261,7 @@ class Util {
 				dataType: "json"
 			})
 				.done(result => {
-					console.log("getOneTabsData", result);
+					// console.log("getOneTabsData", result);
 					resolve(result);
 				})
 

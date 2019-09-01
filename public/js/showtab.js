@@ -173,7 +173,7 @@ $(function () {
 						`<div class="step pic" id="pic${step_target}" images_id="${step.images_id}"></div>`
 					);
 					links.push(["#pic" + step_target, step.stepName]);
-					console.log("step", JSON.stringify(step));
+					// console.log("step", JSON.stringify(step));
 					if (curLG !== null) {
 						// have a group?
 						if (curLG.getStart() !== curLG.getStop()) {
@@ -294,7 +294,7 @@ $(function () {
 			if (curLG.getStop() === null || curLG.getStop() === 0) { // no images at all
 				curLG = null;
 			} else {
-				console.log("close loop");
+				// console.log("close loop");
 				curLG.getPrev().setNext(null);
 				curLG = curLG.getPrev();
 				// form circle so that UP and DOWN arrows move in continuous circle
@@ -335,7 +335,7 @@ $(function () {
 				prev.append($("<li/>").append(a2));
 			}
 		});
-		console.log(links.forEach(l => console.log(l)));
+		// console.log(links.forEach(l => console.log(l)));
 		float.append($("</ul>")).addClass("showfloat"); // hide to start
 	}
 
@@ -358,7 +358,7 @@ $(function () {
 		});
 
 		TV.setDeleteButtons("deleting");
-		console.log(JSON.stringify(data));
+		// console.log(JSON.stringify(data));
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: "/archiveTabImages",

@@ -49,7 +49,7 @@ async function getAllTerms() {
                     dataType: "json"
                 })
                     .done(docs => {
-                        console.log({tfo, docs});
+                        // console.log({tfo, docs});
                         WORDLISTS[tfo] = {};
                         docs.forEach(
                             doc => {
@@ -207,11 +207,11 @@ function addTerm(term, type) {
             }
         })
             .done(results => {
-                console.log('/addTerm', results);
+                // console.log('/addTerm', results);
                 resolve(results);
             })
             .fail(error => {
-                alert("/addTerm Error " + JSON.stringify(error, null, 4));
+                console.log("/addTerm Error " + JSON.stringify(error, null, 4));
                 reject(error);
             });
     });

@@ -201,7 +201,7 @@ $(function () {
 			let pName = found.pName;
 			// Empty pName ??-- fill it in, or wrong pName -- also fill it in
 			KEY5['pName'] = pName;
-			console.log(189, "=1");
+			// console.log(189, "=1");
 			STATUS['pName'] = 1;
 			// Indicate change using visual cue
 			$(insertSelector, "#new_key_input ").val(pName).toggleClass("pnamealert");
