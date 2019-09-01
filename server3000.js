@@ -59,7 +59,7 @@ MongoClient.connect(url, {useNewUrlParser: true, useUnifiedTopology: true},
     /////////////DEBUG
 
     app.listen(port, () => {
-      console.log('Ott App listening on ' + port + '. Mongo "parts" is connected');
+      console.log('Listening on ' + port + '. Mongo "parts" is connected');
     });
 
   });
