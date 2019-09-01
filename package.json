@@ -1,7 +1,7 @@
 {
   "name": "mnode",
   "version": "1.0.0",
-  "description": "Ott website Node using MongoDB",
+  "description": "Jeff website Node using MongoDB",
   "main": "index.js",
   "private": true,
   "dependencies": {

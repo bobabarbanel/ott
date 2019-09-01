@@ -180,23 +180,6 @@ $(function () {
     // set event handlers for this page
     const setUp = function () { // TODO: Consider same navigation as other pages?
         hideSpin();
-
-        // Prepare "buttons" on NAV bar
-        // $("#nav_1").append($('<button id="home_button" class="navButton"><img src="/img/Ott.jpg" alt="Home" class="imageButton"></button>'));
-        // $("#nav_2").append($('<button id="tabedit_button" class="navButton"><i class="far fa-edit fa-lg"></i>&nbsp;&nbsp;Edit Tabs</button>'));
-        // $("#nav_3").html('');
-        // $("#nav_4").append($('<button id="run" tabindex="1" class="active navButton" type="button"><i class="fas fa-bolt fa-lg"></i>&nbsp;&nbsp;Main</button>'));
-
-
-        // $('#nav_2 .navButton').on('click', () => {
-        //     Util.openInSameTab("/tabs/tabsedit.html");
-        // });
-        // $('#nav_1 .navButton').on('click', () => {
-        //     Util.openInSameTab("/");
-        // });
-        // $('#nav_4 .navButton').on('click', () => {
-        //     Util.openInSameTab("/tabs/main.html");
-        // });
     };
 
 
