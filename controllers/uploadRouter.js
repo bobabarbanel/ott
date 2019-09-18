@@ -517,7 +517,7 @@ module.exports = function (dir, app, db) {
 
 		return TAB_IMAGES.updateOne(
 			{
-				_id: key4id
+				job: key4id
 			},
 			{
 				$push: {
@@ -622,7 +622,7 @@ module.exports = function (dir, app, db) {
 		TAB_IMAGES
 			.updateOne(
 				{
-					_id: req.body.job_id
+					job: req.body.job_id
 				},
 				{
 					$set: {
@@ -660,7 +660,7 @@ module.exports = function (dir, app, db) {
 		TAB_IMAGES
 			.updateOne(
 				{
-					_id: req.body.job_id
+					job: req.body.job_id
 				},
 				{
 					$set: {
@@ -740,33 +740,42 @@ module.exports = function (dir, app, db) {
 	});
 
 	app.post("/updateImageComment", (req, res) => {
-		IMAGES //TODO: remove collection
-			.updateOne(
+		if (req.body.imageType === "images") {
+			updateImageComment(req, res);
+		}
+		else {
+			updateTABImageComment(req, res);
+		}
+	});
+	function updateImageComment(req, res) {
+		const COLLECTION = IMAGES;
+		const set = {
+			$set: { "files.$[elem].comment": req.body.comment }
+		};
+		const query = { _id: new ObjectId(req.body._id) };
+		const af = {
+			arrayFilters: [
 				{
-					_id: new ObjectId(req.body._id)
-				},
-				{
-					$set: {
-						"files.$[elem].comment": req.body.comment
-					}
-				},
-				{
-					arrayFilters: [
+					$and: [
 						{
-							$and: [
-								{
-									"elem.filename": req.body.filename
-								},
-								{
-									"elem.dir": req.body.dir
-								},
-								{
-									"elem.archived": false
-								}
-							]
+							"elem.filename": req.body.filename
+						},
+						{
+							"elem.dir": req.body.dir
+						},
+						{
+							"elem.archived": false
 						}
 					]
 				}
+			]
+		};
+
+		COLLECTION
+			.updateOne(
+				query,
+				set,
+				af
 			)
 			.then(
 				doc => {
@@ -777,7 +786,47 @@ module.exports = function (dir, app, db) {
 					res.json(err);
 				}
 			);
-	});
+	};
+	function updateTABImageComment(req, res) {
+		const COLLECTION = TAB_IMAGES;
+		const set = {
+			$set: { "stepFiles.$[elem].comment": req.body.comment }
+		};
+		const query = { job: req.body._id };
+		const af = {
+			arrayFilters: [
+				{
+					$and: [
+						{
+							"elem.filename": req.body.filename
+						},
+						{
+							"elem.dir": req.body.dir
+						},
+						{
+							"elem.archived": false
+						}
+					]
+				}
+			]
+		};
+
+		COLLECTION
+			.updateOne(
+				query,
+				set,
+				af
+			)
+			.then(
+				doc => {
+					res.json(doc);
+				},
+				err => {
+					console.log("updateImageComment error " + JSON.stringify(err));
+					res.json(err);
+				}
+			);
+	};
 
 	app.post("/restoreDbImages", (req, res) => {
 		let query = req.body.query;
@@ -1019,7 +1068,7 @@ module.exports = function (dir, app, db) {
 				doc => {
 					// console.log(doc);
 					let nextNum;
-					
+
 					let _id;
 					if (doc.lastErrorObject !== undefined
 						&&
@@ -1034,7 +1083,7 @@ module.exports = function (dir, app, db) {
 						_id = doc.value._id;
 					}
 					// console.log({_id,nextNum});
-					
+
 					processSpecUploads(
 						fields.tab,
 						fields.term,
@@ -1284,7 +1333,8 @@ module.exports = function (dir, app, db) {
 				TAB_IMAGES
 					.updateOne(
 						{
-							_id: doc._id
+							_id: doc._id,
+							job: doc._id
 						},
 						{
 							$setOnInsert: {
@@ -1384,7 +1434,7 @@ module.exports = function (dir, app, db) {
 			// debugLog("form key4id", key4id);
 
 			let query = {
-				_id: key4id
+				job: key4id
 			};
 
 			let machine = key4id.split("|")[3];
@@ -1497,7 +1547,7 @@ module.exports = function (dir, app, db) {
 			.aggregate([
 				{
 					$match: /** * query - The query in MQL. */ {
-						_id: req.body.job_id
+						job: req.body.job_id
 					}
 				},
 				{

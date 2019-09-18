@@ -102,7 +102,8 @@ $(function () {
 				$(this),
 				prev,
 				dirPathToImages,
-				setTitlesForSingle
+				setTitlesForSingle,
+				"tab_images"
 			); // show image in <single> container
 		}
 	}

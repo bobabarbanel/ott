@@ -83,7 +83,7 @@ function imgClick() { // when small image clicked to show larger image
     if (TV.deleteMode) {
         TV.flipImgDelState($(this)); // allow to flip state of one image
     } else {
-        TV.showSingleLargeImage($(this), prev, dirPathToImages, setTitlesForSingle); // show image in <single> container
+        TV.showSingleLargeImage($(this), prev, dirPathToImages, setTitlesForSingle, "images"); // show image in <single> container
     }
 }
 

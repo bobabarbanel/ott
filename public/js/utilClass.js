@@ -277,7 +277,7 @@ class Util {
 			$.post({
 				url: "/get_tab_images_counts",
 				data: {
-					_id: key4id
+					job: key4id
 				},
 				dataType: "json"
 			})

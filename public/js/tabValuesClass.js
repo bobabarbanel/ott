@@ -113,21 +113,25 @@ class TabValues {
         TabValues.catchKeys('off', 'keydown');
     }
 
-    static dbUpdateImageComment(img) {
+    static dbUpdateImageComment(img, imageType) {
+
+        const data=  {
+            _id: (imageType === "images") ? img.attr("_id") : img.attr("job"),
+            filename: img.attr('filename'),
+            dir: img.attr('dir'),
+            comment: img.attr('comment'),
+            imageType: imageType
+        };
+        // console.log(data);
         return new Promise((resolve, reject) => {
             $.ajax({
                     url: "/updateImageComment",
                     type: 'post',
-                    data: {
-                        "_id": img.attr("_id"),
-                        "filename": img.attr('filename'),
-                        "dir": img.attr('dir'),
-                        "comment": img.attr('comment')
-                    },
+                    data: data,
                     dataType: 'json'
                 })
                 .done(result => {
-                    //alert("updateImageComment " + JSON.stringify(result));
+                    // alert("updateImageComment " + JSON.stringify(result));
                     resolve(result);
                 })
                 .fail((request, status, error) => reject(error));
@@ -221,7 +225,7 @@ class TabValues {
                         ev.data.img.attr("comment", text);
                         // $(ev.target).text(text);
                         $(".comment").text(text);
-                        TabValues.updateComment(ev.data.img);
+                        TabValues.updateComment(ev.data.img, ev.data.imageType);
                         // $.alert('New text ' + text);
                         TabValues.catchKeys("single");
                     }
@@ -521,7 +525,7 @@ class TabValues {
         return false;
     }
 
-    static showSingleLargeImage(this_img, prev, dirPathToImages, setTitlesForSingle) {
+    static showSingleLargeImage(this_img, prev, dirPathToImages, setTitlesForSingle, imageType) {
         this_img.closest('.pic').addClass('highlight'); // visible mark for clicked image
     
         let wrapper = this_img.closest('.img-wrap'); // wrapper for the clicked image
@@ -564,7 +568,8 @@ class TabValues {
             .on("click",
                 null, {
                     img: this_img, // has _id, filename and dir
-                    collection: this_img.closest('.pic').attr('collection')
+                    collection: this_img.closest('.pic').attr('collection'),
+                    imageType: imageType
                 },
                 TabValues.editComment);
         if (narrowImage) { // comment shows next to image
@@ -641,11 +646,11 @@ class TabValues {
     
     }
 
-    static updateComment(img) { //RMA INWORK
+    static updateComment(img,imageType) { //RMA INWORK
         // modify the db
-        TabValues.dbUpdateImageComment(img).then(
+        TabValues.dbUpdateImageComment(img, imageType).then(
             () => {
-                //alert("db updated comment");
+                // alert("db updated comment");
             },
             () => {
                 alert("failure: db NOT updated comment");

@@ -835,7 +835,7 @@ module.exports = function (dir, app, db) {
 			.aggregate([
 				{
 					$match: /** * query - The query in MQL. */ {
-						_id: req.body.key4id
+						job: req.body.key4id
 					}
 				},
 				{
@@ -944,7 +944,7 @@ module.exports = function (dir, app, db) {
 	}
 	function tabCount(jobId) {
 		const query = {
-			_id: jobId
+			job: jobId
 		};
 		// want ONLY those docs which have active images
 		// console.log(JSON.stringify(query));

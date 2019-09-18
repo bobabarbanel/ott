@@ -4,11 +4,10 @@
     background-color: #333;
     overflow: hidden;
     width: 100%;
-    
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 99;
+    z-index: 800;
     height: 4em;
     display: flex;
     justify-content: flex-start;

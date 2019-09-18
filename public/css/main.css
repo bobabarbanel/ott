@@ -28,7 +28,7 @@ content {
     color: rgb(175, 111, 14);
     font-size: 40px !important;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 700;
 }
 
 .tabouter {
